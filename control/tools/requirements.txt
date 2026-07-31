@@ -1,0 +1,6 @@
+# 仿真可视化工具依赖
+# 系统已安装（apt）：python3-matplotlib, python3-numpy
+# 若需在虚拟环境中安装，可执行：
+#   pip install -r requirements.txt
+matplotlib>=3.5
+numpy>=1.20

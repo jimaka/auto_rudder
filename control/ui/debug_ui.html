@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>自动舵调试界面</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Microsoft YaHei","Segoe UI",sans-serif; font-size: 13px;
+         background: #1e1e2e; color: #cdd6f4; }
+  #app { display: grid; grid-template-rows: 48px 1fr 120px; height: 100vh; }
+  #topbar { display: flex; align-items: center; padding: 0 16px; gap: 16px;
+           background: #181825; border-bottom: 1px solid #313244; }
+  #topbar h1 { font-size: 15px; font-weight: 600; color: #cba6f7; }
+  #topbar .group { display: flex; align-items: center; gap: 8px; }
+  #topbar label { color: #a6adc8; }
+  select, input, button { background: #313244; color: #cdd6f4; border: 1px solid #45475a;
+    border-radius: 4px; padding: 4px 8px; font-size: 13px; }
+  button { cursor: pointer; }
+  button:hover { background: #45475a; }
+  button.primary { background: #89b4fa; color: #1e1e2e; border-color: #89b4fa; font-weight: 600; }
+  button.danger  { background: #f38ba8; color: #1e1e2e; border-color: #f38ba8; font-weight: 600; }
+  button.success { background: #a6e3a1; color: #1e1e2e; border-color: #a6e3a1; font-weight: 600; }
+  .led { width: 10px; height: 10px; border-radius: 50%; background: #585b70; display: inline-block; }
+  .led.on { background: #a6e3a1; box-shadow: 0 0 6px #a6e3a1; }
+  .led.warn { background: #f9e2af; }
+  .led.err { background: #f38ba8; }
+  #main { display: grid; grid-template-columns: 280px 1fr 280px; gap: 8px; padding: 8px; overflow: hidden; }
+  .panel { background: #181825; border: 1px solid #313244; border-radius: 6px; padding: 8px; overflow-y: auto; }
+  .panel h2 { font-size: 13px; color: #89b4fa; margin-bottom: 6px; border-bottom: 1px solid #313244; padding-bottom: 4px; }
+  .panel h3 { font-size: 12px; color: #f9e2af; margin: 10px 0 4px 0; }
+  .field { display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .field label { color: #a6adc8; }
+  .field input { width: 100%; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th, td { border: 1px solid #313244; padding: 3px 5px; text-align: center; }
+  th { background: #313244; color: #cba6f7; }
+  td input { width: 56px; padding: 2px 4px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 12px; }
+  .stat-grid div { background: #313244; padding: 4px 6px; border-radius: 4px; }
+  .stat-grid b { color: #a6e3a1; }
+  .maneuver-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .maneuver-btns button { padding: 6px; }
+  #plots { display: grid; grid-template-rows: 1fr 1fr 1fr; gap: 6px; }
+  .plot-box { background: #181825; border: 1px solid #313244; border-radius: 6px; position: relative; }
+  .plot-box canvas { width: 100%; height: 100%; display: block; }
+  .plot-box .title { position: absolute; top: 4px; left: 8px; font-size: 12px; color: #a6adc8; z-index: 2; }
+  #log { background: #181825; border-top: 1px solid #313244; padding: 8px; overflow-y: auto; font-family: monospace; font-size: 12px; }
+  .log-line { color: #a6adc8; }
+  .log-line.info { color: #89b4fa; }
+  .log-line.warn { color: #f9e2af; }
+  .log-line.err  { color: #f38ba8; }
+  .log-line.ok   { color: #a6e3a1; }
+  .tabs { display: flex; gap: 2px; margin-bottom: 6px; }
+  .tabs button { flex: 1; padding: 4px; font-size: 11px; }
+  .tabs button.active { background: #89b4fa; color: #1e1e2e; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .slider-row { margin-bottom: 6px; }
+  .slider-row label { display: flex; justify-content: space-between; font-size: 12px; color: #a6adc8; margin-bottom: 2px; }
+  .slider-row span { color: #a6e3a1; font-weight: 600; }
+  .slider-row input[type=range] { width: 100%; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- Top bar -->
+  <div id="topbar">
+    <h1>🚢 自动舵调试界面</h1>
+    <div class="group">
+      <label>模式</label>
+      <select id="modeSel">
+        <option value="MANUAL">MANUAL</option>
+        <option value="AUTO_HEADING" selected>AUTO_HEADING</option>
+        <option value="AUTO_MANEUVER">AUTO_MANEUVER</option>
+        <option value="HOLD">HOLD</option>
+      </select>
+    </div>
+    <div class="group">
+      <label>航向目标°</label>
+      <input type="number" id="headingRef" value="0" step="1" style="width:70px">
+      <button id="applyHeadingBtn" class="primary">应用</button>
+    </div>
+    <div class="group">
+      <label>仿真</label>
+      <button id="simStartBtn" class="success">启动</button>
+      <button id="simStopBtn" class="danger">停止</button>
+    </div>
+    <div class="group">
+      <label>连接</label>
+      <input type="text" id="wsUrl" value="ws://localhost:8080" style="width:160px">
+      <button id="wsConnBtn">连接 ECU</button>
+      <span class="led" id="connLed"></span>
+    </div>
+    <div class="group">
+      <label>数据</label>
+      <button id="exportCsvBtn" class="primary">导出 CSV</button>
+      <button id="exportJsonBtn">导出 JSON</button>
+      <button id="clearHistBtn" class="danger">清空</button>
+    </div>
+    <div class="group" style="margin-left:auto">
+      <label>状态</label><span class="led on" id="statusLed"></span>
+      <span id="statusText">就绪</span>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div id="main">
+    <!-- Left: parameters -->
+    <div class="panel" id="leftPanel">
+      <h2 style="color:#a6e3a1">🎚 实时调节滑块</h2>
+      <div class="slider-row">
+        <label>Kp <span id="sl_Kp_v">1.50</span></label>
+        <input type="range" id="sl_Kp" min="0" max="5" step="0.01" value="1.5">
+      </div>
+      <div class="slider-row">
+        <label>Kd <span id="sl_Kd_v">0.60</span></label>
+        <input type="range" id="sl_Kd" min="0" max="2" step="0.01" value="0.6">
+      </div>
+      <div class="slider-row">
+        <label>航向目标 <span id="sl_hdg_v">0°</span></label>
+        <input type="range" id="sl_hdg" min="-180" max="180" step="1" value="0">
+      </div>
+      <div class="slider-row">
+        <label>船速 <span id="sl_spd_v">10 kn</span></label>
+        <input type="range" id="sl_spd" min="0" max="25" step="0.5" value="10">
+      </div>
+      <div class="slider-row">
+        <label>海况 <span id="sl_sea_v">1</span></label>
+        <input type="range" id="sl_sea" min="0" max="3" step="1" value="1">
+      </div>
+      <div class="tabs">
+        <button class="active" data-tab="pd">PD</button>
+        <button data-tab="sched">调度</button>
+        <button data-tab="id">辨识</button>
+        <button data-tab="tuner">优化</button>
+      </div>
+
+      <div class="tab-content active" id="tab-pd">
+        <h2>PD 控制器参数</h2>
+        <div class="field"><label>Kp</label><input type="number" id="pd_Kp" value="1.5" step="0.05"></div>
+        <div class="field"><label>Kd</label><input type="number" id="pd_Kd" value="0.6" step="0.05"></div>
+        <div class="field"><label>舵角限幅°</label><input type="number" id="pd_dMax" value="35" step="1"></div>
+        <div class="field"><label>舵速限幅°/s</label><input type="number" id="pd_ddMax" value="10" step="0.5"></div>
+        <div class="field"><label>死区°</label><input type="number" id="pd_deadzone" value="0.3" step="0.05"></div>
+        <div class="field"><label>滤波τ s</label><input type="number" id="pd_tau" value="0.2" step="0.05"></div>
+        <div class="field"><label>量化°</label><input type="number" id="pd_quant" value="0.1" step="0.05"></div>
+        <div class="field"><label>周期 s</label><input type="number" id="pd_dt" value="0.02" step="0.01"></div>
+        <button id="pdApplyBtn" class="primary" style="width:100%;margin-top:6px">应用 PD 参数</button>
+      </div>
+
+      <div class="tab-content" id="tab-sched">
+        <h2>增益调度表</h2>
+        <p style="font-size:11px;color:#a6adc8;margin-bottom:4px">船速/海况 → Kp/Kd</p>
+        <table id="schedTable">
+          <tr><th>min</th><th>max</th><th>海况</th><th>Kp</th><th>Kd</th><th></th></tr>
+        </table>
+        <button id="schedAddBtn" style="width:100%;margin-top:4px">+ 新增行</button>
+        <button id="schedApplyBtn" class="primary" style="width:100%;margin-top:4px">应用调度表</button>
+      </div>
+
+      <div class="tab-content" id="tab-id">
+        <h2>Nomoto 辨识参数</h2>
+        <div class="field"><label>遗忘因子λ</label><input type="number" id="id_lambda" value="0.98" step="0.005"></div>
+        <div class="field"><label>周期 s</label><input type="number" id="id_dt" value="0.02" step="0.01"></div>
+        <div class="field"><label>δ激励°</label><input type="number" id="id_deltaMin" value="3" step="0.5"></div>
+        <div class="field"><label>r激励°/s</label><input type="number" id="id_rMin" value="0.5" step="0.1"></div>
+        <div class="field"><label>P0初值</label><input type="number" id="id_p0" value="1000000" step="100000"></div>
+        <button id="idApplyBtn" class="primary" style="width:100%;margin-top:6px">应用辨识参数</button>
+        <button id="idResetBtn" class="danger" style="width:100%;margin-top:4px">重置辨识器</button>
+      </div>
+
+      <div class="tab-content" id="tab-tuner">
+        <h2>自动优化参数</h2>
+        <div class="field"><label>ζ目标</label><input type="number" id="at_zeta" value="0.85" step="0.05"></div>
+        <div class="field"><label>ωn rad/s</label><input type="number" id="at_wn" value="0.20" step="0.05"></div>
+        <h3>ESC</h3>
+        <div class="field"><label>扰动幅</label><input type="number" id="at_escAmp" value="0.05" step="0.01"></div>
+        <div class="field"><label>扰动频率</label><input type="number" id="at_escFreq" value="0.05" step="0.01"></div>
+        <div class="field"><label>步长η</label><input type="number" id="at_escStep" value="0.02" step="0.01"></div>
+        <h3>性能权重</h3>
+        <div class="field"><label>wU</label><input type="number" id="at_wU" value="0.01" step="0.005"></div>
+        <div class="field"><label>wDu</label><input type="number" id="at_wDu" value="0.005" step="0.005"></div>
+        <h3>安全约束</h3>
+        <div class="field"><label>更新幅≤</label><input type="number" id="at_maxUpd" value="0.10" step="0.01"></div>
+        <div class="field"><label>ζmin</label><input type="number" id="at_zetaMin" value="0.6" step="0.05"></div>
+        <div class="field"><label>ωn max</label><input type="number" id="at_wnMax" value="0.5" step="0.05"></div>
+        <div class="field"><label>振荡°</label><input type="number" id="at_oscMax" value="5" step="0.5"></div>
+        <div class="field"><label>高速去激活kn</label><input type="number" id="at_hsDeact" value="15" step="1"></div>
+        <div class="field"><label>窗口 s</label><input type="number" id="at_window" value="60" step="5"></div>
+        <button id="atApplyBtn" class="primary" style="width:100%;margin-top:6px">应用优化参数</button>
+      </div>
+    </div>
+    <!-- Center: plots -->
+    <div id="plots">
+      <div class="plot-box">
+        <div class="title">航向（蓝=实际 / 红=目标）°</div>
+        <canvas id="plotHeading"></canvas>
+      </div>
+      <div class="plot-box">
+        <div class="title">舵角（绿=指令 / 黄=实际）°</div>
+        <canvas id="plotRudder"></canvas>
+      </div>
+      <div class="plot-box">
+        <div class="title">航向误差° / 转向率 °/s</div>
+        <canvas id="plotError"></canvas>
+      </div>
+    </div>
+
+    <!-- Right: status & maneuvers -->
+    <div class="panel" id="rightPanel">
+      <h2>实时状态</h2>
+      <div class="stat-grid">
+        <div>航向 <b id="st_heading">0.0°</b></div>
+        <div>转向率 <b id="st_rate">0.0°/s</b></div>
+        <div>舵角 <b id="st_rudder">0.0°</b></div>
+        <div>误差 <b id="st_error">0.0°</b></div>
+        <div>船速 <b id="st_speed">0.0 kn</b></div>
+        <div>海况 <b id="st_sea">0</b></div>
+        <div>模式 <b id="st_mode">AUTO_HEADING</b></div>
+        <div>周期 <b id="st_dt">20 ms</b></div>
+      </div>
+
+      <h2>机动触发</h2>
+      <div class="maneuver-btns">
+        <button data-mv="williamson">Williamson</button>
+        <button data-mv="uTurnLeft">U-Turn 左</button>
+        <button data-mv="uTurnRight">U-Turn 右</button>
+        <button data-mv="zigzag">Zigzag</button>
+        <button data-mv="circles">Circles</button>
+        <button data-mv="cloverleaf">Cloverleaf</button>
+        <button data-mv="search">Search</button>
+        <button id="mvStopBtn" class="danger">停止机动</button>
+      </div>
+      <div class="field" style="margin-top:6px">
+        <label>当前段</label>
+        <input type="text" id="mvLeg" value="-" readonly>
+      </div>
+
+      <h2>自动优化</h2>
+      <div class="stat-grid">
+        <div>K̂ <b id="at_K">0.00</b></div>
+        <div>T̂ <b id="at_T">0.00</b></div>
+        <div>J <b id="at_J">0.00</b></div>
+        <div>ζ̂ <b id="at_z">0.00</b></div>
+        <div>ω̂n <b id="at_w">0.00</b></div>
+        <div>激励 <b id="at_exc">否</b></div>
+      </div>
+      <div class="field" style="margin-top:4px">
+        <label>状态</label>
+        <input type="text" id="atStatus" value="禁用" readonly>
+      </div>
+      <div class="maneuver-btns" style="margin-top:4px">
+        <button id="atEnableBtn" class="success">启用</button>
+        <button id="atDisableBtn" class="danger">禁用</button>
+        <button id="atEscBtn" class="primary">ESC 一步</button>
+        <button id="atRevertBtn">回退基线</button>
+      </div>
+
+      <h2>参数存储</h2>
+      <div class="stat-grid">
+        <div>版本 <b id="ps_ver">0</b></div>
+        <div>CRC <b id="ps_crc">OK</b></div>
+        <div>时间戳 <b id="ps_ts">-</b></div>
+        <div>K/T <b id="ps_kt">0/0</b></div>
+      </div>
+      <div class="maneuver-btns" style="margin-top:4px">
+        <button id="psSaveBtn" class="primary">保存</button>
+        <button id="psLoadBtn">加载</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Log -->
+  <div id="log"></div>
+</div>
+<script>
+'use strict';
+
+// ============ 全局状态 ============
+const State = {
+  mode: 'AUTO_HEADING',
+  headingRef: 0,
+  simRunning: false,
+  ws: null,
+  // 实时传感器
+  sensor: { headingDeg:0, rateDegS:0, rudderDeg:0, speedKn:10, seaState:1 },
+  // PD 参数
+  pd: { Kp:1.5, Kd:0.6, dMax:35, ddMax:10, deadzone:0.3, tau:0.2, quant:0.1, dt:0.02 },
+  // 增益调度表
+  sched: [
+    {speedMin:0,  speedMax:4,  seaState:0, Kp:2.0, Kd:0.8},
+    {speedMin:4,  speedMax:10, seaState:0, Kp:1.5, Kd:0.6},
+    {speedMin:4,  speedMax:10, seaState:2, Kp:1.0, Kd:0.4},
+    {speedMin:10, speedMax:18, seaState:0, Kp:1.2, Kd:0.5},
+    {speedMin:18, speedMax:25, seaState:0, Kp:1.0, Kd:0.4},
+    {speedMin:18, speedMax:25, seaState:2, Kp:0.7, Kd:0.3},
+  ],
+  // 辨识器
+  id: { lambda:0.98, dt:0.02, deltaMin:3, rMin:0.5, p0:1e6,
+        K:0, T:0, prevR:0, first:true, P:[[1e6,0],[0,1e6]], excited:false },
+  // 自动优化
+  at: { zeta:0.85, wn:0.20, escAmp:0.05, escFreq:0.05, escStep:0.02,
+        wU:0.01, wDu:0.005, maxUpd:0.10, zetaMin:0.6, wnMax:0.5, oscMax:5,
+        hsDeact:15, window:60, dt:0.02,
+        enabled:false, escPhase:0, J:0, baselineKp:1.5, baselineKd:0.6,
+        winE:[], winD:[], winDD:[], prevDelta:0 },
+  // 机动
+  mv: { legs:[], idx:0, legElapsed:0, cumHeading:0, lastHeading:0, first:true, done:true },
+  // 参数存储
+  ps: { rudderZero:0, rudderLeft:-35, rudderRight:35, ddotMax:10,
+        K:0, T:0, Kp:1.5, Kd:0.6, version:0, timestamp:0, crc:0 },
+  // 历史曲线
+  hist: { heading:[], headingRef:[], rudder:[], rudderCmd:[], error:[], rate:[],
+          maxLen: 600 },
+  // PD 内部状态
+  pdState: { prevErr:0, prevDeriv:0, prevOut:0, first:true },
+  // 船舶仿真
+  sim: { psi:0, r:0, delta:0, K:0.18, T:8.5 },
+};
+
+// ============ 工具函数 ============
+function $(id){ return document.getElementById(id); }
+function normDeg(a){ while(a>180)a-=360; while(a<=-180)a+=360; return a; }
+function diffDeg(ref,act){ return normDeg(ref-act); }
+function clamp(v,lo,hi){ return Math.max(lo, Math.min(hi, v)); }
+function log(msg, lvl){
+  const div = $('log');
+  const t = new Date().toLocaleTimeString();
+  const line = document.createElement('div');
+  line.className = 'log-line ' + (lvl||'');
+  line.textContent = `[${t}] ${msg}`;
+  div.appendChild(line);
+  div.scrollTop = div.scrollHeight;
+  while(div.children.length > 200) div.removeChild(div.firstChild);
+}
+function setStatus(text, lvl){
+  $('statusText').textContent = text;
+  const led = $('statusLed');
+  led.className = 'led ' + (lvl||'on');
+}
+
+log('调试界面已加载', 'ok');
+log('点击"启动"开始内置仿真器，或"连接 ECU"对接真实后端', 'info');
+
+// ============ 参数下发协议（UI → ECU）============
+// 将当前参数集打包为 JSON 并通过 WebSocket 下发
+function sendParamsToEcu(scope){
+  if (!State.ws || State.ws.readyState !== 1){
+    log('参数下发失败：ECU 未连接', 'warn');
+    return false;
+  }
+  const msg = { type: 'set_params', scope: scope, ts: Math.floor(Date.now()/1000) };
+  switch (scope){
+    case 'pd':
+      msg.pd = Object.assign({}, State.pd);
+      break;
+    case 'sched':
+      msg.sched = State.sched.map(p => Object.assign({}, p));
+      break;
+    case 'id':
+      msg.id = { lambda:State.id.lambda, dt:State.id.dt,
+                 deltaMin:State.id.deltaMin, rMin:State.id.rMin, p0:State.id.p0 };
+      break;
+    case 'tuner':
+      msg.tuner = { zeta:State.at.zeta, wn:State.at.wn, escAmp:State.at.escAmp,
+        escFreq:State.at.escFreq, escStep:State.at.escStep, wU:State.at.wU, wDu:State.at.wDu,
+        maxUpd:State.at.maxUpd, zetaMin:State.at.zetaMin, wnMax:State.at.wnMax,
+        oscMax:State.at.oscMax, hsDeact:State.at.hsDeact, window:State.at.window };
+      break;
+    case 'store':
+      msg.store = Object.assign({}, State.ps);
+      break;
+    case 'mode':
+      msg.mode = State.mode; msg.headingRef = State.headingRef;
+      break;
+    default:
+      log('未知下发范围: ' + scope, 'err'); return false;
+  }
+  State.ws.send(JSON.stringify(msg));
+  log(`参数已下发 [${scope}] → ECU`, 'ok');
+  return true;
+}
+
+// ============ 历史数据导出 ============
+function buildCsv(){
+  const h = State.hist;
+  const n = h.heading.length;
+  let csv = 'index,heading,headingRef,rudder,rudderCmd,error,rate\n';
+  for (let i=0;i<n;i++){
+    csv += [i,
+      h.heading[i].toFixed(3), h.headingRef[i].toFixed(3),
+      h.rudder[i].toFixed(3), h.rudderCmd[i].toFixed(3),
+      h.error[i].toFixed(3), h.rate[i].toFixed(3)
+    ].join(',') + '\n';
+  }
+  return csv;
+}
+function buildJson(){
+  return JSON.stringify({
+    meta: { exportedAt: new Date().toISOString(), sampleCount: State.hist.heading.length,
+            dt: State.pd.dt, mode: State.mode },
+    params: { pd: State.pd, id:{lambda:State.id.lambda,K:State.id.K,T:State.id.T},
+               tuner:{zeta:State.at.zeta,wn:State.at.wn,enabled:State.at.enabled} },
+    data: State.hist
+  }, null, 2);
+}
+function downloadFile(filename, content, mime){
+  const blob = new Blob([content], {type: mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  log('已导出 ' + filename, 'ok');
+}
+</script>
+<script>
+// ============ PD 控制器（对应 pd_controller.hpp）============
+function pdUpdate(headingRef, headingAct, p, st){
+  const e = diffDeg(headingRef, headingAct);
+  if (Math.abs(e) < p.deadzone){
+    st.prevErr = e; st.prevOut = 0; return 0;
+  }
+  let derivRaw = st.first ? 0 : (e - st.prevErr)/p.dt;
+  if (st.first) st.first = false;
+  const alpha = 1.0/(1.0 + p.tau/p.dt);
+  const deriv = alpha*derivRaw + (1-alpha)*st.prevDeriv;
+  let out = p.Kp*e + p.Kd*deriv;
+  if (out >  p.dMax) out =  p.dMax;
+  if (out < -p.dMax) out = -p.dMax;
+  const maxDelta = p.ddMax * p.dt;
+  const d = out - st.prevOut;
+  if (d >  maxDelta) out = st.prevOut + maxDelta;
+  if (d < -maxDelta) out = st.prevOut - maxDelta;
+  out = Math.round(out/p.quant)*p.quant;
+  st.prevErr = e; st.prevDeriv = deriv; st.prevOut = out;
+  return out;
+}
+
+// ============ 增益调度查询（对应 gain_schedule.hpp）============
+function schedQuery(speed, sea, table){
+  sea = clamp(sea, 0, 3);
+  for (const pt of table){
+    if (pt.seaState !== sea) continue;
+    if (speed >= pt.speedMin && speed < pt.speedMax) return {Kp:pt.Kp, Kd:pt.Kd};
+  }
+  // 取同海况末段
+  let last = null;
+  for (const pt of table){ if (pt.seaState===sea) last = pt; }
+  return last ? {Kp:last.Kp, Kd:last.Kd} : {Kp:1.0, Kd:0.5};
+}
+
+// ============ Nomoto RLS 辨识（对应 nomoto_identifier.hpp）============
+function idUpdate(delta, r, p, st){
+  st.excited = (Math.abs(delta) > p.deltaMin && Math.abs(r) > p.rMin);
+  if (!st.excited){ st.prevR = r; st.first = false; return; }
+  const dr = st.first ? 0 : (r - st.prevR)/p.dt;
+  if (st.first) st.first = false;
+  const phi = [delta, -dr];
+  const Pphi = [st.P[0][0]*phi[0]+st.P[0][1]*phi[1],
+                st.P[1][0]*phi[0]+st.P[1][1]*phi[1]];
+  const denom = p.lambda + phi[0]*Pphi[0] + phi[1]*Pphi[1];
+  if (Math.abs(denom) < 1e-12){ st.prevR = r; return; }
+  const K = [Pphi[0]/denom, Pphi[1]/denom];
+  const y = r;
+  const yhat = phi[0]*st.K + phi[1]*st.T;
+  const err = y - yhat;
+  st.K += K[0]*err;
+  st.T += K[1]*err;
+  const invL = 1.0/p.lambda;
+  for (let i=0;i<2;i++) for (let j=0;j<2;j++)
+    st.P[i][j] = invL*(st.P[i][j] - K[i]*Pphi[j]);
+  st.prevR = r;
+}
+
+// ============ 极点配置（对应 auto_tuner.hpp polePlacement）============
+function polePlacement(K, T, zeta, wn){
+  if (Math.abs(K) < 1e-6) return [0,0];
+  const Kp = wn*wn*T/K;
+  const Kd = (2*zeta*wn*T - 1)/K;
+  return [Kp, Kd];
+}
+
+// ============ 稳定性监控（对应 auto_tuner.hpp stabilityCheck）============
+function stabilityCheck(K, T, Kp, Kd, osc, p){
+  if (Math.abs(K)<1e-6 || Math.abs(T)<1e-6) return false;
+  const wn = Math.sqrt(Kp*K/T);
+  const zeta = (1 + Kd*K)/(2*Math.sqrt(T*Kp*K));
+  if (zeta < p.zetaMin) return false;
+  if (wn > p.wnMax) return false;
+  if (osc > p.oscMax) return false;
+  return true;
+}
+
+// ============ ESC 一步（对应 auto_tuner.hpp escStep）============
+function escStep(p, st){
+  if (!st.enabled) return;
+  const J = computeJ(p, st);
+  const dJ = J - st.J;
+  st.J = J;
+  st.escPhase += p.escFreq * p.window;
+  const sKp = Math.sin(st.escPhase);
+  const sKd = Math.sin(st.escPhase + Math.PI/2);
+  const gradKp = dJ * sKp;
+  const gradKd = dJ * sKd;
+  let newKp = State.pd.Kp - p.escStep * gradKp;
+  let newKd = State.pd.Kd - p.escStep * gradKd;
+  newKp = clampUpdate(newKp, State.pd.Kp, p.maxUpd);
+  newKd = clampUpdate(newKd, State.pd.Kd, p.maxUpd);
+  State.pd.Kp = newKp;
+  State.pd.Kd = newKd;
+  log(`ESC 更新: Kp=${newKp.toFixed(3)} Kd=${newKd.toFixed(3)} J=${J.toFixed(2)}`, 'info');
+}
+function clampUpdate(newV, oldV, frac){
+  const maxD = Math.abs(oldV)*frac;
+  let d = newV - oldV;
+  if (d >  maxD) d =  maxD;
+  if (d < -maxD) d = -maxD;
+  return oldV + d;
+}
+function accumulateJ(e, delta, p, st){
+  const dd = delta - st.prevDelta;
+  st.winE.push(Math.abs(e));
+  st.winD.push(Math.abs(delta));
+  st.winDD.push(Math.abs(dd));
+  st.prevDelta = delta;
+  const maxN = Math.floor(p.window / p.dt);
+  while (st.winE.length > maxN){ st.winE.shift(); st.winD.shift(); st.winDD.shift(); }
+}
+function computeJ(p, st){
+  if (st.winE.length === 0) return 0;
+  let J = 0, t = 0;
+  for (let i=0;i<st.winE.length;i++, t+=p.dt){
+    J += (t*st.winE[i] + p.wU*st.winD[i] + p.wDu*st.winDD[i]) * p.dt;
+  }
+  return J;
+}
+</script>
+<script>
+// ============ 机动序列（对应 maneuver_sequencer.hpp）============
+function mvSetLegs(legs){
+  State.mv.legs = legs; State.mv.idx = 0;
+  State.mv.legElapsed = 0; State.mv.cumHeading = 0;
+  State.mv.first = true; State.mv.done = legs.length === 0;
+}
+function mvUpdate(headingAct, rateAct, dt){
+  const mv = State.mv;
+  if (mv.done || mv.idx < 0 || mv.idx >= mv.legs.length) return {isHeading:false, heading:0, rudder:0};
+  if (mv.first){ mv.lastHeading = headingAct; mv.first = false; }
+  const dh = diffDeg(headingAct, mv.lastHeading);
+  mv.cumHeading += dh;
+  mv.lastHeading = headingAct;
+  mv.legElapsed += dt;
+  const cur = mv.legs[mv.idx];
+  let advance = false;
+  switch (cur.trigger){
+    case 'HEADING_REACHED':
+      if (Math.abs(mv.cumHeading) >= Math.abs(cur.threshold)) advance = true;
+      break;
+    case 'TIME':
+      if (mv.legElapsed >= cur.threshold) advance = true;
+      break;
+    case 'RATE':
+      if (Math.abs(rateAct) <= cur.threshold) advance = true;
+      break;
+  }
+  const cmd = cur.mode === 'HEADING'
+    ? {isHeading:true, heading:cur.target, rudder:0}
+    : {isHeading:false, heading:0, rudder:cur.target};
+  if (advance){
+    mv.legElapsed = 0; mv.cumHeading = 0;
+    mv.idx = cur.next;
+    if (mv.idx < 0 || mv.idx >= mv.legs.length) mv.done = true;
+  }
+  return cmd;
+}
+// 预置机动
+function mvWilliamson(psi0, dMax){
+  return [
+    {mode:'RUDDER', target:+dMax, trigger:'HEADING_REACHED', threshold:60, next:1},
+    {mode:'RUDDER', target:-dMax, trigger:'HEADING_REACHED', threshold:180, next:2},
+    {mode:'HEADING', target:normDeg(psi0+180), trigger:'NONE', threshold:0, next:-1},
+  ];
+}
+function mvUTurn(psi0, right){
+  return [{mode:'HEADING', target:normDeg(psi0+(right?180:-180)), trigger:'NONE', threshold:0, next:-1}];
+}
+function mvZigzag(psi0, dz, phiz, N){
+  const legs = []; let pos = true;
+  for (let i=0;i<2*N;i++){
+    legs.push({mode:'RUDDER', target:pos?+dz:-dz, trigger:'HEADING_REACHED', threshold:phiz,
+               next:(i+1<2*N)?(i+1):-1});
+    pos = !pos;
+  }
+  return legs;
+}
+function mvCircles(dCmd, totalDeg){
+  return [{mode:'RUDDER', target:dCmd, trigger:'HEADING_REACHED', threshold:totalDeg, next:-1}];
+}
+function mvCloverleaf(psi0, tLeg){
+  const legs = [];
+  for (let i=0;i<4;i++){
+    legs.push({mode:'HEADING', target:normDeg(psi0+270*(i+1)), trigger:'HEADING_REACHED', threshold:270, next:2*i+1});
+    legs.push({mode:'HEADING', target:normDeg(psi0+270*(i+1)), trigger:'TIME', threshold:tLeg, next:(i<3)?(2*i+2):-1});
+  }
+  return legs;
+}
+function mvSearch(psi0, t0, dt, cycles){
+  const legs = []; let hdg = psi0, idx = 0;
+  for (let c=0;c<cycles;c++){
+    const t = t0 + c*dt;
+    legs.push({mode:'HEADING', target:hdg, trigger:'TIME', threshold:t, next:idx+1}); idx++;
+    hdg = normDeg(hdg + 90);
+    legs.push({mode:'HEADING', target:hdg, trigger:'HEADING_REACHED', threshold:90, next:(c<cycles-1)?(idx+1):-1}); idx++;
+  }
+  return legs;
+}
+
+// ============ 船舶仿真器（Nomoto 一阶）============
+function simStep(dt){
+  // 简化 Nomoto：T·dr + r = K·δ
+  const dr = (State.sim.K * State.sim.delta - State.sim.r) / State.sim.T;
+  State.sim.r += dr * dt;
+  State.sim.psi = normDeg(State.sim.psi + State.sim.r * dt);
+  // 舵角跟随（一阶滞后）
+  State.sim.delta += (State.sim.deltaCmd - State.sim.delta) * (dt / 0.5);
+  // 注入噪声
+  State.sim.psi += (Math.random()-0.5) * 0.05;
+  State.sim.r   += (Math.random()-0.5) * 0.02;
+  State.sensor.headingDeg = State.sim.psi;
+  State.sensor.rateDegS   = State.sim.r;
+  State.sensor.rudderDeg   = State.sim.delta;
+}
+</script>
+<script>
+// ============ 主控制循环 ============
+let simTimer = null;
+let escAccum = 0;
+
+function controlStep(){
+  const dt = State.pd.dt;
+  const s = State.sensor;
+
+  // 仿真器推进
+  if (State.simRunning) simStep(dt);
+
+  let rudderCmd = 0;
+  switch (State.mode){
+    case 'MANUAL':
+      rudderCmd = s.rudderDeg;
+      break;
+    case 'AUTO_HEADING': {
+      const g = schedQuery(s.speedKn, s.seaState, State.sched);
+      // 自动优化
+      if (s.speedKn <= State.at.hsDeact){
+        State.at.enabled = true;
+        idUpdate(s.rudderDeg, s.rateDegS, State.id, State.id);
+        if (State.id.excited){
+          const [Kp2, Kd2] = polePlacement(State.id.K, State.id.T, State.at.zeta, State.at.wn);
+          if (stabilityCheck(State.id.K, State.id.T, Kp2, Kd2, 0, State.at)){
+            State.at.baselineKp = Kp2; State.at.baselineKd = Kd2;
+            g.Kp = Kp2; g.Kd = Kd2;
+          }
+        }
+      } else { State.at.enabled = false; }
+      const e = diffDeg(State.headingRef, s.headingDeg);
+      accumulateJ(e, s.rudderDeg, State.at, State.at);
+      State.pd.Kp = g.Kp; State.pd.Kd = g.Kd;
+      rudderCmd = pdUpdate(State.headingRef, s.headingDeg, State.pd, State.pdState);
+      // ESC 周期触发
+      escAccum += dt;
+      if (escAccum >= State.at.window){
+        escStep(State.at, State.at);
+        escAccum = 0;
+      }
+      break;
+    }
+    case 'AUTO_MANEUVER': {
+      const cmd = mvUpdate(s.headingDeg, s.rateDegS, dt);
+      if (State.mv.done){ State.mode = 'AUTO_HEADING'; $('modeSel').value='AUTO_HEADING'; break; }
+      if (cmd.isHeading){
+        State.headingRef = cmd.heading;
+        rudderCmd = pdUpdate(cmd.heading, s.headingDeg, State.pd, State.pdState);
+      } else {
+        rudderCmd = cmd.rudder;
+      }
+      break;
+    }
+    case 'HOLD':
+      rudderCmd = 0;
+      break;
+  }
+
+  // 输出到仿真器（或通过 WS 发给 ECU）
+  State.sim.deltaCmd = rudderCmd;
+  if (State.ws && State.ws.readyState === 1){
+    State.ws.send(JSON.stringify({type:'cmd', rudder:rudderCmd, mode:State.mode, headingRef:State.headingRef}));
+  }
+
+  // 记录历史
+  const h = State.hist;
+  h.heading.push(s.headingDeg); h.headingRef.push(State.headingRef);
+  h.rudder.push(s.rudderDeg); h.rudderCmd.push(rudderCmd);
+  h.error.push(diffDeg(State.headingRef, s.headingDeg)); h.rate.push(s.rateDegS);
+  if (h.heading.length > h.maxLen){
+    h.heading.shift(); h.headingRef.shift(); h.rudder.shift();
+    h.rudderCmd.shift(); h.error.shift(); h.rate.shift();
+  }
+
+  // 更新 UI
+  updateStatusUI();
+  drawPlots();
+}
+
+// ============ UI 更新 ============
+function updateStatusUI(){
+  const s = State.sensor;
+  $('st_heading').textContent = s.headingDeg.toFixed(1) + '°';
+  $('st_rate').textContent    = s.rateDegS.toFixed(2) + '°/s';
+  $('st_rudder').textContent  = s.rudderDeg.toFixed(1) + '°';
+  $('st_error').textContent   = diffDeg(State.headingRef, s.headingDeg).toFixed(2) + '°';
+  $('st_speed').textContent   = s.speedKn.toFixed(1) + ' kn';
+  $('st_sea').textContent      = s.seaState;
+  $('st_mode').textContent     = State.mode;
+  $('st_dt').textContent       = (State.pd.dt*1000).toFixed(0) + ' ms';
+  $('mvLeg').textContent       = State.mv.done ? '-' : `${State.mv.idx+1}/${State.mv.legs.length}`;
+  $('at_K').textContent  = State.id.K.toFixed(3);
+  $('at_T').textContent  = State.id.T.toFixed(3);
+  $('at_J').textContent  = State.at.J.toFixed(2);
+  const wn = (State.id.K>1e-6 && State.id.T>1e-6) ? Math.sqrt(State.pd.Kp*State.id.K/State.id.T) : 0;
+  const zeta = (State.id.K>1e-6 && State.id.T>1e-6) ? (1+State.pd.Kd*State.id.K)/(2*Math.sqrt(State.id.T*State.pd.Kp*State.id.K)) : 0;
+  $('at_z').textContent = zeta.toFixed(2);
+  $('at_w').textContent = wn.toFixed(2);
+  $('at_exc').textContent = State.id.excited ? '是' : '否';
+  $('atStatus').value = State.at.enabled ? '启用' : '禁用';
+  $('ps_ver').textContent = State.ps.version;
+  $('ps_crc').textContent = 'OK';
+  $('ps_ts').textContent  = State.ps.timestamp ? new Date(State.ps.timestamp*1000).toLocaleString() : '-';
+  $('ps_kt').textContent  = `${State.ps.K.toFixed(3)}/${State.ps.T.toFixed(2)}`;
+}
+
+// ============ Canvas 绘图 ============
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+function drawSeries(ctx, canvas, series, opts){
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width, H = rect.height;
+  ctx.clearRect(0,0,W,H);
+  // 网格
+  ctx.strokeStyle = '#313244'; ctx.lineWidth = 1;
+  for (let i=0;i<=4;i++){
+    const y = H*i/4;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+  if (!series.length) return;
+  // 自动量程
+  let lo = opts.lo, hi = opts.hi;
+  if (lo === undefined || hi === undefined){
+    let mn = Infinity, mx = -Infinity;
+    for (const s of series) for (const v of s.data){
+      if (v < mn) mn = v; if (v > mx) mx = v;
+    }
+    if (!isFinite(mn)){ mn = -1; mx = 1; }
+    const pad = (mx-mn)*0.1 + 1;
+    lo = mn - pad; hi = mx + pad;
+  }
+  // 零线
+  if (0 >= lo && 0 <= hi){
+    const y0 = H - (0-lo)/(hi-lo)*H;
+    ctx.strokeStyle = '#45475a'; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(0,y0); ctx.lineTo(W,y0); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  // 曲线
+  for (const s of series){
+    ctx.strokeStyle = s.color; ctx.lineWidth = 1.5; ctx.beginPath();
+    for (let i=0;i<s.data.length;i++){
+      const x = i/(s.data.length-1)*W;
+      const y = H - (s.data[i]-lo)/(hi-lo)*H;
+      if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.stroke();
+  }
+  // 量程标签
+  ctx.fillStyle = '#a6adc8'; ctx.font = '10px monospace';
+  ctx.fillText(hi.toFixed(1), W-32, 12);
+  ctx.fillText(lo.toFixed(1), W-32, H-4);
+}
+function drawPlots(){
+  const h = State.hist;
+  let ctx = setupCanvas($('plotHeading'));
+  drawSeries(ctx, $('plotHeading'),
+    [{data:h.heading, color:'#89b4fa'}, {data:h.headingRef, color:'#f38ba8'}],
+    {lo:-180, hi:180});
+  ctx = setupCanvas($('plotRudder'));
+  drawSeries(ctx, $('plotRudder'),
+    [{data:h.rudderCmd, color:'#a6e3a1'}, {data:h.rudder, color:'#f9e2af'}],
+    {lo:-35, hi:35});
+  ctx = setupCanvas($('plotError'));
+  drawSeries(ctx, $('plotError'),
+    [{data:h.error, color:'#cba6f7'}, {data:h.rate, color:'#94e2d5'}],
+    {lo:-20, hi:20});
+}
+</script>
+<script>
+// ============ 事件绑定 ============
+// Tab 切换
+document.querySelectorAll('.tabs button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    $('tab-' + btn.dataset.tab).classList.add('active');
+  };
+});
+
+// 模式切换
+$('modeSel').onchange = e => {
+  State.mode = e.target.value;
+  log('模式切换 → ' + State.mode, 'info');
+};
+
+// 航向目标
+$('applyHeadingBtn').onclick = () => {
+  State.headingRef = parseFloat($('headingRef').value);
+  State.pdState.first = true;
+  log('航向目标 → ' + State.headingRef + '°', 'info');
+};
+
+// 仿真启停
+$('simStartBtn').onclick = () => {
+  if (simTimer) return;
+  State.simRunning = true;
+  simTimer = setInterval(controlStep, State.pd.dt * 1000);
+  setStatus('仿真运行中', 'on');
+  log('仿真启动 @ ' + (State.pd.dt*1000) + 'ms', 'ok');
+};
+$('simStopBtn').onclick = () => {
+  if (simTimer){ clearInterval(simTimer); simTimer = null; }
+  State.simRunning = false;
+  setStatus('已停止', 'warn');
+  log('仿真停止', 'warn');
+};
+
+// PD 参数应用
+$('pdApplyBtn').onclick = () => {
+  State.pd.Kp = parseFloat($('pd_Kp').value);
+  State.pd.Kd = parseFloat($('pd_Kd').value);
+  State.pd.dMax = parseFloat($('pd_dMax').value);
+  State.pd.ddMax = parseFloat($('pd_ddMax').value);
+  State.pd.deadzone = parseFloat($('pd_deadzone').value);
+  State.pd.tau = parseFloat($('pd_tau').value);
+  State.pd.quant = parseFloat($('pd_quant').value);
+  const newDt = parseFloat($('pd_dt').value);
+  if (Math.abs(newDt - State.pd.dt) > 1e-6 && simTimer){
+    clearInterval(simTimer);
+    State.pd.dt = newDt;
+    simTimer = setInterval(controlStep, newDt * 1000);
+  } else { State.pd.dt = newDt; }
+  State.pdState.first = true;
+  // 同步滑块
+  $('sl_Kp').value = State.pd.Kp; $('sl_Kp_v').textContent = State.pd.Kp.toFixed(2);
+  $('sl_Kd').value = State.pd.Kd; $('sl_Kd_v').textContent = State.pd.Kd.toFixed(2);
+  log(`PD 参数已应用: Kp=${State.pd.Kp} Kd=${State.pd.Kd} dt=${State.pd.dt}`, 'ok');
+  sendParamsToEcu('pd');
+};
+
+// 调度表渲染
+function renderSchedTable(){
+  const tb = $('schedTable');
+  // 清除数据行
+  while (tb.children.length > 1) tb.removeChild(tb.lastChild);
+  State.sched.forEach((p, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><input type="number" value="${p.speedMin}" data-i="${i}" data-k="speedMin"></td>
+      <td><input type="number" value="${p.speedMax}" data-i="${i}" data-k="speedMax"></td>
+      <td><input type="number" value="${p.seaState}" data-i="${i}" data-k="seaState"></td>
+      <td><input type="number" value="${p.Kp}" data-i="${i}" data-k="Kp"></td>
+      <td><input type="number" value="${p.Kd}" data-i="${i}" data-k="Kd"></td>
+      <td><button class="danger" data-del="${i}" style="padding:2px 6px">✕</button></td>`;
+    tb.appendChild(tr);
+  });
+  tb.querySelectorAll('input').forEach(inp => {
+    inp.onchange = e => {
+      const i = +e.target.dataset.i, k = e.target.dataset.k;
+      State.sched[i][k] = parseFloat(e.target.value);
+    };
+  });
+  tb.querySelectorAll('button[data-del]').forEach(b => {
+    b.onclick = e => {
+      const i = +e.target.dataset.del;
+      State.sched.splice(i, 1);
+      renderSchedTable();
+    };
+  });
+}
+$('schedAddBtn').onclick = () => {
+  State.sched.push({speedMin:0, speedMax:10, seaState:0, Kp:1.0, Kd:0.5});
+  renderSchedTable();
+};
+$('schedApplyBtn').onclick = () => {
+  log(`调度表已应用 (${State.sched.length} 条)`, 'ok');
+  sendParamsToEcu('sched');
+};
+renderSchedTable();
+
+// 辨识参数
+$('idApplyBtn').onclick = () => {
+  State.id.lambda = parseFloat($('id_lambda').value);
+  State.id.dt = parseFloat($('id_dt').value);
+  State.id.deltaMin = parseFloat($('id_deltaMin').value);
+  State.id.rMin = parseFloat($('id_rMin').value);
+  State.id.p0 = parseFloat($('id_p0').value);
+  log('辨识参数已应用', 'ok');
+  sendParamsToEcu('id');
+};
+$('idResetBtn').onclick = () => {
+  State.id.K = 0; State.id.T = 0; State.id.first = true;
+  State.id.P = [[State.id.p0,0],[0,State.id.p0]];
+  log('辨识器已重置', 'warn');
+};
+
+// 自动优化参数
+$('atApplyBtn').onclick = () => {
+  State.at.zeta = parseFloat($('at_zeta').value);
+  State.at.wn = parseFloat($('at_wn').value);
+  State.at.escAmp = parseFloat($('at_escAmp').value);
+  State.at.escFreq = parseFloat($('at_escFreq').value);
+  State.at.escStep = parseFloat($('at_escStep').value);
+  State.at.wU = parseFloat($('at_wU').value);
+  State.at.wDu = parseFloat($('at_wDu').value);
+  State.at.maxUpd = parseFloat($('at_maxUpd').value);
+  State.at.zetaMin = parseFloat($('at_zetaMin').value);
+  State.at.wnMax = parseFloat($('at_wnMax').value);
+  State.at.oscMax = parseFloat($('at_oscMax').value);
+  State.at.hsDeact = parseFloat($('at_hsDeact').value);
+  State.at.window = parseFloat($('at_window').value);
+  log('自动优化参数已应用', 'ok');
+  sendParamsToEcu('tuner');
+};
+$('atEnableBtn').onclick = () => {
+  State.at.enabled = true;
+  log('自动优化已启用', 'ok');
+};
+$('atDisableBtn').onclick = () => {
+  State.at.enabled = false;
+  log('自动优化已禁用', 'warn');
+};
+$('atEscBtn').onclick = () => escStep(State.at, State.at);
+$('atRevertBtn').onclick = () => {
+  State.pd.Kp = State.at.baselineKp;
+  State.pd.Kd = State.at.baselineKd;
+  log(`回退基线: Kp=${State.at.baselineKp} Kd=${State.at.baselineKd}`, 'warn');
+};
+
+// 机动触发
+document.querySelectorAll('button[data-mv]').forEach(b => {
+  b.onclick = () => {
+    const psi0 = State.sensor.headingDeg;
+    let legs = [];
+    switch (b.dataset.mv){
+      case 'williamson':  legs = mvWilliamson(psi0, 25); break;
+      case 'uTurnLeft':   legs = mvUTurn(psi0, false); break;
+      case 'uTurnRight': legs = mvUTurn(psi0, true); break;
+      case 'zigzag':     legs = mvZigzag(psi0, 10, 10, 5); break;
+      case 'circles':    legs = mvCircles(15, 360); break;
+      case 'cloverleaf': legs = mvCloverleaf(psi0, 30); break;
+      case 'search':     legs = mvSearch(psi0, 30, 10, 6); break;
+    }
+    mvSetLegs(legs);
+    State.mode = 'AUTO_MANEUVER';
+    $('modeSel').value = 'AUTO_MANEUVER';
+    log(`启动机动: ${b.dataset.mv} (${legs.length} 段)`, 'info');
+  };
+});
+$('mvStopBtn').onclick = () => {
+  mvSetLegs([]);
+  State.mode = 'AUTO_HEADING';
+  $('modeSel').value = 'AUTO_HEADING';
+  log('机动已停止', 'warn');
+};
+
+// 参数存储
+$('psSaveBtn').onclick = () => {
+  State.ps.K = State.id.K; State.ps.T = State.id.T;
+  State.ps.Kp = State.pd.Kp; State.ps.Kd = State.pd.Kd;
+  State.ps.version += 1;
+  State.ps.timestamp = Math.floor(Date.now()/1000);
+  State.ps.crc = (State.ps.version * 31 +
+    Math.round(State.ps.K*1e6) + Math.round(State.ps.T*1e6) +
+    Math.round(State.ps.Kp*1e6) + Math.round(State.ps.Kd*1e6)) >>> 0;
+  log(`参数已保存 v${State.ps.version} CRC=${State.ps.crc.toString(16).toUpperCase()}`, 'ok');
+  sendParamsToEcu('store');
+};
+$('psLoadBtn').onclick = () => {
+  State.id.K = State.ps.K; State.id.T = State.ps.T;
+  State.pd.Kp = State.ps.Kp; State.pd.Kd = State.ps.Kd;
+  $('pd_Kp').value = State.pd.Kp; $('pd_Kd').value = State.pd.Kd;
+  log(`参数已加载 v${State.ps.version}`, 'info');
+};
+
+// WebSocket 连接
+$('wsConnBtn').onclick = () => {
+  if (State.ws){
+    State.ws.close(); State.ws = null; return;
+  }
+  try {
+    State.ws = new WebSocket($('wsUrl').value);
+    State.ws.onopen = () => {
+      $('connLed').className = 'led on';
+      log('ECU 已连接', 'ok');
+    };
+    State.ws.onclose = () => {
+      $('connLed').className = 'led';
+      State.ws = null;
+      log('ECU 连接断开', 'warn');
+    };
+    State.ws.onmessage = ev => {
+      try {
+        const m = JSON.parse(ev.data);
+        if (m.type === 'sensor'){
+          State.sensor = Object.assign(State.sensor, m.sensor);
+        } else if (m.type === 'params_ack'){
+          log(`ECU 确认参数 [${m.scope}] v${m.version||'?'}`, 'ok');
+        } else if (m.type === 'status'){
+          if (m.faults && m.faults.length) log('ECU 故障: ' + m.faults.join(','), 'err');
+        }
+      } catch(e){}
+    };
+    State.ws.onerror = () => { log('WebSocket 错误', 'err'); };
+  } catch(e){ log('连接失败: ' + e.message, 'err'); }
+};
+
+// ============ 实时调节滑块 ============
+function bindSlider(id, valId, fmt, onChange){
+  const sl = $(id), v = $(valId);
+  sl.oninput = () => {
+    const val = parseFloat(sl.value);
+    v.textContent = fmt(val);
+    onChange(val);
+  };
+}
+bindSlider('sl_Kp', 'sl_Kp_v', v=>v.toFixed(2), v => {
+  State.pd.Kp = v; $('pd_Kp').value = v;
+  if (State.ws && State.ws.readyState===1) sendParamsToEcu('pd');
+});
+bindSlider('sl_Kd', 'sl_Kd_v', v=>v.toFixed(2), v => {
+  State.pd.Kd = v; $('pd_Kd').value = v;
+  if (State.ws && State.ws.readyState===1) sendParamsToEcu('pd');
+});
+bindSlider('sl_hdg', 'sl_hdg_v', v=>v.toFixed(0)+'°', v => {
+  State.headingRef = v; $('headingRef').value = v;
+  State.pdState.first = true;
+  if (State.ws && State.ws.readyState===1) sendParamsToEcu('mode');
+});
+bindSlider('sl_spd', 'sl_spd_v', v=>v.toFixed(1)+' kn', v => {
+  State.sensor.speedKn = v;
+});
+bindSlider('sl_sea', 'sl_sea_v', v=>v.toFixed(0), v => {
+  State.sensor.seaState = v;
+});
+
+// ============ 数据导出 ============
+$('exportCsvBtn').onclick = () => {
+  if (State.hist.heading.length === 0){ log('无历史数据可导出', 'warn'); return; }
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  downloadFile(`autopilot_${ts}.csv`, buildCsv(), 'text/csv');
+};
+$('exportJsonBtn').onclick = () => {
+  if (State.hist.heading.length === 0){ log('无历史数据可导出', 'warn'); return; }
+  const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  downloadFile(`autopilot_${ts}.json`, buildJson(), 'application/json');
+};
+$('clearHistBtn').onclick = () => {
+  State.hist.heading.length = 0; State.hist.headingRef.length = 0;
+  State.hist.rudder.length = 0; State.hist.rudderCmd.length = 0;
+  State.hist.error.length = 0; State.hist.rate.length = 0;
+  drawPlots();
+  log('历史数据已清空', 'warn');
+};
+
+// 初始化
+updateStatusUI();
+drawPlots();
+log('界面初始化完成，可点击"启动"开始', 'info');
+</script>
+</body>
+</html>

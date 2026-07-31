@@ -1,0 +1,17 @@
+# 构建产物
+build/
+build-*/
+control/build/
+control/build-*/
+
+# 仿真输出（csv/mp4 等）
+out/
+control/out/
+
+# Python
+__pycache__/
+*.pyc
+
+# 编辑器
+*.swp
+*~
