@@ -203,18 +203,28 @@ public:
         return r;
     }
 
-    // ESC 长期场景：启用自动优化，跑多个评估窗口，验证增益不发散
+    // ESC 长期场景：Z 形航向参考激励 → RLS 辨识收敛 → 极点配置建立基线 → ESC 窗口调参
+    // 激励设计：辨识器按 1 s 节拍采样，激励门为 |δ|>3° 且 (|r|>0.5°/s 或 |dr|>0.2°/s²)。
+    //   旧 ±10°/30 s 阶跃 max|r|≈1.1°/s，1 s 差分后绝大多数样本过不了门，
+    //   辨识只收到少量有偏样本 → 收敛到非物理值 → valid()=false → 基线永不建立
+    //   → ESC 从不启动，而旧场景只查有界性仍打印 PASS（假阳性）。
+    //   现改用海试辨识常用的 Z 形 ±40°/15 s 参考（物理合理），摆向期间 |r| 与
+    //   |dr| 持续过门，辨识器在 ~1 min 内收敛到真实 K/T 附近。
     struct EscResult {
-        double KpFinal, KdFinal;
-        double Jinit, Jfinal;  // 性能指标初/末
-        bool stable;            // 增益有界且无 NaN
+        double Kp0, Kd0;              // 调度表基线增益（起点）
+        double KpFinal, KdFinal;      // 结束时实际增益
+        double Khat, That;            // 辨识器最终 K/T 估计
+        bool   identValid;            // 结束时辨识结果物理合理
+        bool   baselineEstablished;   // 观测到极点配置/ESC 接管增益
+        double baselineSec;           // 首次观测到接管的时刻（未接管为 -1）
+        bool   gainsMoved;            // 增益相对起点移动超过阈值
+        bool   stable;                // 增益与船态有限且有界
     };
     EscResult runEsc(double K, double T, double speedKn, double totalSec) {
         plant.K = K; plant.T = T; plant.reset(0.0);
         lastSamples.clear();
         ap.setMode(Mode::AUTO_HEADING);
-        ap.setHeadingRef(0.0);
-        // 用接近最优的极点配置增益作调度表基线
+        // 用极点配置增益作调度表基线
         const double Kp0 = wnTarget * wnTarget * T / K;
         const double Kd0 = (2.0 * zetaTarget * wnTarget * T - 1.0) / K;
         ap.scheduleMut().setTable({{0.0, 100.0, 0, Kp0, Kd0}});
@@ -223,18 +233,23 @@ public:
         tp.highSpeedDeactivateKn = 100.0;
         ap.tunerMut().setParams(tp);
 
+        // Z 形（zigzag）航向参考：每 legSec 在 ±refAmp 间翻转，全程确定性激励
+        const double refAmp = 40.0;  // deg
+        const double legSec = 15.0;  // s
+        const int legSteps  = static_cast<int>(legSec / dt);
         const int totalSteps = static_cast<int>(totalSec / dt);
-        double Jfinal = 0.0;
+        double curRef = refAmp;
+        ap.setHeadingRef(curRef);
+
         double KpFinal = Kp0, KdFinal = Kd0;
-        double curRef = 0.0;  // 本地跟踪航向参考
+        bool   baselineSeen = false;
+        double baselineSec  = -1.0;
         for (int k = 0; k < totalSteps; ++k) {
             double t = k * dt;
-            // 每 30 s 施加一次 ±10° 阶跃，制造激励
-            if (k > 0 && k % static_cast<int>(30.0 / dt) == 0) {
-                curRef = (k % static_cast<int>(60.0 / dt) == 0) ? 10.0 : 0.0;
+            if (k > 0 && k % legSteps == 0) {
+                curRef = -curRef;
                 ap.setHeadingRef(curRef);
             }
-            (void)t;
             SensorInput s;
             s.headingDeg = plant.psi;
             s.rateDegS   = plant.r;
@@ -245,6 +260,15 @@ public:
             plant.step(cmd, dt, 0.0);
             KpFinal = ap.pd().params().Kp;
             KdFinal = ap.pd().params().Kd;
+            // 基线建立观测：AutopilotCore 的 baselineEstablished_ 无 getter，
+            // 但其效果可观测——接管前每拍 PD 增益恒等于调度表值 Kp0/Kd0；
+            // 接管后增益由极点配置（wn 目标不同）重写并叠加 ±5% ESC 载波，必然偏离。
+            if (!baselineSeen &&
+                (std::abs(KpFinal - Kp0) > 1e-9 * Kp0 ||
+                 std::abs(KdFinal - Kd0) > 1e-9 * Kd0)) {
+                baselineSeen = true;
+                baselineSec  = t;
+            }
             if (k % recordEvery == 0) {
                 Sample sm; sm.t = t; sm.psi = plant.psi;
                 sm.psiRef = curRef; sm.rudderCmd = cmd; sm.rudderAct = plant.deltaAct;
@@ -254,14 +278,22 @@ public:
                 lastSamples.push_back(sm);
             }
         }
-        // 性能指标取首末窗口的 computeJ（通过 tuner 内部已累积）
-        // 简化：用稳态误差近似
-        Jfinal = std::abs(ap.pd().params().Kp);
         EscResult r;
+        r.Kp0 = Kp0; r.Kd0 = Kd0;
         r.KpFinal = KpFinal; r.KdFinal = KdFinal;
-        r.Jinit = Kp0; r.Jfinal = Jfinal;
+        r.Khat = ap.identifier().K();
+        r.That = ap.identifier().T();
+        r.identValid = ap.identifier().valid();
+        r.baselineEstablished = baselineSeen;
+        r.baselineSec = baselineSec;
+        // 增益移动判据：Kp 或 Kd 相对起点偏移 > 1%（基线接管+ESC 调参的共同效果）
+        r.gainsMoved = (std::abs(KpFinal - Kp0) > 0.01 * Kp0)
+                    || (std::abs(KdFinal - Kd0) > 0.01 * Kd0);
+        // 稳定性：增益与船态有限、Kp 不发散（沿用原有界判据精神，Kd 同法）
         r.stable = std::isfinite(KpFinal) && std::isfinite(KdFinal)
-                && KpFinal > 0.0 && KpFinal < Kp0 * 5.0;  // 增益不发散
+                && std::isfinite(plant.psi) && std::isfinite(plant.r)
+                && KpFinal > 0.0 && KpFinal < Kp0 * 5.0
+                && KdFinal >= 0.0 && KdFinal < Kd0 * 5.0;
         return r;
     }
 

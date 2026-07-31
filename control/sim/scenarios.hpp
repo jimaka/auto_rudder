@@ -36,7 +36,8 @@ struct IdentScenario {
     double totalSec;
 };
 
-// ESC 长期场景：跑足够长让 ESC 窗口触发，验证增益不发散且性能指标下降
+// ESC 长期场景：Z 形参考激励使 RLS 辨识收敛，基线建立后跑多个评估窗口；
+// 判 PASS 要求：辨识 valid + 基线建立（ESC 真正启动）+ 增益相对起点移动 + 数值有界
 struct EscScenario {
     std::string name;
     double K, T;

@@ -23,9 +23,9 @@ MANEUVERS=(williamson uturn zigzag circles cloverleaf search)
 # 每个工况的总时长（秒）— 慢船/长机动需要更长（按实测序列完成时间标定）
 duration_for() {
   case "$1:$2" in
-    slow:cloverleaf)    echo 740 ;;  # 实测约 725s 才完成
+    slow:cloverleaf)    echo 760 ;;  # 修正几何后实测约 744s 才完成
     slow:search)        echo 540 ;;  # 实测约 520s 才完成
-    typical:cloverleaf) echo 480 ;;  # 实测约 380s 才完成
+    typical:cloverleaf) echo 480 ;;  # 实测约 398s 才完成
     slow:*)             echo 420 ;;
     typical:*)          echo 300 ;;
     *)                  echo 240 ;;

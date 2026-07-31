@@ -149,22 +149,29 @@ public:
 
     // §4.7 Cloverleaf：4×(转向 270° + 直航 t_leg)
     // P7 整改：转向段改 RUDDER 恒舵角 + 显式 270° 航向变化阈值
+    // 几何整改：四个转向段必须同向（文档 §4.7 图示四叶均为 +270°）。
+    //   同向时第 k 段直航目标航向 = ψ0 + 270°·k (mod 360°)，与出转航向一致；
+    //   总航向变化 4×270° = 1080°，净回 ψ0，四叶图案闭合。
+    //   若转向方向交替，出转航向只有 ψ0 与 ψ0+270° 两个取值，
+    //   直航目标与船舶实际航向脱节（如船在 ψ0 而目标 ψ0+180°），飞不出四叶形。
+    // dMax 取负值时整体换向（左转四叶），直航目标随之镜像。
     static std::vector<Leg> cloverleaf(double psi0, double tLeg = 30.0, double dMax = 20.0) {
+        const double dir = (dMax >= 0.0) ? 1.0 : -1.0;  // 转向方向由 dMax 符号决定
         std::vector<Leg> legs;
         for (int i = 0; i < 4; ++i) {
-            // 转向段：恒舵角，累计航向变化达 270° 切下一段
+            // 转向段：恒舵角，累计航向变化达 270° 切下一段（四段同向）
             Leg turn;
             turn.mode = Leg::Mode::RUDDER;
-            turn.target = (i % 2 == 0) ? +dMax : -dMax;  // 交替转向方向形成四叶
+            turn.target = dMax;
             turn.trigger = Leg::Trigger::HEADING_REACHED;
             turn.threshold = 270.0;
             turn.next = 2 * i + 1;
             legs.push_back(turn);
 
-            // 直航段：保持当前航向 t_leg 秒
+            // 直航段：保持出转航向 t_leg 秒（= ψ0 + dir·270°·(i+1)）
             Leg straight;
             straight.mode = Leg::Mode::HEADING;
-            straight.target = normalizeAngleDeg(psi0 + 270.0 * (i + 1));
+            straight.target = normalizeAngleDeg(psi0 + dir * 270.0 * (i + 1));
             straight.trigger = Leg::Trigger::TIME;
             straight.threshold = tLeg;
             straight.next = (i < 3) ? (2 * i + 2) : -1;

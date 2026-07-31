@@ -157,12 +157,20 @@ int main(int argc, char** argv) {
         sim.dt = 0.02;
         double K = (Koverride > 0) ? Koverride : 0.2;
         double T = (Toverride > 0) ? Toverride : 8.0;
-        double sec = (secOverride > 0) ? secOverride : 240.0;
+        // 默认 480 s：辨识收敛（约 1~2 min）+ 基线建立后再留数个 60 s ESC 评估窗口
+        double sec = (secOverride > 0) ? secOverride : 480.0;
         auto r = sim.runEsc(K, T, 10.0, sec);
-        std::printf("ESC 长期: Kp=%.4f Kd=%.4f stable=%d\n", r.KpFinal, r.KdFinal, r.stable);
-        std::printf("%s\n", r.stable ? "PASS" : "FAIL");
+        std::printf("ESC 长期: Kp %.4f→%.4f Kd %.4f→%.4f | 辨识 K=%.4f (真值 %.2f) T=%.4f (真值 %.2f) valid=%d | baseline=%d(t=%.0fs) moved=%d stable=%d\n",
+                    r.Kp0, r.KpFinal, r.Kd0, r.KdFinal,
+                    r.Khat, K, r.That, T, r.identValid ? 1 : 0,
+                    r.baselineEstablished ? 1 : 0, r.baselineSec,
+                    r.gainsMoved ? 1 : 0, r.stable ? 1 : 0);
+        // PASS：辨识收敛且物理合理 + 基线建立（ESC 真正启动过）+ 增益确实移动 + 数值稳定有界
+        // 任一不满足即 FAIL——ESC 从未启动时增益与初值逐位相同，moved=0，必然 FAIL
+        bool ok = r.identValid && r.baselineEstablished && r.gainsMoved && r.stable;
+        std::printf("%s\n", ok ? "PASS" : "FAIL");
         if (!outPath.empty()) { sim.exportLastCsv(outPath); std::printf("CSV 导出: %s\n", outPath.c_str()); }
-        return r.stable ? 0 : 1;
+        return ok ? 0 : 1;
     }
 
     // --validate 跑全验证矩阵 + 实时性测量
