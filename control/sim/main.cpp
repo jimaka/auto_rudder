@@ -16,6 +16,7 @@ static void printHelp() {
     std::printf("  --all               跑全部默认矩阵\n");
     std::printf("  --scenario <name>   指定场景名\n");
     std::printf("  --ident             跑 RLS 闭环辨识场景\n");
+    std::printf("  --trial             跑自动 Z 形辨识试验（试验后自动出辨识 K/T 并应用极点配置增益）\n");
     std::printf("  --esc               跑 ESC 长期场景\n");
     std::printf("  --maneuver <name>   跑六机动形态场景 (williamson/uturn/zigzag/circles/cloverleaf/search)\n");
     std::printf("  --validate          跑全验证矩阵 + 实时性测量\n");
@@ -60,6 +61,7 @@ int main(int argc, char** argv) {
     bool runAll = false;
     bool listOnly = false;
     bool runIdent = false;
+    bool runTrial = false;
     bool runEscMode = false;
     bool runValidateMode = false;
     bool runManeuverMode = false;
@@ -86,6 +88,7 @@ int main(int argc, char** argv) {
         if (a == "--list") listOnly = true;
         else if (a == "--all") runAll = true;
         else if (a == "--ident") runIdent = true;
+        else if (a == "--trial") runTrial = true;
         else if (a == "--esc") runEscMode = true;
         else if (a == "--validate") runValidateMode = true;
         else if (a == "--dist") { distOverride = true; hasDistOverride = true; }
@@ -148,6 +151,28 @@ int main(int argc, char** argv) {
         bool ok = r.valid && std::abs(r.Khat - K) < 0.05 && std::abs(r.That - T) < 2.0;
         std::printf("%s\n", ok ? "PASS" : "FAIL");
         if (!outPath.empty()) { sim.exportLastCsv(outPath); std::printf("CSV 导出: %s\n", outPath.c_str()); }
+        return ok ? 0 : 1;
+    }
+
+    // --trial 跑自动 Z 形辨识试验（P14）
+    if (runTrial) {
+        Simulator sim;
+        sim.dt = 0.02;
+        const double K = (Koverride > 0) ? Koverride : 0.2;
+        const double T = (Toverride > 0) ? Toverride : 8.0;
+        const double sec = (secOverride > 0) ? secOverride : 300.0;
+        const double speedKn = (speedOverride > 0) ? speedOverride : 10.0;
+        auto r = sim.runIdentTrial(K, T, speedKn, sec);
+        const double errK = (r.Khat - K) / K * 100.0;
+        const double errT = (r.That - T) / T * 100.0;
+        std::printf("Z形辨识试验: K=%.3f→K̂=%.4f (%+.1f%%)  T=%.1f→T̂=%.2f (%+.1f%%)  valid=%d  用时 %.0fs\n",
+                    K, r.Khat, errK, T, r.That, errT, (int)r.identValid, r.trialSec);
+        std::printf("增益: 试验前 Kp=%.2f Kd=%.2f → 试验后 Kp=%.4f Kd=%.4f  applied=%d\n",
+                    r.KpOld, r.KdOld, r.KpNew, r.KdNew, (int)r.applied);
+        if (!outPath.empty()) { sim.exportLastCsv(outPath); std::printf("CSV 导出: %s\n", outPath.c_str()); }
+        // PASS：收官应用成功 + 辨识误差 ≤25%（与 --ident 容差一致）
+        const bool ok = r.applied && std::abs(errK) <= 25.0 && std::abs(errT) <= 25.0;
+        std::printf("%s\n", ok ? "PASS" : "FAIL");
         return ok ? 0 : 1;
     }
 

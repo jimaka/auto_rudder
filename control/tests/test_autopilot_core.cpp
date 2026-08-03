@@ -392,3 +392,33 @@ TEST(AutopilotCore, ManeuverHeadingLegAppliesScheduledGains) {
     EXPECT_DOUBLE_EQ(ap.pd().params().Kp, 7.25);
     EXPECT_DOUBLE_EQ(ap.pd().params().Kd, 33.5);
 }
+
+// P14 回归：自动 Z 形辨识试验——机动期间辨识器被喂入，收官自动辨识并应用极点配置增益
+TEST(AutopilotCore, IdentTrialIdentifiesAndAppliesGains) {
+    AutopilotCore ap;
+    ap.scheduleMut().setTable({{0.0, 100.0, 0, 1.0, 0.5}});  // 未标定冷启动
+    auto tp = ap.tunerMut().params(); tp.highSpeedDeactivateKn = -1.0;  // 无 ESC 载波
+    ap.tunerMut().setParams(tp);
+    ap.startIdentifyTrial(20.0, 20.0, 4);
+    EXPECT_EQ(ap.mode(), Mode::AUTO_MANEUVER);
+    EXPECT_EQ(ap.identTrialState(), IdentTrialState::RUNNING);
+    // 用 K=0.2/T=8 的 Nomoto 模型当船（与 sim/nomoto_plant.hpp 相同方程）
+    double r = 0.0, psi = 0.0, deltaAct = 0.0;
+    for (int k = 0; k < 300 * 50 && ap.identTrialState() == IdentTrialState::RUNNING; ++k) {
+        SensorInput s{psi, r, deltaAct, 10.0, 0};
+        const double cmd = ap.step(s, 0.02);
+        double ddot = (cmd - deltaAct) / 0.3;
+        ddot = std::clamp(ddot, -10.0, 10.0);
+        deltaAct = std::clamp(deltaAct + ddot * 0.02, -35.0, 35.0);
+        r += (0.2 * deltaAct - r) / 8.0 * 0.02;
+        psi += r * 0.02;
+    }
+    ASSERT_EQ(ap.identTrialState(), IdentTrialState::OK);
+    EXPECT_TRUE(ap.identifier().valid());
+    EXPECT_NEAR(ap.identifier().K(), 0.2, 0.05);
+    EXPECT_NEAR(ap.identifier().T(), 8.0, 2.0);
+    // 试验后增益 = 极点配置 (ζ=0.85, ωn=0.2)：Kp=ωn²T/K=1.6，Kd=(2ζωnT−1)/K=8.6
+    EXPECT_NEAR(ap.pd().params().Kp, 1.6, 0.8);
+    EXPECT_NEAR(ap.pd().params().Kd, 8.6, 4.0);
+    EXPECT_EQ(ap.mode(), Mode::AUTO_HEADING);
+}

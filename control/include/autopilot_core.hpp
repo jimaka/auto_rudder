@@ -8,6 +8,8 @@
 //            重基线（增益=新配置 + ESC 积分器 rebaseEsc 重锚）。同时振荡检测改为
 //            仅在航向参考稳定后喂入——参考机动期间误差摆动是指令响应，旧逻辑在
 //            Z 形激励下 oscAmp≈100°+ 把稳定门永久锁死，基线被钉死在早期坏估计上。
+//   P14 新增：自动 Z 形辨识试验（startIdentifyTrial）——自动执行 Z 形机动，
+//            期间按 1 s 节拍辨识，机动收官自动 极点配置→稳定检查→应用增益。
 #pragma once
 #include "pd_controller.hpp"
 #include "gain_schedule.hpp"
@@ -29,6 +31,9 @@ struct SensorInput {
 
 enum class Mode { MANUAL, AUTO_HEADING, AUTO_MANEUVER, HOLD };
 
+// P14：自动 Z 形辨识试验状态（§3.9.4 Z 形试验辨识的自动化）
+enum class IdentTrialState { NONE, RUNNING, OK, FAILED };
+
 class AutopilotCore {
 public:
     AutopilotCore() {
@@ -45,6 +50,7 @@ public:
         pd_.reset();
         identCounter_ = 0;
         escCounter_ = 0;
+        identTrial_ = IdentTrialState::NONE;  // P14：切模式取消进行中的辨识试验
         // 切出 AUTO_HEADING/AUTO_MANEUVER 时去激活自动优化
         if (m == Mode::MANUAL || m == Mode::HOLD) tuner_.disable();
         // HOLD 模式：冻结当前舵角作为保持指令
@@ -63,9 +69,22 @@ public:
 
     // 启动机动
     void startManeuver(const std::vector<Leg>& legs) {
+        identTrial_ = IdentTrialState::NONE;  // P14：普通机动抢占进行中的辨识试验
         sequencer_.setLegs(legs);
         mode_ = Mode::AUTO_MANEUVER;
     }
+
+    // P14：自动 Z 形辨识试验——执行 dz/phiz 的 Z 形机动，期间按 1 s 节拍喂
+    //       辨识器；机动结束自动 极点配置 → 稳定性检查 → 应用新增益，
+    //       结果经 identTrialState()/identifier()/pd() 读取
+    void startIdentifyTrial(double dz = 20.0, double phiz = 20.0, int cycles = 4) {
+        identifier_.reset();   // 重新辨识，不被历史数据污染
+        identCounter_ = 0;
+        sequencer_.setLegs(ManeuverSequencer::zigzag(0.0, dz, phiz, cycles, false));
+        identTrial_ = IdentTrialState::RUNNING;
+        mode_ = Mode::AUTO_MANEUVER;
+    }
+    IdentTrialState identTrialState() const { return identTrial_; }
 
     // 主循环：50 Hz 调用
     // 输出：目标舵角 (deg)
@@ -84,12 +103,20 @@ public:
             case Mode::AUTO_MANEUVER: {
                 ManeuverSequencer::Cmd cmd = sequencer_.update(s.headingDeg, s.rateDegS, dt);
                 if (sequencer_.done()) {
+                    // P14：Z 形辨识试验收官——辨识有效则 极点配置+应用，失败保持原增益
+                    if (identTrial_ == IdentTrialState::RUNNING) finalizeIdentTrial();
                     // P11 整改：完成拍不再输出 0（那是绕过舵速限幅的瞬时跳变），
                     //           立即转入航向保持并闭环运行本拍
                     mode_ = Mode::AUTO_HEADING;
                     headingRef_ = s.headingDeg;  // 保持当前航向
                     rudderCmd = headingControlStep(s, dt);
                     break;
+                }
+                // P14：辨识试验期间按 1 s 节拍喂辨识器（试验显式发起，
+                //       不受调参器启用/高速去激活门控）
+                if (identTrial_ == IdentTrialState::RUNNING && ++identCounter_ >= 50) {
+                    identCounter_ = 0;
+                    identifier_.update(s.rudderDeg, s.rateDegS);
                 }
                 if (cmd.isHeading) {
                     headingRef_ = cmd.heading;
@@ -243,6 +270,31 @@ private:
         return pd_.update(headingRef_, s.headingDeg);
     }
 
+    // P14：Z 形辨识试验收官——辨识结果物理合理且极点配置/稳定检查通过，
+    //       才把新增益设为基线并应用（ESC 从该基线继续微调）；否则保持原增益。
+    //       机动刚结束时振荡测量无效，osc 条件以 0 传入，由 ζ/ωn 代数条件把关
+    //       （与 P12 参考机动期间不喂振荡检测同一理由）。
+    void finalizeIdentTrial() {
+        bool ok = false;
+        if (identifier_.excited() && identifier_.valid()) {
+            const double Khat = identifier_.K();
+            const double That = identifier_.T();
+            double Kp2, Kd2;
+            if (AutoTuner::polePlacement(Khat, That, tuner_.params().zeta,
+                                         tuner_.params().wn, Kp2, Kd2)
+                && tuner_.stabilityCheck(Khat, That, Kp2, Kd2, 0.0)) {
+                tuner_.setBaseline(Kp2, Kd2);
+                baselineEstablished_ = true;
+                escKp_ = Kp2; escKd_ = Kd2;
+                escBaseK_ = Khat; escBaseT_ = That;
+                tuner_.rebaseEsc();   // 旧梯度围绕旧增益测得，不得施加到新基线
+                escCounter_ = 0;
+                ok = true;
+            }
+        }
+        identTrial_ = ok ? IdentTrialState::OK : IdentTrialState::FAILED;
+    }
+
     // ESC 窗口结算统一入口（P11 整改：消除 step() 与 runEscTuning() 的重复逻辑）
     // 仅在调参器启用且基线已建立时执行；稳定性检查不通过则回退基线
     void escTrigger(double& Kp, double& Kd) {
@@ -277,6 +329,7 @@ private:
     double             refAgeSec_ = 0.0;       // P12: 参考未变累计时长 (s)
     double             holdRudder_ = 0.0;     // P9: HOLD 模式冻结舵角
     double             lastRudderCmd_ = 0.0;   // P9: 上一拍舵角指令
+    IdentTrialState    identTrial_ = IdentTrialState::NONE;  // P14: Z 形辨识试验状态
 
     // P12: K/T 估计相对漂移超过 25% 才显式重基线——小于该幅度时新旧极点配置差异
     //      在 ESC 自身修正能力范围内，交给 ESC 连续调参；超过则意味着船况/航速

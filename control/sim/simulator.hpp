@@ -360,6 +360,59 @@ public:
         return r;
     }
 
+    // P14：自动 Z 形辨识试验场景——从未标定增益 (1.0/0.5) 冷启动，自动执行
+    //   Z 形机动，期间 1 s 节拍辨识，收官自动 极点配置→稳定检查→应用增益。
+    //   调参器强制去激活（无 ESC 载波纹波），试验后增益 = 极点配置结果本身。
+    struct TrialResult {
+        double Khat = 0.0, That = 0.0;    // 辨识结果
+        double KpOld = 0.0, KdOld = 0.0;  // 试验前增益（冷启动失谐值）
+        double KpNew = 0.0, KdNew = 0.0;  // 试验后增益
+        double trialSec = 0.0;            // 实际试验时长（收官即停）
+        bool   identValid = false;
+        bool   applied = false;           // 收官是否通过检查并应用（false=失败或超时）
+    };
+    TrialResult runIdentTrial(double K, double T, double speedKn, double maxSec,
+                              double dz = 20.0, double phiz = 20.0, int cycles = 4) {
+        plant.K = K; plant.T = T; plant.reset(0.0);
+        lastSamples.clear();
+        // 模拟未标定冷启动：调度表给保守默认增益（覆盖全海况行）
+        ap.scheduleMut().setTable({{0.0, 100.0, 0, 1.0, 0.5},
+                                   {0.0, 100.0, 1, 1.0, 0.5},
+                                   {0.0, 100.0, 2, 1.0, 0.5},
+                                   {0.0, 100.0, 3, 1.0, 0.5}});
+        auto tp = ap.tunerMut().params(); tp.highSpeedDeactivateKn = -1.0;
+        ap.tunerMut().setParams(tp);
+        dist.setSeaState(0);
+        ap.startIdentifyTrial(dz, phiz, cycles);
+
+        TrialResult r;
+        r.KpOld = 1.0; r.KdOld = 0.5;
+        const int totalSteps = static_cast<int>(maxSec / dt);
+        for (int k = 0; k < totalSteps; ++k) {
+            const double t = k * dt;
+            SensorInput s;
+            s.headingDeg = plant.psi; s.rateDegS = plant.r;
+            s.rudderDeg = plant.deltaAct; s.speedKn = speedKn; s.seaState = 0;
+            const double cmd = ap.step(s, dt);
+            plant.step(cmd, dt);
+            r.trialSec = t;
+            if (k % recordEvery == 0) {
+                Sample sm; sm.t = t; sm.psi = plant.psi;
+                sm.psiRef = 0.0; sm.rudderCmd = cmd; sm.rudderAct = plant.deltaAct;
+                sm.rate = plant.r; sm.err = 0.0;
+                sm.Kp = ap.pd().params().Kp; sm.Kd = ap.pd().params().Kd;
+                sm.mode = static_cast<int>(ap.mode());
+                lastSamples.push_back(sm);
+            }
+            if (ap.identTrialState() != IdentTrialState::RUNNING) break;  // 收官即停
+        }
+        r.Khat = ap.identifier().K(); r.That = ap.identifier().T();
+        r.identValid = ap.identifier().valid();
+        r.applied = (ap.identTrialState() == IdentTrialState::OK);
+        r.KpNew = ap.pd().params().Kp; r.KdNew = ap.pd().params().Kd;
+        return r;
+    }
+
     // 全验证矩阵 + 实时性测量：跑带干扰的阶跃，测指标 + 单拍耗时
     struct ValidationResult {
         double overshootPct, settlingTime, ess1Sigma, essBias, rudderFreq;

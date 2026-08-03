@@ -12,7 +12,8 @@ if(AR_BUILD_TESTS)
     add_test(NAME sim_validate      COMMAND ar_sim --validate)
     add_test(NAME sim_ident         COMMAND ar_sim --ident)
     add_test(NAME sim_esc           COMMAND ar_sim --esc)
+    add_test(NAME sim_trial         COMMAND ar_sim --trial)
     add_test(NAME sim_maneuver_zigzag COMMAND ar_sim --maneuver zigzag)
-    set_tests_properties(sim_all sim_validate sim_ident sim_esc sim_maneuver_zigzag
+    set_tests_properties(sim_all sim_validate sim_ident sim_esc sim_trial sim_maneuver_zigzag
         PROPERTIES TIMEOUT 120)
 endif()
