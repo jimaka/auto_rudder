@@ -2,6 +2,12 @@
 // 自动舵核心集成（对应文档 §5 定位与控制联合工作流）
 //   将 PD 控制器 + 增益调度 + 在线辨识 + 自动优化 + 机动序列 整合
 //   仅算法层，IO 由外部注入
+//   P12 整改：ESC 增益所有权——基线建立后辨识触发的极点配置不再每秒盲目覆写
+//            escKp_/escKd_（旧逻辑把 ESC 窗口间的积分成果全部冲掉，回退基线也被
+//            拖到未收敛估计上）；仅当 K/T 估计相对基线估计漂移超阈值时才走显式
+//            重基线（增益=新配置 + ESC 积分器 rebaseEsc 重锚）。同时振荡检测改为
+//            仅在航向参考稳定后喂入——参考机动期间误差摆动是指令响应，旧逻辑在
+//            Z 形激励下 oscAmp≈100°+ 把稳定门永久锁死，基线被钉死在早期坏估计上。
 #pragma once
 #include "pd_controller.hpp"
 #include "gain_schedule.hpp"
@@ -87,6 +93,13 @@ public:
                 }
                 if (cmd.isHeading) {
                     headingRef_ = cmd.heading;
+                    // P13 整改：机动 HEADING 段此前直接 pd_.update，从不查调度表，
+                    //           PD 全程停留在默认增益 Kp=1/Kd=0.5（慢船几乎拉不动舵，
+                    //           直航段目标航向完全丢失，cloverleaf 严重畸变）。
+                    //           此处补齐增益调度查询；辨识/ESC 在机动中仍保持挂起。
+                    double Kp, Kd;
+                    schedule_.query(s.speedKn, s.seaState, Kp, Kd);
+                    pd_.setGains(Kp, Kd);
                     // P1 整改：用 setDt 替代 setParams，避免切段 reset 清状态
                     pd_.setDt(dt);
                     rudderCmd = pd_.update(headingRef_, s.headingDeg);
@@ -150,18 +163,41 @@ private:
                 identifier_.update(s.rudderDeg, s.rateDegS);
                 // P6 整改：仅在辨识结果物理合理时才送极点配置
                 if (identifier_.excited() && identifier_.valid()) {
-                    double Khat = identifier_.K();
-                    double That = identifier_.T();
-                    double Kp2, Kd2;
-                    // P6 整改：polePlacement 返回 bool，失败保持原增益
-                    if (AutoTuner::polePlacement(Khat, That, tuner_.params().zeta,
-                                                 tuner_.params().wn, Kp2, Kd2)) {
-                        // 稳定性监控（P4 整改：oscAmplitude 由 OscillationDetector 实测）
-                        if (tuner_.stabilityCheck(Khat, That, Kp2, Kd2,
-                                                  tuner_.oscDetector().amplitude())) {
-                            tuner_.setBaseline(Kp2, Kd2);
-                            baselineEstablished_ = true;
-                            escKp_ = Kp2; escKd_ = Kd2;
+                    const double Khat = identifier_.K();
+                    const double That = identifier_.T();
+                    // P12 整改：基线建立后 ESC 拥有增益。K/T 估计漂移在阈值内时跳过
+                    //           重配置（旧逻辑每秒覆写 escKp_/escKd_，ESC 窗口间的积分
+                    //           成果全被冲掉）；漂移超阈值（船况/航速真正改变，或估计
+                    //           已显著远离早期未收敛值）才走显式重基线。
+                    const bool driftSmall = baselineEstablished_
+                        && std::abs(Khat - escBaseK_)
+                           <= kReBaselineTol * std::max(std::abs(escBaseK_), kReBaselineKFloor)
+                        && std::abs(That - escBaseT_)
+                           <= kReBaselineTol * std::max(std::abs(escBaseT_), kReBaselineTFloor);
+                    if (!driftSmall) {
+                        const bool rebaseline = baselineEstablished_;  // P12: 本次为显式重基线
+                        double Kp2, Kd2;
+                        // P6 整改：polePlacement 返回 bool，失败保持原增益
+                        if (AutoTuner::polePlacement(Khat, That, tuner_.params().zeta,
+                                                     tuner_.params().wn, Kp2, Kd2)) {
+                            // 稳定性监控（P4 整改：oscAmplitude 由 OscillationDetector 实测）
+                            if (tuner_.stabilityCheck(Khat, That, Kp2, Kd2,
+                                                      tuner_.oscDetector().amplitude())) {
+                                tuner_.setBaseline(Kp2, Kd2);
+                                baselineEstablished_ = true;
+                                escKp_ = Kp2; escKd_ = Kd2;
+                                // P12：记录本次基线对应的 K/T 估计，作为漂移判据基准
+                                escBaseK_ = Khat; escBaseT_ = That;
+                                if (rebaseline) {
+                                    // P12：显式重基线——ESC 积分器清零重锚（旧梯度不得
+                                    //      施加到新基线），窗口节拍重对齐，使下一窗在
+                                    //      新增益附近完整测量
+                                    tuner_.rebaseEsc();
+                                    escCounter_ = 0;
+                                }
+                            }
+                            // P12：配置/检查失败时不更新 escBaseK_/escBaseT_，
+                            //      下一秒估计若仍超阈值会重试；ESC 继续在旧基线上运行
                         }
                     }
                 }
@@ -172,7 +208,15 @@ private:
 
         // 累积性能指标样本（P11：内部同步做每拍因果解调）
         const double e = angleDiffDeg(headingRef_, s.headingDeg);
-        tuner_.accumulate(e, s.rudderDeg);
+        // P12 整改：振荡检测仅在航向参考稳定满 kOscRefSettleSec 后喂入——
+        //           参考机动（如辨识 Z 形 ±40°/15 s）期间误差大幅摆动是指令响应
+        //           而非闭环振荡，喂入检测器会把 oscAmp 顶到远超 oscMax（实测
+        //           ≈100°+），稳定门从此永久封锁一切配置/ESC 更新，基线被钉死在
+        //           早期未收敛估计上。参考机动期间由 ζ/ωn 代数条件把关；
+        //           参考平稳后 osc 条件恢复实测参与，回退语义不变。
+        if (headingRef_ != prevHeadingRef_) { prevHeadingRef_ = headingRef_; refAgeSec_ = 0.0; }
+        else                                { refAgeSec_ += dt; }
+        tuner_.accumulate(e, s.rudderDeg, refAgeSec_ >= kOscRefSettleSec);
 
         // P11 整改：ESC 增益持久化——基线建立后以 ESC 结果为基准，
         //           否则每拍被调度表覆盖，调参永远无效
@@ -227,8 +271,23 @@ private:
     bool               pendingBaseline_ = false;      // P11: 首拍以实际舵角初始化舵速基准
     double             escKp_ = 0.0;       // P11: ESC 持久化增益（基线建立后接管调度值）
     double             escKd_ = 0.0;
+    double             escBaseK_ = 0.0;    // P12: 基线/重基线时的 K/T 估计（漂移判据基准）
+    double             escBaseT_ = 0.0;
+    double             prevHeadingRef_ = 0.0;  // P12: 航向参考变化检测（振荡检测门控）
+    double             refAgeSec_ = 0.0;       // P12: 参考未变累计时长 (s)
     double             holdRudder_ = 0.0;     // P9: HOLD 模式冻结舵角
     double             lastRudderCmd_ = 0.0;   // P9: 上一拍舵角指令
+
+    // P12: K/T 估计相对漂移超过 25% 才显式重基线——小于该幅度时新旧极点配置差异
+    //      在 ESC 自身修正能力范围内，交给 ESC 连续调参；超过则意味着船况/航速
+    //      真正改变（或估计已远离早期未收敛值），必须显式重锚。
+    static constexpr double kReBaselineTol = 0.25;
+    // P12: 相对漂移分母下限（防早期小估计把相对偏差放大到失真；K∈(0,2]、T∈[1,60]）
+    static constexpr double kReBaselineKFloor = 0.05;
+    static constexpr double kReBaselineTFloor = 1.0;
+    // P12: 参考稳定满 30 s 才喂入振荡检测——覆盖典型船闭环调节时间（T≤20 s 船
+    //      约 4T），短于此的参考机动期间 osc 测量无效、不参与稳定门
+    static constexpr double kOscRefSettleSec = 30.0;
 };
 
 } // namespace ar

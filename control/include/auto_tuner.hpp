@@ -10,6 +10,12 @@
 //            调参结果与初值逐位相同。现改为：每控制拍 escDither() 叠加 a·sin(ωt)，
 //            accumulate() 内按拍累积 成本增量×载波（因果解调），窗末 escStep()
 //            用按 windowSec 计算的 LPF 平滑梯度并积分更新。
+//   P12 整改：配合 AutopilotCore 的 ESC 增益所有权修复——
+//            (1) 新增 rebaseEsc()：显式重基线时清零 ESC 积分/解调/窗口样本，
+//                旧梯度是围绕旧增益旧模型测的，不得施加到新基线上；
+//            (2) accumulate() 三参形式允许调用方抑制振荡检测喂入——参考机动
+//                期间误差大幅摆动是指令响应而非闭环振荡，喂入检测器会把 oscAmp
+//                顶到越限，稳定门永久封锁一切 ESC/配置更新。
 #pragma once
 #include "nomoto_identifier.hpp"
 #include <algorithm>
@@ -129,7 +135,11 @@ public:
     // P11 整改：启用 ESC 时同步做因果解调累积——每拍计算成本增量 c_k，
     //           经按控制周期 dt 设计的一阶 HPF 去直流后乘以当前扰动载波 sin/cos，
     //           窗末由 escStep() 归一化为梯度估计
-    void accumulate(double e, double delta) {
+    void accumulate(double e, double delta) { accumulate(e, delta, true); }
+    // P12 整改：oscEligible=false 时跳过振荡检测喂入（参考机动期间误差摆动是
+    //           指令响应而非闭环振荡，详见 autopilot_core.hpp 的 P12 注释）；
+    //           成本累积与 ESC 解调不受影响。两参形式保持原行为（恒喂入）。
+    void accumulate(double e, double delta, bool oscEligible) {
         const double ddelta = delta - prevDelta_;
         const double t = windowErr_.size() * p_.dt;  // 本拍在窗口内的时刻（ITAE 时间权重）
         windowErr_.push(std::abs(e));
@@ -137,7 +147,7 @@ public:
         windowDDelta_.push(std::abs(ddelta));
         prevDelta_ = delta;
         // P4：振荡检测器同步累积原始误差（带符号）
-        oscDetector_.update(e, p_.dt);
+        if (oscEligible) oscDetector_.update(e, p_.dt);
 
         if (!enabled_) return;
         // 本拍成本增量（与 computeJ 的被积函数一致）
@@ -277,6 +287,24 @@ public:
     void revert(double& Kp, double& Kd) const {
         Kp = baselineKp_;
         Kd = baselineKd_;
+    }
+
+    // P12 整改：显式重基线（K/T 估计漂移超阈值）时由调用方触发——ESC 积分/解调/
+    //   窗口样本清零重锚。旧梯度与旧窗口成本是围绕旧增益、旧模型测得的，重锚后
+    //   继续积分会把陈旧梯度施加到新基线上。载波相位 escPhase_ 不清：相位连续
+    //   可避免重锚拍载波突跳（且调用方可能按拍推算载波相位）。
+    void rebaseEsc() {
+        gradKp_ = 0.0;
+        gradKd_ = 0.0;
+        hpfCPrev_ = 0.0;
+        hpfY_ = 0.0;
+        demodKpSum_ = 0.0;
+        demodKdSum_ = 0.0;
+        demodCount_ = 0;
+        windowErr_.clear();
+        windowDelta_.clear();
+        windowDDelta_.clear();
+        prevDelta_ = 0.0;
     }
 
 private:

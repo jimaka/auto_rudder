@@ -1,4 +1,4 @@
-// test_maneuver_sequencer.cpp — 机动序列框架（对应开发文档 §4 + P7/P10 整改回归）
+// test_maneuver_sequencer.cpp — 机动序列框架（对应开发文档 §4 + P7/P10/P12 整改回归）
 #include "maneuver_sequencer.hpp"
 #include <gtest/gtest.h>
 #include <cmath>
@@ -27,7 +27,7 @@ TEST(ManeuverSequencer, WilliamsonStructure) {
     EXPECT_EQ(legs[0].trigger, Leg::Trigger::HEADING_REACHED);
     EXPECT_NEAR(legs[0].threshold, 60.0, 1e-9);
     EXPECT_LT(legs[1].target, 0.0);  // -δ_max
-    EXPECT_NEAR(legs[1].threshold, 180.0, 1e-9);
+    EXPECT_NEAR(legs[1].threshold, -180.0, 1e-9);  // P12：反舵段阈值为负，与舵向一致
     EXPECT_EQ(legs[2].mode, Leg::Mode::HEADING);
 }
 
@@ -44,6 +44,7 @@ TEST(ManeuverSequencer, UTurnUsesRudderTurn) {
 
     auto legsL = ManeuverSequencer::uTurn(10.0, false);  // 用非边界航向避免 ±180 归一化歧义
     EXPECT_LT(legsL[0].target, 0.0);  // 左转 -dMax
+    EXPECT_NEAR(legsL[0].threshold, -180.0, 1e-9);  // P12：左转阈值为负
     EXPECT_NEAR(legsL[1].target, normalizeAngleDeg(10.0 - 180.0), 1e-9);  // -170°
 }
 
@@ -53,7 +54,10 @@ TEST(ManeuverSequencer, ZigzagStructure) {
     for (size_t i = 0; i < legs.size(); ++i) {
         EXPECT_EQ(legs[i].mode, Leg::Mode::RUDDER);
         EXPECT_EQ(legs[i].trigger, Leg::Trigger::HEADING_REACHED);
-        EXPECT_NEAR(legs[i].threshold, 15.0, 1e-9);
+        // P12：阈值带符号且与本段舵向一致，符号交替
+        const double expect = (i % 2 == 0) ? 15.0 : -15.0;
+        EXPECT_NEAR(legs[i].threshold, expect, 1e-9) << "leg " << i;
+        EXPECT_GT(legs[i].target * legs[i].threshold, 0.0) << "leg " << i << " 阈值符号须与舵向一致";
     }
     EXPECT_GT(legs[0].target, 0.0);
     EXPECT_LT(legs[1].target, 0.0);
@@ -65,6 +69,14 @@ TEST(ManeuverSequencer, ZigzagReturnToStart) {
     ASSERT_EQ(legs.size(), 5u);  // 2*2 + 1
     EXPECT_EQ(legs.back().mode, Leg::Mode::HEADING);
     EXPECT_EQ(legs.back().next, -1);
+}
+
+TEST(ManeuverSequencer, ZigzagReturnTargetsPsi0) {
+    // P12 整改：returnToStart 保持段目标 = 传入的 psi0（旧实现硬编码 0°）
+    auto legs = ManeuverSequencer::zigzag(40.0, 10.0, 15.0, 2, true);
+    ASSERT_EQ(legs.size(), 5u);
+    EXPECT_EQ(legs.back().mode, Leg::Mode::HEADING);
+    EXPECT_NEAR(legs.back().target, 40.0, 1e-9);
 }
 
 TEST(ManeuverSequencer, CloverleafTurnsUseRudder) {
@@ -92,7 +104,7 @@ TEST(ManeuverSequencer, CloverleafLegsAreGeometricallyConsistent) {
             EXPECT_EQ(l.next, (i < 7) ? (i + 1) : -1) << "leg " << i;
             if (l.mode == Leg::Mode::RUDDER) {
                 EXPECT_GT(l.target, 0.0) << "turn leg " << i << " 四段转向必须同向(+)";
-                const double dpsi = (l.target > 0 ? 1.0 : -1.0) * l.threshold;
+                const double dpsi = l.threshold;  // P12：阈值带符号，直接即航向增量
                 hdg = normalizeAngleDeg(hdg + dpsi);
                 totalTurn += dpsi;
             } else {
@@ -115,7 +127,8 @@ TEST(ManeuverSequencer, CloverleafLegsAreGeometricallyConsistent) {
     for (const Leg& l : legsL) {
         if (l.mode == Leg::Mode::RUDDER) {
             EXPECT_LT(l.target, 0.0);
-            const double dpsi = (l.target > 0 ? 1.0 : -1.0) * l.threshold;
+            EXPECT_LT(l.threshold, 0.0);  // P12：左转段阈值为负，与舵向一致
+            const double dpsi = l.threshold;
             hdg = normalizeAngleDeg(hdg + dpsi);
             totalTurn += dpsi;
         } else {
@@ -139,7 +152,7 @@ TEST(ManeuverSequencer, CloverleafGeometryClosesWithIdealShip) {
     for (size_t i = 0; i + 1 < legs.size(); ++i) {
         double exitH = planEntry.back();
         if (legs[i].mode == Leg::Mode::RUDDER)
-            exitH += (legs[i].target > 0 ? 1.0 : -1.0) * legs[i].threshold;
+            exitH += legs[i].threshold;  // P12：阈值带符号，直接即计划航向增量
         planEntry.push_back(normalizeAngleDeg(exitH));
     }
 
@@ -230,4 +243,41 @@ TEST(ManeuverSequencer, HeadingReachedTriggerAdvances) {
         cmd = step(s, hdg, 5.0, dt);  // 5°/s 转向，18 s 转 90°
     }
     EXPECT_EQ(s.currentIndex(), 1);  // 累计 90° 后切段
+}
+
+TEST(ManeuverSequencer, HeadingReachedIsDirectionAware) {
+    // P12 整改回归：反舵段的顺漂预触发。
+    // 段1 右舵转 +30°；段2 反舵、阈值 -20°。进入段2 后船因惯性仍沿旧方向
+    // 顺漂（cumHeading 继续正向增长，甚至远超 |-20°|），触发器不得切段；
+    // 直到船真正反向、累计航向变化过 -20° 才允许切段。
+    ManeuverSequencer s;
+    std::vector<Leg> legs = {
+        {Leg::Mode::RUDDER, +20.0, Leg::Trigger::HEADING_REACHED, +30.0, 1},
+        {Leg::Mode::RUDDER, -20.0, Leg::Trigger::HEADING_REACHED, -20.0, 2},
+        {Leg::Mode::HEADING, 0.0, Leg::Trigger::NONE, 0.0, -1},
+    };
+    s.setLegs(legs);
+    double hdg = 0.0;
+    const double dt = 0.1;
+    // 段1：+5°/s 右转，累计 +30° 后切到段2
+    for (int k = 0; k < 200 && s.currentIndex() == 0; ++k) step(s, hdg, 5.0, dt);
+    ASSERT_EQ(s.currentIndex(), 1);
+    const double hdgAtLeg2Entry = hdg;  // ≈ +30°
+    // 顺漂阶段：舵已反，航向仍 +5°/s 增长 8 s（累计 +40°。
+    // 旧逻辑 |cum|>=|thr| 在顺漂 +20° 时就会误切段）
+    for (int k = 0; k < 80; ++k) {
+        step(s, hdg, 5.0, dt);
+        ASSERT_EQ(s.currentIndex(), 1) << "顺漂阶段不得触发（k=" << k << "）";
+    }
+    // 船真正反向：-5°/s，从 +40° 回摆，净变化过 -20° 后应切段
+    bool advanced = false;
+    for (int k = 0; k < 300 && !advanced; ++k) {
+        step(s, hdg, -5.0, dt);
+        if (s.currentIndex() == 2) {
+            advanced = true;
+            // 切段点相对段2入口的真实航向变化必须已达 -20°（容差一步 0.5°）
+            EXPECT_LE(angleDiffDeg(hdg, hdgAtLeg2Entry), -19.5);
+        }
+    }
+    EXPECT_TRUE(advanced) << "真正反向过阈值后必须切段";
 }

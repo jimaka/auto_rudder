@@ -200,3 +200,195 @@ TEST(AutopilotCore, RunEscTuningNoBaselineNoop) {
     EXPECT_NEAR(ap.pd().params().Kp, Kp0, 1e-9);
     EXPECT_NEAR(ap.pd().params().Kd, Kd0, 1e-9);
 }
+
+// P12 整改回归：ESC 拥有增益后，辨识更新不再盲目覆写；
+//               K/T 漂移超阈值时才走显式重基线（增益跳到新配置）
+// 场景（与探针核对过的确定性时序）：合成辨识驱动 (K=0.2,T=8) → 基线链收敛到
+//   placement≈(1.588, 8.30)；t=200s 切换 T=12（K 不变）。RLS 缓慢再收敛期间
+//   （t≈270s，T̂≈9.1，较基线估计 +19% < 25% 阈值）增益必须仍钉在旧基线——
+//   旧实现此时每秒都被覆写到 placement≈(2.0, 12+)；t≈284s 漂移越阈触发显式
+//   重基线，增益跳到新 placement≈(2.12, 12.54) 并保持。
+TEST(AutopilotCore, IdentUpdatesDoNotOverwriteEscGains) {
+    AutopilotCore ap;
+    auto tp = ap.tunerMut().params();
+    tp.escFreq = 2.0 * M_PI;   // 1 s 载波：50 拍均值恰好整周期去抖
+    tp.windowSec = 10.0;       // 缩短 ESC 窗口加快测试
+    ap.tunerMut().setParams(tp);
+    ap.setMode(Mode::AUTO_HEADING);
+    ap.setHeadingRef(0.0);
+    SensorInput s{0, 0, 0, 10, 0};
+
+    // 合成 Nomoto 数据驱动在线辨识：±25° Z 形（8/3 拍保持）
+    double K = 0.2, T = 8.0;
+    double r = 0.0;
+    int hold[2] = {8, 3}; double dval[2] = {25.0, -25.0};
+    int phase = 0, cnt = 0;
+    auto step1s = [&]() {  // 跑 50 拍（1 s），推进一次合成激励
+        const double d = dval[phase];
+        r = (K * d * 1.0 + T * r) / (1.0 + T);
+        s.rudderDeg = d;
+        s.rateDegS = r;
+        if (++cnt >= hold[phase]) { cnt = 0; phase = 1 - phase; }
+        for (int k = 0; k < 50; ++k) ap.step(s, 0.02);
+    };
+    // 50 拍（载波整周期）PD 增益均值 = 去抖后的 ESC 持久增益
+    auto gainCenter = [&](double& kpC, double& kdC) {
+        kpC = 0.0; kdC = 0.0;
+        for (int k = 0; k < 50; ++k) {
+            ap.step(s, 0.02);
+            kpC += ap.pd().params().Kp;
+            kdC += ap.pd().params().Kd;
+        }
+        kpC /= 50.0; kdC /= 50.0;
+    };
+
+    // 阶段1：(K=0.2,T=8) 驱动 200 s，基线链收敛到 placement≈(1.588, 8.30)
+    for (int sec = 0; sec < 199; ++sec) step1s();
+    double KpB, KdB;
+    gainCenter(KpB, KdB);  // 第 200 s
+    EXPECT_NEAR(KpB, 1.588, 0.10);
+    EXPECT_NEAR(KdB, 8.30, 0.50);
+
+    // 阶段2：切换 T=12（K 不变），RLS 缓慢再收敛
+    T = 12.0;
+    for (int sec = 0; sec < 70; ++sec) step1s();  // t≈270 s
+    // 检查点1：估计已明显移动（T̂>8.6，较基线估计 +13% 以上），但 25% 阈值未到，
+    //          增益必须仍钉在旧基线（盲目覆写实现此时已跳到 placement≈(2.0,12+)）
+    EXPECT_GT(ap.identifier().T(), 8.6) << "辨识未跟上新对象，测试前提不成立";
+    double Kp1, Kd1;
+    gainCenter(Kp1, Kd1);
+    EXPECT_NEAR(Kp1, KpB, 0.06) << "Kp 被辨识更新覆写";
+    EXPECT_NEAR(Kd1, KdB, 0.40) << "Kd 被辨识更新覆写";
+
+    // 阶段3：继续再收敛，t≈284 s 漂移越阈 → 显式重基线
+    for (int sec = 0; sec < 118; ++sec) step1s();  // t≈389 s
+    double Kp2, Kd2;
+    gainCenter(Kp2, Kd2);
+    // 增益必须已跳到新 placement≈(2.12, 12.54)（显式重基线路径）
+    EXPECT_NEAR(Kp2, 2.12, 0.15);
+    EXPECT_NEAR(Kd2, 12.54, 0.80);
+    EXPECT_GT(Kd2 - KdB, 3.0) << "未发生显式重基线";
+}
+
+// P12 整改回归：稳定门回退路径保留——ESC 更新被四条件检查拒绝时，
+//               增益必须回到极点配置基线（而不是停在 ESC 试出界的位置）
+// 时序：基线收敛后先注入与 Kp 载波负相关的成本（e 恒正，不触发振荡检测），
+//   ESC 更新被接受、Kp 上移；再改注零均值振荡误差（峰-峰 12° > oscMax 5°），
+//   窗口结算被稳定门拒绝 → revert 回基线。
+TEST(AutopilotCore, EscFallbackRestoresBaselineOnOscillation) {
+    AutopilotCore ap;
+    auto tp = ap.tunerMut().params();
+    tp.escFreq = 2.0 * M_PI;   // 1 s 载波（50 拍整周期）
+    tp.windowSec = 10.0;       // 500 拍窗口
+    ap.tunerMut().setParams(tp);
+    ap.setMode(Mode::AUTO_HEADING);
+    ap.setHeadingRef(0.0);
+    SensorInput s{0, 0, 0, 10, 0};
+
+    double K = 0.2, T = 8.0;
+    double r = 0.0;
+    int hold[2] = {8, 3}; double dval[2] = {25.0, -25.0};
+    int phase = 0, cnt = 0;
+    int k0 = -1;              // 基线建立拍（载波相位原点）
+    double schedKp = 0.0;
+    long kGlobal = 0;
+    // 跑 50 拍（1 s）；eFn 为空则 heading=0（e=0），否则按拍注入航向误差
+    auto run1s = [&](double (*eFn)(long, int)) {
+        const double d = dval[phase];
+        r = (K * d * 1.0 + T * r) / (1.0 + T);
+        s.rudderDeg = d;
+        s.rateDegS = r;
+        if (++cnt >= hold[phase]) { cnt = 0; phase = 1 - phase; }
+        for (int k = 0; k < 50; ++k, ++kGlobal) {
+            if (eFn) s.headingDeg = -eFn(kGlobal, k0);  // e = -heading（ref=0）
+            ap.step(s, 0.02);
+            if (kGlobal == 0) schedKp = ap.pd().params().Kp;
+            if (k0 < 0 && std::abs(ap.pd().params().Kp - schedKp) > 0.01 * schedKp)
+                k0 = kGlobal;  // 首次极点配置接管的拍
+        }
+    };
+    auto gainCenter = [&](double& kpC, double& kdC) {
+        kpC = 0.0; kdC = 0.0;
+        for (int k = 0; k < 50; ++k, ++kGlobal) {
+            ap.step(s, 0.02);
+            kpC += ap.pd().params().Kp;
+            kdC += ap.pd().params().Kd;
+        }
+        kpC /= 50.0; kdC /= 50.0;
+    };
+
+    // 阶段1：驱动 200 s 收敛基线（e=0）
+    for (int sec = 0; sec < 199; ++sec) run1s(nullptr);
+    ASSERT_GE(k0, 0) << "极点配置基线未建立";
+    double KpB, KdB;
+    gainCenter(KpB, KdB);
+    EXPECT_NEAR(KpB, 1.588, 0.10);
+    EXPECT_NEAR(KdB, 8.30, 0.50);
+
+    // 阶段2：注入 e = 5-3·sin(载波相位)（恒正 → 振荡检测无过零，幅值保持 0），
+    //        成本与 Kp 载波负相关 → 梯度使 Kp 上移，更新被接受
+    for (int sec = 0; sec < 25; ++sec) {
+        run1s([](long k, int base) {
+            return 5.0 - 3.0 * std::sin(2.0 * M_PI * static_cast<double>(k - base) / 50.0);
+        });
+    }
+    double KpUp, KdUp;
+    gainCenter(KpUp, KdUp);
+    EXPECT_GT(KpUp, KpB * 1.04) << "ESC 未能在稳定门放行时上调 Kp";
+
+    // 阶段3：改注 e = 6·sin(载波相位)（零均值过零振荡，峰-峰 12° > oscMax 5°），
+    //        窗口结算被稳定门拒绝 → revert 回极点配置基线
+    for (int sec = 0; sec < 25; ++sec) {
+        run1s([](long k, int base) {
+            return 6.0 * std::sin(2.0 * M_PI * static_cast<double>(k - base) / 50.0);
+        });
+    }
+    double KpR, KdR;
+    gainCenter(KpR, KdR);
+    EXPECT_NEAR(KpR, KpB, 0.03) << "回退未恢复 Kp 基线";
+    EXPECT_NEAR(KdR, KdB, 0.20) << "回退未恢复 Kd 基线";
+}
+
+// P12 整改回归：振荡检测在参考机动期间不喂入（测量无效），参考稳定后恢复
+TEST(AutopilotCore, OscDetectorStarvedDuringReferenceMotion) {
+    AutopilotCore ap;
+    ap.setMode(Mode::AUTO_HEADING);
+    SensorInput s{0, 0, 0, 10, 0};
+    // 参考每 15 s 翻转（--esc Z 形节拍），航向误差 ±8° 摆动：
+    // 若检测器照常喂入，幅值会顶到 16° 并锁死稳定门
+    double maxAmp = 0.0;
+    for (int k = 0; k < 60 * 50; ++k) {  // 60 s
+        ap.setHeadingRef((k / 750) % 2 == 0 ? 40.0 : -40.0);
+        s.headingDeg = 8.0 * std::sin(2.0 * M_PI * k / 250.0);
+        ap.step(s, 0.02);
+        maxAmp = std::max(maxAmp, ap.tuner().oscDetector().amplitude());
+    }
+    EXPECT_DOUBLE_EQ(maxAmp, 0.0);  // 参考机动期间检测器不喂入
+    // 参考稳定 30 s 后恢复喂入：±8° 摆动的峰-峰幅值 ≈16°
+    ap.setHeadingRef(0.0);
+    for (int k = 0; k < 45 * 50; ++k) {
+        s.headingDeg = 8.0 * std::sin(2.0 * M_PI * k / 250.0);
+        ap.step(s, 0.02);
+    }
+    EXPECT_GT(ap.tuner().oscDetector().amplitude(), 8.0);
+}
+
+// P13 整改回归：机动 HEADING 段必须应用增益调度（此前直接 pd_.update，
+// PD 全程停留在默认增益 Kp=1/Kd=0.5，慢船机动闭环形同虚设）
+TEST(AutopilotCore, ManeuverHeadingLegAppliesScheduledGains) {
+    AutopilotCore ap;
+    // 安装具有辨识度的调度表增益（区别于默认值 1.0/0.5）
+    ap.scheduleMut().setTable({{0.0, 100.0, 0, 7.25, 33.5}});
+    // 单段 HEADING 保持机动（trigger=NONE，永不推进，便于观察稳态增益）
+    Leg hold;
+    hold.mode = Leg::Mode::HEADING;
+    hold.target = 20.0;
+    hold.trigger = Leg::Trigger::NONE;
+    hold.threshold = 0.0;
+    hold.next = -1;
+    ap.startManeuver({hold});
+    SensorInput s{0, 0, 0, 10, 0};
+    ap.step(s, 0.02);
+    EXPECT_DOUBLE_EQ(ap.pd().params().Kp, 7.25);
+    EXPECT_DOUBLE_EQ(ap.pd().params().Kd, 33.5);
+}

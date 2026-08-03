@@ -219,3 +219,34 @@ TEST(AutoTuner, RevertRestoresBaseline) {
     EXPECT_DOUBLE_EQ(Kp, 1.6);
     EXPECT_DOUBLE_EQ(Kd, 8.6);
 }
+
+// P12 整改：rebaseEsc 清零 ESC 积分/解调/窗口样本——显式重基线后，
+//           旧梯度不得继续作用于新基线
+TEST(AutoTuner, RebaseEscClearsIntegratorState) {
+    AutoTuner::Params p;
+    p.dt = 0.02; p.windowSec = 10.0;
+    p.escFreq = 2.0 * M_PI / 2.5;  // 2.5 s 载波，每窗 4 个整周期
+    AutoTuner t(p);
+    t.enable(10.0);
+    t.setBaseline(1.0, 0.5);
+    double Kp = 1.0, Kd = 0.5;
+    // 注入与 Kd 载波（cos）负相关的成本 → 积累非零梯度并作用一个窗口
+    for (int k = 0; k < 500; ++k) {  // 10 s 窗口
+        const double phase = std::fmod(k * p.escFreq * p.dt, 2.0 * M_PI);
+        t.accumulate(5.0 - 3.0 * std::cos(phase), 0.0);
+        double a = Kp, b = Kd;
+        t.escDither(a, b);
+    }
+    t.escStep(Kp, Kd);
+    EXPECT_GT(Kd, 0.5 + 1e-9);  // 梯度已作用（Kd 增大），证明积分器非空
+    // 重锚：梯度/解调/窗口样本清零
+    t.rebaseEsc();
+    // 重锚后立即结算（无新样本）：梯度为零 → 增益必须原地不动；
+    // 若旧梯度残留，本拍会被再次施加
+    const double KpBefore = Kp, KdBefore = Kd;
+    t.escStep(Kp, Kd);
+    EXPECT_DOUBLE_EQ(Kp, KpBefore);
+    EXPECT_DOUBLE_EQ(Kd, KdBefore);
+    // 窗口样本同样作废（旧窗口成本是围绕旧增益测的）
+    EXPECT_DOUBLE_EQ(t.computeJ(), 0.0);
+}

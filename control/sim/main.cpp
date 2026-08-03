@@ -226,7 +226,9 @@ int main(int argc, char** argv) {
         else if (maneuverName == "uturn")  legs = ManeuverSequencer::uTurn(0.0, true);
         else if (maneuverName == "zigzag") legs = ManeuverSequencer::zigzag(0.0, 10.0, 15.0, 3);
         else if (maneuverName == "circles") legs = ManeuverSequencer::circles(15.0, 360.0);
-        else if (maneuverName == "cloverleaf") legs = ManeuverSequencer::cloverleaf(0.0, 20.0, 20.0);
+        // 直航段时长随 T 缩放：慢船出转超调大，20 s 直航拉不回目标航向（四叶畸变），tLeg≈2.5T 才够消超调
+        // 注意签名为 cloverleaf(psi0, tLeg, dMax)
+        else if (maneuverName == "cloverleaf") legs = ManeuverSequencer::cloverleaf(0.0, std::max(20.0, 2.5 * T), 20.0);
         else if (maneuverName == "search")   legs = ManeuverSequencer::search(0.0, 20.0, 10.0, 4);
         else { std::fprintf(stderr, "未知机动: %s\n", maneuverName.c_str()); return 1; }
         auto r = sim.runManeuver(legs, K, T, speedKn, seaState, sec);
