@@ -77,9 +77,9 @@ ax.legend(loc="lower right", bbox_to_anchor=(1.15, -0.05))
 fig.tight_layout(); fig.savefig(f"{OUT}/fig3_radar.png", dpi=150); plt.close(fig)
 
 # ---------------- 图4: 节能措施量级对比 ----------------
-measures = ["减速航行\n(slow steaming)\n[IMO/GloMEEP]", "气象航线优化\n[IMO MEPC58\n/StormGeo]", "航速+纵倾\n联合优化\n[ClassNK-NAPA\n实船试航]", "纵倾优化\n[ClassNK/Eniram\n实船]", "自动舵调整\n(减少舵动作)\n[IMO GloMEEP\n/ABS]"]
-lo = np.array([10, 2, 2, 1, 0.25])
-hi = np.array([50, 5, 4, 5, 1.25])
+measures = ["减速航行\n(slow steaming)\n[IMO/GloMEEP\n主机油耗口径]", "气象航线优化\n[IMO≥3%\nStormGeo≤10%]", "航速+纵倾\n联合优化\n[ClassNK-NAPA\n实船试航]", "纵倾优化\n[ClassNK/Eniram\n实船]", "自动舵调整\n(减少舵动作)\n[IMO GloMEEP\n0.1–1.0%]"]
+lo = np.array([10, 3, 2, 1, 0.1])
+hi = np.array([50, 10, 4, 5, 1.0])
 mid = (lo + hi) / 2
 fig, ax = plt.subplots(figsize=(9.5, 5.5))
 bars = ax.bar(measures, mid, yerr=[mid - lo, hi - mid], capsize=6,
@@ -95,9 +95,9 @@ ax.grid(axis="y", alpha=0.3)
 fig.tight_layout(); fig.savefig(f"{OUT}/fig4_energy_measures.png", dpi=150); plt.close(fig)
 
 # ---------------- 图5: 工业部署案例节油率 ----------------
-cases = ["Yara FuelOpt\n(Teekay 油轮)", "ABB OCTOPUS\n(1000+ 船)", "Kongsberg\nEcoAdvisor (DP)", "NAPA 航程优化\n(Marubeni)", "DeepSea+Nabtesco\n(汽车船)", "ClassNK-NAPA\n(K Line 箱船)", "Anschütz 自动舵\n(双舵 toe angle)"]
-vals = [4, 9, 9, 7.1, 3.4, 3.9, 5]
-notes = ["实测 3–5%", "官方 ≤9%", "DP 工况 8–10%", "实测 ≤7.1%", "实测 3.4%", "试航 3.8–3.9%", "宣称 ≤5%"]
+cases = ["Yara FuelOpt\n(Teekay 油轮)", "ABB OCTOPUS\n(1000+ 船)", "NAPA 航程优化\n(Marubeni)", "DeepSea+Nabtesco\n(汽车船)", "ClassNK-NAPA\n(K Line 箱船)", "Anschütz 自动舵\n(双舵 toe angle)"]
+vals = [4, 9, 7.1, 3.4, 3.9, 4.7]
+notes = ["实测 3–5%", "官方 ≤9%", "实测 ≤7.1%", "实测 3.4%", "试航 3.8–3.9%", "实测最高 4.7%（宣称 ≤5%）"]
 fig, ax = plt.subplots(figsize=(10, 5.2))
 bars = ax.barh(cases[::-1], vals[::-1], color="#1f77b4", edgecolor="k")
 for b, v, n in zip(bars, vals[::-1], notes[::-1]):
@@ -114,7 +114,7 @@ ax.axis("off")
 layers = [
     ("决策层（航次级）", "气象航线优化 / 航速剖面优化 / 到达时间管理（JIT）", "#2ca02c", "节油 2–5%（最大杠杆在减速航行 10–50%）"),
     ("操作层（工况级）", "纵倾优化 / 主机负荷点优化 / 混合动力能量管理（MPC-EMS）", "#17becf", "节油 1–5%，EMS 仿真最高 17%"),
-    ("控制层（舵机级）", "自动舵航向/航迹控制：PID / 自适应 / MPC —— 减少无效操舵、降低舵致阻力", "#1f77b4", "节油 0.25–1.25%（双舵 toe angle 特例 ≤5%）"),
+    ("控制层（舵机级）", "自动舵航向/航迹控制：PID / 自适应 / MPC —— 减少无效操舵、降低舵致阻力", "#1f77b4", "节油 0.1–1.0%（IMO）；双舵 toe angle 实测最高 4.7%"),
     ("执行层", "舵机 / 主机 / 可调螺距桨 / 储能系统", "#7f7f7f", "执行机构与传感器"),
 ]
 y = 0.86
