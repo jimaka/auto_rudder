@@ -148,7 +148,7 @@ bullets(s, Inches(0.6), Inches(1.7), Inches(6.4), Inches(5.4), [
     (1, "连续 3 年 D 或 1 年 E → 必须提交纠正计划"),
     (1, "EU ETS 2024 年起纳入航运，碳成本显性化"),
     (0, "MPC 向船舶控制下沉", BLUE, True),
-    (1, "嵌入式 QP 求解器成熟：实测 7 ms @ 20 Hz（acados）"),
+    (1, "嵌入式 QP 求解器成熟：水下机器人实测 7 ms @ 20 Hz（acados，JMSE 2024）"),
     (1, "船舶航向动态慢（控制周期 0.1–0.2 s），算力足够"),
     (1, "学术界大量仿真/船模成果，实船落地仍少"),
 ], size=15)
@@ -187,7 +187,9 @@ table(s, Inches(7.9), Inches(1.7), Inches(5.1), Inches(4.4), [
     ["RA-L 2017\n(波浪场机器人)", "位置误差降 74%\n(MPC vs PD，仿真)"],
 ], col_widths=[1.15, 1.5], size=11)
 textbox(s, Inches(0.5), Inches(6.55), Inches(12.4), Inches(0.7),
-        [("⚠ 证据边界：对比几乎全部来自仿真/水池船模；预测模型与仿真模型同源会高估 MPC 优势（He et al., 2023 明确警示）",
+        [("［证据边界］对比几乎全部来自仿真/水池船模；预测模型与仿真模型同源会高估 MPC 优势（He 2023 警示）；",
+          {"size": 13, "color": RED}),
+         ("Zhang 2025 中舵机控制投入指标（AACE）在直道/弯道工况 PID 反优——「占优」限跟踪精度维度",
           {"size": 13, "color": RED})])
 
 # ============ S6 调试难度 ============
@@ -275,12 +277,37 @@ table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(4.2), [
     ["长期\n6–12 个月", "分层节能架构", "MPC 代价函数计入操舵能量，对接航速/纵倾优化指令；\n输出舵机磨损/能耗统计；Lyapunov-based MPC 保稳定性"],
 ], col_widths=[0.9, 1.4, 4.0], size=13)
 textbox(s, Inches(0.5), Inches(6.1), Inches(12.4), Inches(1.0),
-        [("核心逻辑：节能大头在决策层（航速/航线 3–50%），控制层贡献 0.1–1% 但几乎零成本；",
+        [("核心逻辑：节能大头在决策层（气象航线 3–10%、减速航行主机口径可达 50%），控制层贡献 0.1–1% 但几乎零成本；",
           {"size": 15, "color": DARK}),
          ("先把 PD 整定与辨识流程工具化，再让 MPC 平滑接管性能增强。",
           {"size": 15, "color": DARK})])
 
-# ============ S13 结尾 ============
+# ============ S13 主要数据来源 ============
+s = add_slide()
+header(s, "主要数据来源", "完整 45 条参考文献见调研文档；所有定量数据经两轮原文核对")
+bullets(s, Inches(0.6), Inches(1.7), Inches(6.1), Inches(5.5), [
+    (0, "控制对比研究", BLUE, True),
+    (1, "Jannaty et al., 2023, Kadikma 14(3)"),
+    (1, "Zhang et al., 2025, Ocean Engineering 334:121592"),
+    (1, "He et al., 2023, Ocean Engineering（船模实验）"),
+    (1, "Zheng et al., 2025, JMSE 13(5):851（自动舵综述）"),
+    (0, "整定 / 实时 / 稳定性", BLUE, True),
+    (1, "Christensen et al., 2025, arXiv:2509.11235"),
+    (1, "Hu et al., 2024, JMSE 12(1):94（acados 实测）"),
+    (1, "Mayne et al., 2000, Automatica 36(6)"),
+], size=13)
+bullets(s, Inches(6.9), Inches(1.7), Inches(6.1), Inches(5.5), [
+    (0, "节能算法", GREEN, True),
+    (1, "Pelić et al., 2023, JMSE 11(3):675"),
+    (1, "Du et al., 2019, TR-B 121:88–114"),
+    (1, "IMO GreenVoyage2050 / GloMEEP 官方评估"),
+    (1, "ClassNK-NAPA 全尺度试航（2014）"),
+    (0, "部署案例与法规", GREEN, True),
+    (1, "ABB / Wärtsilä-Eniram / Yara / Kongsberg / NAPA / DeepSea / Anschütz / Orca AI 官方资料"),
+    (1, "IMO EEXI/CII 官方 FAQ（MEPC.328(76) 等）"),
+], size=13)
+
+# ============ S14 结尾 ============
 s = add_slide()
 bg = s.shapes.add_shape(1, 0, 0, SW, SH)
 bg.fill.solid(); bg.fill.fore_color.rgb = DARK; bg.line.fill.background()
@@ -291,6 +318,13 @@ textbox(s, Inches(1), Inches(4.2), Inches(11.3), Inches(1.5),
           {"size": 15, "color": RGBColor(0x9F, 0xC5, 0xE8), "align": PP_ALIGN.CENTER}),
          ("所有定量数据经两轮来源核对，修正记录见文档附录 A",
           {"size": 15, "color": RGBColor(0x9F, 0xC5, 0xE8), "align": PP_ALIGN.CENTER})])
+
+# ============ 页码 ============
+for idx, slide in enumerate(prs.slides, 1):
+    if idx in (1, len(prs.slides._sldIdLst)):  # 跳过封面与结尾页
+        continue
+    textbox(slide, Inches(12.55), Inches(7.08), Inches(0.7), Inches(0.35),
+            [(f"{idx} / {len(prs.slides._sldIdLst)}", {"size": 11, "color": GRAY, "align": PP_ALIGN.RIGHT})])
 
 out = os.path.join(BASE, "船舶控制与节能算法调研汇报.pptx")
 prs.save(out)
