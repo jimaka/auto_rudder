@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""生成《船舶控制与节能算法调研》汇报 PPT"""
+"""生成《船舶控制与节能算法调研》汇报 PPT（扩充版，20 页）"""
 from pptx import Presentation
 from pptx.util import Inches, Pt, Emu
 from pptx.dml.color import RGBColor
@@ -13,6 +13,7 @@ DARK = RGBColor(0x1B, 0x2A, 0x4A)
 BLUE = RGBColor(0x1F, 0x77, 0xB4)
 RED = RGBColor(0xD6, 0x27, 0x28)
 GREEN = RGBColor(0x2C, 0xA0, 0x2C)
+ORANGE = RGBColor(0xE8, 0x7D, 0x0D)
 GRAY = RGBColor(0x66, 0x66, 0x66)
 WHITE = RGBColor(0xFF, 0xFF, 0xFF)
 FONT = "Noto Sans CJK SC"
@@ -114,7 +115,7 @@ def table(slide, x, y, w, h, data, col_widths=None, size=12, header_fill=BLUE):
     return gt
 
 
-# ============ S1 封面 ============
+# ============ S01 封面 ============
 s = add_slide()
 bg = s.shapes.add_shape(1, 0, 0, SW, SH)
 bg.fill.solid(); bg.fill.fore_color.rgb = DARK; bg.line.fill.background()
@@ -127,18 +128,18 @@ textbox(s, Inches(1), Inches(5.6), Inches(11.3), Inches(0.8),
         [("2026-08-07   |   数据均经两轮来源核对，出处见调研文档附录",
           {"size": 14, "color": GRAY, "align": PP_ALIGN.CENTER})])
 
-# ============ S2 目录 ============
+# ============ S02 目录 ============
 s = add_slide()
 header(s, "汇报提纲")
 bullets(s, Inches(1.0), Inches(1.6), Inches(11), Inches(5.5), [
-    (0, "01  背景与驱动：EEXI/CII 法规倒逼节能，MPC 向船舶控制下沉", None, False),
-    (0, "02  MPC vs PD 自动舵：原理、控制效果、调试难度全方位对比", None, False),
-    (0, "03  船舶节能五大算法路线：节能率、优缺点与证据强度", None, False),
-    (0, "04  工业部署案例：ABB / Yara / NAPA / DeepSea / Anschütz / Orca AI", None, False),
-    (0, "05  分层节能架构与本项目落地建议", None, False),
+    (0, "01  背景与法规驱动：EEXI/CII 机制详解，MPC 向船舶控制下沉", None, False),
+    (0, "02  MPC vs PD 自动舵：原理、控制效果、证据强度、调试难度、实时性与稳定性", None, False),
+    (0, "03  船舶节能五大算法路线：节能率、关键数据、优缺点", None, False),
+    (0, "04  工业部署案例：规模化部署与实测细节", None, False),
+    (0, "05  技术趋势判断与本项目落地建议", None, False),
 ], size=19)
 
-# ============ S3 背景 ============
+# ============ S03 背景 ============
 s = add_slide()
 header(s, "背景：节能从「可选项」变为「合规刚需」", "法规 + 控制理论双重驱动")
 bullets(s, Inches(0.6), Inches(1.7), Inches(6.4), Inches(5.4), [
@@ -157,7 +158,22 @@ pic_fit(s, os.path.join(FIG, "fig6_architecture.png"), Inches(7.1), Inches(1.7),
 textbox(s, Inches(7.1), Inches(6.9), Inches(5.9), Inches(0.4),
         [("船舶节能分层架构总览", {"size": 12, "color": GRAY, "align": PP_ALIGN.CENTER})])
 
-# ============ S4 原理对比 ============
+# ============ S04 法规详解（新增） ============
+s = add_slide()
+header(s, "法规背景详解：EEXI 与 CII 的约束机制", "MARPOL 附则 VI 修正案（MEPC.328(76)），IMO 官方 FAQ 口径")
+table(s, Inches(0.5), Inches(1.7), Inches(12.4), Inches(3.6), [
+    ["项目", "EEXI（技术能效指数）", "CII（营运碳强度指标）"],
+    ["适用船舶", "≥400 GT 各船型", "≥5,000 GT 各船型"],
+    ["核心机制", "实际值 attained ≤ 要求值 required\n（required 按船型/吨位以折减系数确定）", "年度营运碳强度（AER，单位运输功 CO2）\n对照 G2 参考线 + G3 逐年折减系数"],
+    ["合规方式", "一次性技术验证；\n常用轴/主机功率限制（ShaPoLi/EPL）", "按 G4 边界评 A–E 级；连续 3 年 D 或 1 年 E\n须在 SEEMP Part III 提交纠正措施计划"],
+    ["关键时间线", "2022-11-01 生效\n2023-01-01 起须计算 attained EEXI", "2023 年起数据收集，2024 年首次评级\n法规要求 2026-01-01 前完成复审"],
+], col_widths=[0.9, 2.4, 2.7], size=12)
+bullets(s, Inches(0.6), Inches(5.6), Inches(12.2), Inches(1.7), [
+    (0, "对节能技术选型的驱动：船东自 2022 年起集中评估船队并规划改装；EU ETS 自 2024 年纳入航运，碳成本显性化；", None, False),
+    (0, "厂商已直接以「改善 CII 评级」作为产品卖点（Anschütz、Yara 等）——节能软件从「节油回本」变为「合规刚需」。", None, False),
+], size=14)
+
+# ============ S05 原理对比 ============
 s = add_slide()
 header(s, "MPC vs PD：原理差异", "前视预测 + 显式约束 + 多目标代价函数")
 pic_fit(s, os.path.join(FIG, "fig2_mpc_principle.png"), Inches(0.4), Inches(1.7),
@@ -174,7 +190,7 @@ bullets(s, Inches(8.0), Inches(1.8), Inches(5.0), Inches(5.4), [
     (1, "代价函数可计入操舵能量（省油）"),
 ], size=15)
 
-# ============ S5 效果对比 ============
+# ============ S06 效果对比 ============
 s = add_slide()
 header(s, "控制效果：仿真/船模层面 MPC 全面占优", "注意：尚无全尺度实船 MPC vs PID 公开定量对比")
 pic_fit(s, os.path.join(FIG, "fig1_step_response.png"), Inches(0.4), Inches(1.7),
@@ -192,7 +208,22 @@ textbox(s, Inches(0.5), Inches(6.55), Inches(12.4), Inches(0.7),
          ("Zhang 2025 中舵机控制投入指标（AACE）在直道/弯道工况 PID 反优——「占优」限跟踪精度维度",
           {"size": 13, "color": RED})])
 
-# ============ S6 调试难度 ============
+# ============ S07 证据强度分级（新增） ============
+s = add_slide()
+header(s, "证据强度分级：本文数据的可靠性坐标", "引用前先看数据站在哪一级")
+table(s, Inches(0.5), Inches(1.7), Inches(12.4), Inches(4.3), [
+    ["证据等级", "代表数据", "可靠性评估"],
+    ["实船试航 / 第三方实测", "ClassNK-NAPA 试航 3.8–3.9%；Yara 实测 3–5%；\nMalaysia Grace 3.4%；MRAS 全尺度 1–3%", "最高，可直接引用"],
+    ["船模实验", "He 2023 MPC 路径跟踪（8 Hz 自由自航船模）", "较高，注意尺度效应"],
+    ["试验校验的仿真", "Pelić 2023 减速 72–76%（船模+柴油机模型，偏差 <2%）", "中等，模型经试验校验"],
+    ["纯仿真", "MPC vs PID 多数对比（4 s vs 15 s、74%）；\nMPC-EMS 节油 4.85–17.2%", "参考级，需实船/船模验证"],
+    ["厂商宣称", "ABB ≤9%；Anschütz ≤5%；Yara 5–15%", "注意营销偏差，以第三方复核为准"],
+], col_widths=[1.5, 3.4, 1.6], size=12)
+bullets(s, Inches(0.6), Inches(6.25), Inches(12.2), Inches(1.1), [
+    (0, "关键提醒：MPC vs PID 无全尺度实船公开对比；「预测模型与仿真模型同源会高估优势」（He 2023）；Li 2022（2.1–5.2%）为二手转引。", RED, False),
+], size=14)
+
+# ============ S08 调试难度 ============
 s = add_slide()
 header(s, "调试难度：MPC 上船的最大障碍", "「模型参数确定是实现 MPC 的最大障碍」—— He et al., 2023 原文")
 pic_fit(s, os.path.join(FIG, "fig3_radar.png"), Inches(0.4), Inches(1.6),
@@ -209,7 +240,28 @@ bullets(s, Inches(6.8), Inches(1.7), Inches(6.2), Inches(5.6), [
     (0, "注：雷达图为基于文献证据的主观打分示意", GRAY, False),
 ], size=14)
 
-# ============ S7 优缺点小结 ============
+# ============ S09 实时性与稳定性（新增） ============
+s = add_slide()
+header(s, "MPC 工程化两个关键问题：实时性与稳定性", "均有文献实测数据支撑")
+bullets(s, Inches(0.6), Inches(1.7), Inches(6.2), Inches(5.6), [
+    (0, "实时性：船舶慢动态下可满足", BLUE, True),
+    (1, "船舶航向控制周期 0.1–0.2 s 足够（He 2023 船模 8 Hz）"),
+    (1, "acados 实测：预测时域 60、20 Hz 下平均求解 7 ms，仅占采样周期 14%（Hu 2024，JMSE）"),
+    (1, "嵌入式平台（x86/ARM）QP 求解器基准：HPIPM 长时域最快；OSQP 热启动稳定可用（arXiv 2510.21773）"),
+    (1, "可选求解器：OSQP / qpSWIFT / acados / HPIPM"),
+    (1, "自主拖船 MPC 采样 0.2 s（You et al., 2024，UCL）"),
+], size=14)
+bullets(s, Inches(7.0), Inches(1.7), Inches(6.0), Inches(5.6), [
+    (0, "稳定性：需专门构造，不能默认获得", ORANGE, True),
+    (1, "PID：Nomoto 闭环分析成熟，频域裕度/极点配置直观"),
+    (1, "MPC：有限时域优化不天然保证闭环稳定"),
+    (1, "经典框架：终端约束集 + 终端代价（Mayne et al., 2000, Automatica）"),
+    (1, "船舶落地形式：Lyapunov 约束嵌入优化问题"),
+    (1, "Gong et al., 2021（AUV，Ocean Engineering）"),
+    (1, "Zhang et al., 2023（DP 船，JMSE 11(2):281）"),
+], size=14)
+
+# ============ S10 优缺点小结 ============
 s = add_slide()
 header(s, "MPC vs PD 部署优缺点小结")
 table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(3.9), [
@@ -225,13 +277,13 @@ textbox(s, Inches(0.5), Inches(5.8), Inches(12.4), Inches(1.3),
          ("模型辨识与整定自动化（本仓库 auto_tuning 流程）是 MPC 能否落地的前置条件。",
           {"size": 17, "bold": True, "color": GREEN})])
 
-# ============ S8 节能总览 ============
+# ============ S11 节能总览 ============
 s = add_slide()
 header(s, "船舶节能五大路线：量级差异极大", "来源：IMO / 船级社 / 实船试航，均为已核对数据")
 pic_fit(s, os.path.join(FIG, "fig4_energy_measures.png"), Inches(0.5), Inches(1.7),
         Inches(12.3), Inches(5.6))
 
-# ============ S9 节能方案优缺点（一） ============
+# ============ S12 节能方案优缺点（一） ============
 s = add_slide()
 header(s, "节能方案优缺点（一）：决策层", "节能大头所在")
 table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(5.3), [
@@ -241,7 +293,19 @@ table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(5.3), [
     ["纵倾优化", "ClassNK-NAPA 实船试航：纵倾贡献 1.2%\n专项研究最多 4%；Eniram 实测 1–5%", "几乎零成本（调压载水）；实船背书强", "最优纵倾随工况变化；受稳性/装卸约束；幅度偏小"],
 ], col_widths=[1.0, 2.6, 1.8, 1.9], size=12)
 
-# ============ S10 节能方案优缺点（二） ============
+# ============ S13 节能关键数据补充（新增） ============
+s = add_slide()
+header(s, "节能方案关键数据补充", "对比基线与口径已逐条核对，避免误读")
+table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(5.3), [
+    ["方案", "补充数据（已核对）", "口径说明"],
+    ["减速航行", "IMO 案例：56,000 DWT 敞舱口货船 13% 减速 → 日油耗 −34%；\n10% 减速 → 功率 −27%，计入航时后航次总节油约 19%", "特定船案例，非普适值；\n主机口径 10–50% vs 全船 3–12%"],
+    ["航速+纵倾联合", "Du 2019（实船数据+ANN 模型）：动态纵倾 C1 省 4.96%/5.83%；\nANN 航速优化 C2 省 7.63%/7.57%；综合 C3 平均省 8.25%", "0.57%/3.69% 是相对三次方定律的\n额外节油，非总节油"],
+    ["纵倾优化", "ClassNK 两次印度洋横渡专项：最优纵倾最多再省 4%", "与航速/航程优化收益可叠加"],
+    ["MPC 能量管理", "Zhang 2022：双层 MPC 比传统单层 MPC 再省 17.2%（30 kW 柴电混合船）\n周妍 2024：比规则控制省 4.85%（客滚船）", "两者对比基线不同，不可互比；\n均为仿真"],
+    ["气象航线", "算法基准研究：Isochrone / Isopone / DP / 3D-DP / Dijkstra\n五算法横向对比（Wang et al., Chalmers，北大西洋案例）", "仿真基准，无单一最优算法"],
+], col_widths=[1.2, 4.0, 2.0], size=11.5)
+
+# ============ S14 节能方案优缺点（二） ============
 s = add_slide()
 header(s, "节能方案优缺点（二）：操作层与控制层")
 table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(5.3), [
@@ -251,9 +315,9 @@ table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(5.3), [
     ["双舵 Toe Angle\n(舵系水动力优化)", "Anschütz 实测最大 4.7%、平均约 2%（宣称 ≤5%）\n自适应模式平均减少舵动作 25%", "双舵船额外收益；已有商用产品", "仅适用双舵船；厂商数据待第三方复核"],
 ], col_widths=[1.3, 2.6, 1.8, 1.9], size=12)
 
-# ============ S11 部署案例 ============
+# ============ S15 部署案例（一） ============
 s = add_slide()
-header(s, "工业部署案例：第三方实测集中在 3–10%", "厂商宣称值普遍高于实测，引用以船级社/试航数据为准")
+header(s, "工业部署案例（一）：第三方实测集中在 3–10%", "厂商宣称值普遍高于实测，引用以船级社/试航数据为准")
 pic_fit(s, os.path.join(FIG, "fig5_deploy_cases.png"), Inches(0.4), Inches(1.6),
         Inches(7.6), Inches(5.4))
 bullets(s, Inches(8.2), Inches(1.7), Inches(4.9), Inches(5.6), [
@@ -267,7 +331,36 @@ bullets(s, Inches(8.2), Inches(1.7), Inches(4.9), Inches(5.6), [
     (1, "印证：门槛不在算力，在模型获取与整定"),
 ], size=14)
 
-# ============ S12 落地建议 ============
+# ============ S16 部署案例（二）（新增） ============
+s = add_slide()
+header(s, "工业部署案例（二）：实测细节与口径", "注意：各案例节油路径不同，不可直接横向比较")
+table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(4.6), [
+    ["案例", "实测细节（已核对）", "节油路径"],
+    ["Wärtsilä/Eniram\nVLCC 案例", "320,000+ DWT、450 天数据：年燃油成本 −2.6%\n（≈48.2 万美元 / 730 吨燃油）", "纵倾优化 + 污底评估"],
+    ["Yara FuelOpt\n（独立复核）", "NAPA 独立分析确认 10–18%：\nSten Bothnia 12 个月 17.9%、Ekfjord 24 个月 10.3%", "推进功率闭环优化"],
+    ["NAPA × Norsepower\n× SHI-ME", "转筒帆+航程优化六条航线平均 CO2 −19%\n（纽约–阿姆斯特丹线 28%，NAPA 贡献 10–12 个百分点）", "风助推 + 航程优化"],
+    ["Orca AI\n（Seaspan）", "近距遭遇事件 −54%；2024 年合计减排约 19.5 万吨 CO2；\n单船年省约 $10 万 / 减 500 t CO2", "减少避碰机动与无谓变速"],
+    ["Kongsberg\nEcoAdvisor", "DP 工况主机/推进器停机建议工具（DOF 试点）；\n官方未公布定量节油数据（流传的 8–10% 无法证实，已弃用）", "动力定位能耗优化"],
+], col_widths=[1.5, 3.6, 1.6], size=11.5)
+textbox(s, Inches(0.5), Inches(6.45), Inches(12.4), Inches(0.8),
+        [("Anschütz 补充：自适应 ECO 模式平均减少舵动作约 25%（多年运营数据分析），案例折算节油约 4%。",
+          {"size": 13, "color": GRAY})])
+
+# ============ S17 技术趋势判断（新增） ============
+s = add_slide()
+header(s, "技术趋势判断", "基于两轮来源核对的四条判断")
+bullets(s, Inches(0.8), Inches(1.8), Inches(11.8), Inches(5.4), [
+    (0, "① 节能大头在决策层，控制层价值在「少损耗」", BLUE, True),
+    (1, "自动舵贡献 0.1–1.0%（IMO 口径），但 7×24 在线、几乎零边际成本，兼降舵机磨损"),
+    (0, "② MPC 可行域正在打开，瓶颈不是算力", BLUE, True),
+    (1, "嵌入式求解器毫秒级（7 ms @ 20 Hz）；真正门槛是模型辨识与整定自动化"),
+    (0, "③ 数据驱动自学习模型成为商用标配", BLUE, True),
+    (1, "ClassNK-NAPA 油耗预测精度 99.6%；DeepSea 周油耗预报误差 0.8%；纯机理模型路线已少见"),
+    (0, "④ 法规持续加码，合规刚需取代节油回本逻辑", BLUE, True),
+    (1, "CII 纠正计划机制 + 2026 年法规复审可能进一步收紧；EU ETS 碳成本显性化"),
+], size=16)
+
+# ============ S18 落地建议 ============
 s = add_slide()
 header(s, "对本项目（auto_rudder）的落地建议")
 table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(4.2), [
@@ -282,7 +375,7 @@ textbox(s, Inches(0.5), Inches(6.1), Inches(12.4), Inches(1.0),
          ("先把 PD 整定与辨识流程工具化，再让 MPC 平滑接管性能增强。",
           {"size": 15, "color": DARK})])
 
-# ============ S13 主要数据来源 ============
+# ============ S19 主要数据来源 ============
 s = add_slide()
 header(s, "主要数据来源", "完整 45 条参考文献见调研文档；所有定量数据经两轮原文核对")
 bullets(s, Inches(0.6), Inches(1.7), Inches(6.1), Inches(5.5), [
@@ -307,7 +400,7 @@ bullets(s, Inches(6.9), Inches(1.7), Inches(6.1), Inches(5.5), [
     (1, "IMO EEXI/CII 官方 FAQ（MEPC.328(76) 等）"),
 ], size=13)
 
-# ============ S14 结尾 ============
+# ============ S20 结尾 ============
 s = add_slide()
 bg = s.shapes.add_shape(1, 0, 0, SW, SH)
 bg.fill.solid(); bg.fill.fore_color.rgb = DARK; bg.line.fill.background()
