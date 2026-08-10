@@ -396,12 +396,32 @@ textbox(s, Inches(1), Inches(4.2), Inches(11.3), Inches(1.5),
          ("所有定量数据经两轮来源核对，修正记录见文档附录 A",
           {"size": 15, "color": RGBColor(0x9F, 0xC5, 0xE8), "align": PP_ALIGN.CENTER})])
 
-# ============ 页码 ============
+# ============ 页码与来源链接 ============
+# 每页底部的参考来源链接（均已经过可访问性核对；mdpi/sciencedirect 对爬虫返回 403 但链接本身有效）
+FOOTERS = {
+    3: "来源：https://www.anschuetz.com/news/article/want-to-know-how-efficiently-your-ship-steers ｜ https://www.mdpi.com/2077-1312/12/1/94",
+    4: "来源：https://pdfs.semanticscholar.org/d822/3e9163b9d78bbae541b1e9820cbe36d81daf.pdf（Jannaty 2023，含约束设置）",
+    5: "来源：https://repository.tudelft.nl/file/File_4dca60ee-8635-4954-bee2-d55ab94a6f2c?preview=1（Zhang 2025 全文）｜ https://www.mdpi.com/2076-3417/16/9/4477",
+    6: "来源：https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3 ｜ https://ww2.eagle.org/content/dam/eagle/advisories-and-debriefs/ABS_Energy_Efficiency_Advisory.pdf",
+    7: "来源：https://arxiv.org/abs/2509.11235 ｜ https://theses.gla.ac.uk/4493/（Nomoto 极点配置公式推导 §3.6.1）",
+    8: "来源：https://arxiv.org/abs/2510.21773 ｜ https://www.mdpi.com/2077-1312/11/2/281（Lyapunov-based MPC，DP 船）",
+    9: "来源：https://www.sciencedirect.com/science/article/abs/pii/S0029801823023557（He 2023）｜ https://arxiv.org/abs/2509.11235",
+    10: "来源：https://greenvoyage2050.imo.org/technology/speed-management/ ｜ https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/",
+    11: "来源：https://www.mdpi.com/2077-1312/11/3/675 ｜ https://stormgeo.com/insights/how-the-evolution-of-weather-routing-is-reducing-greenhouse-gas-emissions",
+    12: "来源：https://greenvoyage2050.imo.org/technology/speed-management/ ｜ https://research.chalmers.se/en/publication/516144（气象航线五算法基准）",
+    13: "来源：https://www.sciopen.com/article/10.19693/j.issn.1673-3185.03104 ｜ https://ww2.eagle.org/content/dam/eagle/advisories-and-debriefs/ABS_Energy_Efficiency_Advisory.pdf",
+    14: "来源：https://library.e.abb.com/public/b92c10c2533647b08601322d2f9ffef4/Detailed%20Description_ABB%20Ability%20Marine%20Advisory%20Suite%20-%20OCTOPUS.pdf ｜ https://www.hellenicshippingnews.com/nabtesco-combines-telegraph-agent-and-cassandra-to-deliver-unmatched-fuel-optimisation-for-eastern-car-liner-co/",
+    15: "来源：https://www.rivieramm.com/news-content-hub/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433 ｜ https://www.napa.fi/news/napa-norsepower-sumitomo-study/",
+    16: "来源：https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3 ｜ https://vesselperformance.info/2024/11/15/eastern-pacific-uses-deepsea-to-improve-fuel-consumption-forecasts-to-within-1-per-cent/",
+    17: "来源：https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/ ｜ https://www.mdpi.com/2077-1312/12/1/94",
+}
 for idx, slide in enumerate(prs.slides, 1):
-    if idx in (1, len(prs.slides._sldIdLst)):  # 跳过封面与结尾页
-        continue
-    textbox(slide, Inches(12.55), Inches(7.08), Inches(0.7), Inches(0.35),
-            [(f"{idx} / {len(prs.slides._sldIdLst)}", {"size": 11, "color": GRAY, "align": PP_ALIGN.RIGHT})])
+    if idx not in (1, len(prs.slides._sldIdLst)):  # 跳过封面与结尾页
+        textbox(slide, Inches(12.55), Inches(7.08), Inches(0.7), Inches(0.35),
+                [(f"{idx} / {len(prs.slides._sldIdLst)}", {"size": 11, "color": GRAY, "align": PP_ALIGN.RIGHT})])
+    if idx in FOOTERS:
+        textbox(slide, Inches(0.5), Inches(7.1), Inches(11.9), Inches(0.34),
+                [(FOOTERS[idx], {"size": 8.5, "color": GRAY})])
 
 out = os.path.join(BASE, "船舶控制与节能算法调研汇报.pptx")
 prs.save(out)

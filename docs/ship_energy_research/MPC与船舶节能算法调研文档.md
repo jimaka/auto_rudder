@@ -155,7 +155,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 | 代表文献 | 方法 | 定量结果（已核对） | 验证 |
 |----------|------|----------|------|
 | Zaccone et al., 2018, *Ocean Engineering*（[链接](https://www.academia.edu/109716159/Optimal_ship_routing)） | 三维动态规划联合优化航线+航速剖面，计入风浪增阻与耐波性约束 | 摘要级无百分比 | 仿真 |
-| Wang et al., Chalmers（[链接](https://core.ac.uk/download/pdf/289287244.pdf)） | 北大西洋案例，基准对比 5 种算法（Isochrone/Isopone/DP/3D-DP/Dijkstra） | 算法横向基准 | 仿真 |
+| Wang, Mao & Eriksson, 2017, Chalmers（[链接](https://research.chalmers.se/en/publication/516144)） | 北大西洋案例，基准对比 5 种算法（Isochrone/Isopone/DP/3D-DP/Dijkstra） | 算法横向基准 | 仿真 |
 | Li et al., 2022 | 航线分段 + 气象载荷-航速优化 | 节油 **2.1–5.2%**——⚠️ 该数字来自 Aredah & Rakha 2024 年 ShipNetSim 结题报告的文献综述转引（[报告 PDF](https://www.morgan.edu/Documents/ACADEMIA/CENTERS/ntc/SMARTER/Year%201%20Core%20Projects/SM07_Final_Door_to_Door.pdf)），**原始论文未直接核实**，引用时请标注为二手来源 | 实船（据转引） |
 | IMO 口径（经 [StormGeo](https://stormgeo.com/insights/how-the-evolution-of-weather-routing-is-reducing-greenhouse-gas-emissions) 转引） | 官方评估 | "The IMO has publicly stated that weather routing saves **at least 3%**… for container ships, that number can be **as high as 10%**"（初版文档"2–4%"与转引页不符，已修正；MEPC 58/INF.21 原文未直接核实） | 官方口径（转引） |
 
@@ -261,7 +261,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 23. [IMO GreenVoyage2050 — Speed management](https://greenvoyage2050.imo.org/technology/speed-management/) / [Autopilot adjustment](https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/)
 24. [ClassNK-NAPA GREEN 全尺度试航, 2014](https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3)
 25. [Zaccone et al., 2018, Ocean Engineering](https://www.academia.edu/109716159/Optimal_ship_routing) — 动态规划气象航线优化
-26. [Wang et al., Chalmers](https://core.ac.uk/download/pdf/289287244.pdf) — 气象航线五算法基准
+26. [Wang, Mao & Eriksson, 2017, Chalmers](https://research.chalmers.se/en/publication/516144) — 气象航线五算法基准（原 core.ac.uk 链接 404 已更换为官方页面）
 27. [Aredah & Rakha, 2024, ShipNetSim 结题报告](https://www.morgan.edu/Documents/ACADEMIA/CENTERS/ntc/SMARTER/Year%201%20Core%20Projects/SM07_Final_Door_to_Door.pdf) — 转引 Li et al. 2022 气象航线节油 2.1–5.2%
 28. [StormGeo — 气象航线 IMO 口径转引](https://stormgeo.com/insights/how-the-evolution-of-weather-routing-is-reducing-greenhouse-gas-emissions)
 29. [Zhang et al., 2022, J. Energy Storage](https://www.sciencedirect.com/science/article/abs/pii/S2352152X22007733) — 混合动力船双层 MPC 能量管理
