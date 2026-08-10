@@ -133,3 +133,63 @@ ax.set_title("图6  船舶节能的分层架构：节能大头在决策/操作�
 fig.tight_layout(); fig.savefig(f"{OUT}/fig6_architecture.png", dpi=150); plt.close(fig)
 
 print("done:", sorted(os.listdir(OUT)))
+
+
+# ---------------- 图7: PD(Nomoto) vs MPC(MMG) 参数辨识流程对比 ----------------
+fig, ax = plt.subplots(figsize=(12.8, 6.4))
+ax.axis("off")
+ax.set_xlim(0, 13.2); ax.set_ylim(0, 6.6)
+
+def lane_boxes(y_center, boxes, color, lane_label):
+    n = len(boxes)
+    bw, bh = 1.72, 1.15
+    x0 = 1.25
+    gap = (13.2 - 0.1 - x0 - n * bw) / (n - 1)
+    # 泳道标签
+    ax.add_patch(FancyBboxPatch((0.05, y_center - bh / 2 - 0.28), 1.05, bh + 0.56,
+                                boxstyle="round,pad=0.02", fc=color, ec="k"))
+    ax.text(0.575, y_center, lane_label, fontsize=9.5, fontweight="bold",
+            color="white", ha="center", va="center", linespacing=1.3)
+    xs = []
+    for i, txt in enumerate(boxes):
+        x = x0 + i * (bw + gap)
+        xs.append(x)
+        ax.add_patch(FancyBboxPatch((x, y_center - bh / 2), bw, bh,
+                                    boxstyle="round,pad=0.02", fc="white",
+                                    ec=color, lw=1.8))
+        ax.text(x + bw / 2, y_center, txt, fontsize=9.2, ha="center", va="center",
+                color="#1B2A4A", linespacing=1.25)
+        if i > 0:
+            ax.add_patch(FancyArrowPatch((xs[i - 1] + bw + 0.02, y_center),
+                                         (x - 0.02, y_center),
+                                         arrowstyle="-|>", mutation_scale=15,
+                                         color=color, lw=1.6))
+
+# 上行：PD / Nomoto（本项目已实现）
+lane_boxes(4.9, [
+    "Z 形试验 /\n在线航行数据\n(δ, r @50 Hz)",
+    "自降频 + 激励门控\n(1 s 拍；|δ|>3°\n且高 |r|/|dr|)",
+    "线性回归化\nφ=[δ/50, −dr]^T\n(线性参数形式)",
+    "RLS 递推\n(λ=0.98)\n→ K、T 估计",
+    "物理检查 + 稳定门\nK∈(0,2], T∈[1,60]\nζ≥0.6, ωn≤0.5",
+    "极点配置\nKp=ωn²T/K\nKd=(2ζωnT−1)/K",
+], "#d62728", "PD /\nNomoto\n（已实现）")
+# 下行：MPC / MMG（目标方案）
+lane_boxes(1.9, [
+    "多工况机动试验\n(Z 形/回转/螺旋)\n或 CFD/约束模试验",
+    "3-DOF MMG 方程\n船体/螺旋桨/舵\n分离建模",
+    "水动力导数辨识\n非线性 LS / EKF /\nSVM，数十个导数",
+    "状态空间离散化\n(Ts=0.1–0.2 s)\n得预测模型",
+    "约束与权重整定\n舵角/舵速约束\nQ, R, Np, Nc",
+    "QP 滚动求解\n→ MPC 舵令\n闭环仿真验证",
+], "#1f77b4", "MPC /\nMMG\n（目标方案）")
+
+ax.annotate("2 个参数 · 线性问题 · 在线实时跟踪 · 一次 Z 形试验即可",
+            xy=(6.6, 4.05), fontsize=10.5, ha="center", color="#d62728", fontweight="bold")
+ax.annotate("数十个参数 · 非线性问题 · 多离线辨识 · 需多工况试验或 CFD 支撑",
+            xy=(6.6, 1.05), fontsize=10.5, ha="center", color="#1f77b4", fontweight="bold")
+ax.set_title("图7  PD（Nomoto）与 MPC（MMG）参数辨识流程对比", fontsize=14)
+fig.tight_layout()
+fig.savefig(f"{OUT}/fig7_ident_flows.png", dpi=150)
+plt.close(fig)
+print("fig7 done")

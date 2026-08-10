@@ -133,7 +133,7 @@ s = add_slide()
 header(s, "汇报提纲")
 bullets(s, Inches(1.0), Inches(1.6), Inches(11), Inches(5.5), [
     (0, "01  技术背景：船舶节能的能耗痛点与 MPC 控制的下沉机遇", None, False),
-    (0, "02  MPC vs PD 自动舵：原理、控制效果、证据强度、调试难度、实时性与稳定性", None, False),
+    (0, "02  MPC vs PD 自动舵：原理、效果、调试难度、参数辨识流程、实时性与稳定性", None, False),
     (0, "03  船舶节能五大算法路线：节能率、关键数据、优缺点", None, False),
     (0, "04  工业部署案例：规模化部署与实测细节", None, False),
     (0, "05  技术趋势判断与本项目落地建议", None, False),
@@ -224,7 +224,35 @@ bullets(s, Inches(6.8), Inches(1.7), Inches(6.2), Inches(5.6), [
     (0, "注：雷达图为基于文献证据的主观打分示意", GRAY, False),
 ], size=14)
 
-# ============ S08 实时性与稳定性 ============
+# ============ S08 参数辨识流程对比（新增） ============
+s = add_slide()
+header(s, "参数辨识流程对比：PD（Nomoto）vs MPC（MMG）",
+       "上行：本项目已实现的 PD 整定链路；下行：基于 MMG 方程的 MPC 目标方案辨识链路")
+pic_fit(s, os.path.join(FIG, "fig7_ident_flows.png"), Inches(0.4), Inches(1.65),
+        Inches(12.5), Inches(4.7))
+textbox(s, Inches(0.5), Inches(6.5), Inches(12.4), Inches(0.55),
+        [("要点：PD 辨识是 2 个参数的线性问题，一次 Z 形试验 + 在线 RLS 即可闭环；MMG-MPC 辨识是数十个水动力导数的非线性问题，需多工况机动试验或 CFD/约束模支撑。",
+          {"size": 13.5, "color": DARK, "bold": True})])
+
+# ============ S09 参数辨识维度对比（新增） ============
+s = add_slide()
+header(s, "参数辨识维度对比：MMG-MPC 辨识难在哪", "与本仓库 control/ 已实现代码一一对应")
+table(s, Inches(0.5), Inches(1.6), Inches(12.4), Inches(4.9), [
+    ["维度", "PD 参数辨识（Nomoto，本仓已实现）", "MPC 参数辨识（MMG，目标方案）"],
+    ["模型", "Nomoto 一阶：T·ṙ+r=Kδ（单入单出）", "3-DOF MMG：船体/桨/舵分离，u/v/r 耦合"],
+    ["待辨识参数", "2 个（K、T）", "数十个水动力导数 + 干扰项"],
+    ["试验与数据", "一次 Z 形试验或在线航行数据", "Z 形/回转/螺旋多工况试验簇，或 CFD/约束模试验"],
+    ["辨识算法", "线性 RLS（闭式递推，λ=0.98）", "非线性最小二乘 / EKF / 极大似然 / SVM"],
+    ["在线性", "在线实时跟踪，每秒一拍", "多为离线辨识 + 定期重辨识"],
+    ["输出用途", "极点配置 PD 增益基线（+ESC 微调）", "MPC 离散状态空间预测模型（Ts=0.1–0.2 s）"],
+    ["模型覆盖", "低频艏摇良好；不覆盖横荡/耦合模态", "全耦合覆盖，但导数误差会传播进预测"],
+    ["工程成本", "低：nomoto_identifier.hpp 已落地", "高：试验资源 + 辨识工具链 + 整定流程"],
+], col_widths=[0.9, 2.5, 2.9], size=11.5)
+textbox(s, Inches(0.5), Inches(6.6), Inches(12.4), Inches(0.5),
+        [("工程判断：Nomoto 辨识是 MMG-MPC 的前置能力——先交付 PD 基线并跑通辨识数据链，再把同一数据链升级为 MMG 导数辨识。",
+          {"size": 13.5, "bold": True, "color": GREEN})])
+
+# ============ S10 实时性与稳定性 ============
 s = add_slide()
 header(s, "MPC 工程化两个关键问题：实时性与稳定性", "均有文献实测数据支撑")
 bullets(s, Inches(0.6), Inches(1.7), Inches(6.2), Inches(5.6), [
@@ -404,16 +432,18 @@ FOOTERS = {
     5: "来源：https://repository.tudelft.nl/file/File_4dca60ee-8635-4954-bee2-d55ab94a6f2c?preview=1（Zhang 2025 全文）｜ https://www.mdpi.com/2076-3417/16/9/4477",
     6: "来源：https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3 ｜ https://ww2.eagle.org/content/dam/eagle/advisories-and-debriefs/ABS_Energy_Efficiency_Advisory.pdf",
     7: "来源：https://arxiv.org/abs/2509.11235 ｜ https://theses.gla.ac.uk/4493/（Nomoto 极点配置公式推导 §3.6.1）",
-    8: "来源：https://arxiv.org/abs/2510.21773 ｜ https://www.mdpi.com/2077-1312/11/2/281（Lyapunov-based MPC，DP 船）",
-    9: "来源：https://www.sciencedirect.com/science/article/abs/pii/S0029801823023557（He 2023）｜ https://arxiv.org/abs/2509.11235",
-    10: "来源：https://greenvoyage2050.imo.org/technology/speed-management/ ｜ https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/",
-    11: "来源：https://www.mdpi.com/2077-1312/11/3/675 ｜ https://stormgeo.com/insights/how-the-evolution-of-weather-routing-is-reducing-greenhouse-gas-emissions",
-    12: "来源：https://greenvoyage2050.imo.org/technology/speed-management/ ｜ https://research.chalmers.se/en/publication/516144（气象航线五算法基准）",
-    13: "来源：https://www.sciopen.com/article/10.19693/j.issn.1673-3185.03104 ｜ https://ww2.eagle.org/content/dam/eagle/advisories-and-debriefs/ABS_Energy_Efficiency_Advisory.pdf",
-    14: "来源：https://library.e.abb.com/public/b92c10c2533647b08601322d2f9ffef4/Detailed%20Description_ABB%20Ability%20Marine%20Advisory%20Suite%20-%20OCTOPUS.pdf ｜ https://www.hellenicshippingnews.com/nabtesco-combines-telegraph-agent-and-cassandra-to-deliver-unmatched-fuel-optimisation-for-eastern-car-liner-co/",
-    15: "来源：https://www.rivieramm.com/news-content-hub/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433 ｜ https://www.napa.fi/news/napa-norsepower-sumitomo-study/",
-    16: "来源：https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3 ｜ https://vesselperformance.info/2024/11/15/eastern-pacific-uses-deepsea-to-improve-fuel-consumption-forecasts-to-within-1-per-cent/",
-    17: "来源：https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/ ｜ https://www.mdpi.com/2077-1312/12/1/94",
+    8: "来源：本仓库 docs/auto_tuning/辨识流程原理推导与工作流程.md ｜ https://link.springer.com/article/10.1007/s00773-014-0293-y（Yasukawa & Yoshimura 2015，MMG 标准方法）",
+    9: "来源：本仓库 control/include/nomoto_identifier.hpp、auto_tuner.hpp ｜ https://arxiv.org/abs/2312.04224（MMG 实船数据参数微调）",
+    10: "来源：https://arxiv.org/abs/2510.21773 ｜ https://www.mdpi.com/2077-1312/11/2/281（Lyapunov-based MPC，DP 船）",
+    11: "来源：https://www.sciencedirect.com/science/article/abs/pii/S0029801823023557（He 2023）｜ https://arxiv.org/abs/2509.11235",
+    12: "来源：https://greenvoyage2050.imo.org/technology/speed-management/ ｜ https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/",
+    13: "来源：https://www.mdpi.com/2077-1312/11/3/675 ｜ https://stormgeo.com/insights/how-the-evolution-of-weather-routing-is-reducing-greenhouse-gas-emissions",
+    14: "来源：https://greenvoyage2050.imo.org/technology/speed-management/ ｜ https://research.chalmers.se/en/publication/516144（气象航线五算法基准）",
+    15: "来源：https://www.sciopen.com/article/10.19693/j.issn.1673-3185.03104 ｜ https://ww2.eagle.org/content/dam/eagle/advisories-and-debriefs/ABS_Energy_Efficiency_Advisory.pdf",
+    16: "来源：https://library.e.abb.com/public/b92c10c2533647b08601322d2f9ffef4/Detailed%20Description_ABB%20Ability%20Marine%20Advisory%20Suite%20-%20OCTOPUS.pdf ｜ https://www.hellenicshippingnews.com/nabtesco-combines-telegraph-agent-and-cassandra-to-deliver-unmatched-fuel-optimisation-for-eastern-car-liner-co/",
+    17: "来源：https://www.rivieramm.com/news-content-hub/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433 ｜ https://www.napa.fi/news/napa-norsepower-sumitomo-study/",
+    18: "来源：https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3 ｜ https://vesselperformance.info/2024/11/15/eastern-pacific-uses-deepsea-to-improve-fuel-consumption-forecasts-to-within-1-per-cent/",
+    19: "来源：https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/ ｜ https://www.mdpi.com/2077-1312/12/1/94",
 }
 for idx, slide in enumerate(prs.slides, 1):
     if idx not in (1, len(prs.slides._sldIdLst)):  # 跳过封面与结尾页
