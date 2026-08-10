@@ -1,6 +1,6 @@
 # 船舶控制与节能算法调研文档：MPC vs PD 自动舵 与 船舶节能方案综述
 
-> 调研日期：2026-08-07（初版）；2026-08-07（第二轮来源核对与补充修订）
+> 调研日期：2026-08-07（初版）；2026-08-07（第二轮来源核对与补充修订）；2026-08-07（第三轮修订：去除法规内容，改为纯技术视角）
 > 调研范围：① MPC（模型预测控制）与传统 PD/PID 自动舵在船舶上的部署对比（调试难度、控制效果）；② 船舶节能算法的学术论文与工业部署案例
 > 数据来源：IEEE / ScienceDirect / MDPI / arXiv 论文，IMO / ABS / ClassNK 官方资料，ABB、Wärtsilä、Kongsberg、NAPA、Yara Marine、Anschütz 等厂商公开资料
 > **核查说明**：本文全部定量数据已经过第二轮逐条与原文核对（核对结论标注为 ✅一致 / ⚠️已修正 / ❌无法证实），修正记录见附录 A；厂商宣称数据与第三方实测数据已区分标注，引用时注意营销偏差。
@@ -11,12 +11,9 @@
 
 船舶航向/航迹控制（自动舵）是船舶上最基础的控制回路。当前工业自动舵的绝对主流仍是 **PID/PD 型控制器**（常叠加海浪滤波与自适应增益调度）。Källström 在 *Control Engineering Practice*（2000）记载的 Stena HSS 高速双体船实船自动舵系统（TAP）即以 PID 型与自适应控制并行提供，且"正常海况下 PID 与自适应控制性能大致相当"——但该文同时指出其参数整定工作量"comprehensive（非常庞大）"；这一"PID 为主、整定繁琐"的格局至今未根本改变。（来源：[Källström, 2000](https://www.sciencedirect.com/science/article/abs/pii/S0967066199001677)，实船应用论文，非综述）
 
-两条外部驱动正在改变技术选型空间：
+两条技术驱动正在改变技术选型空间：
 
-- **法规驱动**：IMO 的 EEXI（现有船舶能效指数）与 CII（营运碳强度指标）依据 MARPOL 附则 VI 修正案（MEPC.328(76)，2022-11-01 生效）强制执行：
-  - **EEXI**：适用于 ≥400 GT 船舶，将"实际 EEXI（attained）"与按船型/吨位折减系数确定的"要求 EEXI（required）"对比，一次性技术合规；计算与验证指南为 MEPC.350(78)/MEPC.351(78)，轴/主机功率限制（ShaPoLi/EPL）指南为 MEPC.335(76)；
-  - **CII**：适用于 ≥5,000 GT 船舶，按年度营运碳强度（常用 AER，单位运输功 CO₂）对照参考线（G2=MEPC.353(78)）与逐年折减系数（G3=MEPC.338(76)）评级，评级边界（G4=MEPC.354(78)）分为 A–E 五档；**连续 3 年 D 或 1 年 E 须在 SEEMP Part III 中提交纠正措施计划**；法规要求 2026-01-01 前完成复审。EU ETS 自 2024 年起将航运纳入碳交易。
-  （来源：[IMO 官方 EEXI/CII FAQ](https://www.imo.org/en/MediaCentre/HotTopics/Pages/EEXI-CII-FAQ.aspx)；[MarineLink, 2023](https://ports.marinelink.com/ports/port/port-allen-uspal/news/imos-eexi-and-cii-decarbonization-regulations-enter-enforcement-in-2023)）
+- **能耗痛点驱动**：推进能耗是船舶运营能耗的主体，效率提升直接折算为运营成本；无效操舵会增加舵致附加阻力与舵机磨损——Anschütz 多年运营数据分析表明自适应操舵平均可减少舵动作约 25%（见 3.5 节）；风浪流干扰下的航向/航迹偏差还会放大实际航程。节能与控制品质是同一条技术线上的两件事。
 - **控制理论下沉**：MPC 在过程工业成熟后，正随嵌入式求解器（OSQP、qpSWIFT、acados、HPIPM 等）的成熟向船舶控制渗透；学术界已有大量船舶 MPC 仿真与船模试验成果（见 2.2、2.4 节）。
 
 本文回答两个工程问题：
@@ -138,7 +135,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 | Du et al., 2019, *TR-B* 121:88–114（[链接](https://www.sciencedirect.com/science/article/abs/pii/S0191261517305738)，OpenAlex 被引 169） | 基于实船航次报告数据 + ANN 油耗模型的两阶段优化（岸上航速规划 + 海上纵倾优化） | 原文：动态纵倾（C1）省 **4.96%/5.83%**，ANN 模型航速优化（C2）省 **7.63%/7.57%**，综合（C3）平均省 **8.25%**；"0.57%/3.69%"是 ANN 航速优化相对**三次方定律航速优化**的额外节油（初版文档误述为"两阶段再省"，已修正） | 实船数据 |
 | IMO GreenVoyage2050（[链接](https://greenvoyage2050.imo.org/technology/speed-management/)） | 官方技术评估 | "一艘 56,000 DWT 敞舱口货船，13% 减速省约 34% **日油耗**"（特定船案例，非普适值）；另"10% 减速 → 功率/推进油耗降 27%，计入航时后航次总节油约 19%"；削减潜力 **10–50% 为主机油耗口径，全船总油耗口径约 3–12%** | 官方口径 |
 
-- **优点**：杠杆最大（油耗近似与航速立方成正比）；无需任何硬件改装；直接改善 CII 评级。
+- **优点**：杠杆最大（油耗近似与航速立方成正比）；无需任何硬件改装；单位运输功油耗直接下降。
 - **缺点**：以牺牲船期为代价，受租约/班期约束；需供应链端配合（JIT 到港）；低速可能偏离主机最佳负荷点，部分收益被主机效率下降抵消（IMO 口径下全船总节油仅 3–12% 即为例证）。
 
 ### 3.2 纵倾优化（Trim Optimization）
@@ -220,7 +217,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 1. **节能的大头在决策层，控制层的价值在"少损耗"**：自动舵本身贡献 0.1–1.0% 量级节油（IMO 口径），但它是唯一 7×24 小时在线、几乎零边际成本的环节，且舵机磨损降低带来维护收益。
 2. **MPC 在船舶上的可行域正在打开**：船舶航向动态慢（0.1–0.2 s 控制周期），嵌入式 QP 求解器实测毫秒级求解（7 ms @ 20 Hz，见 2.4 节）；真正的瓶颈是**模型辨识与整定自动化**——谁能把"辨识-整定-验证"流程工具化，谁就能让 MPC 上船。
 3. **数据驱动自学习模型成为标配**：ClassNK-NAPA（预测精度 99.6%）、DeepSea（周油耗预测误差 0.8%）均以实船数据自学习模型为核心，纯机理模型的路线在商用产品中已少见。
-4. **EEXI/CII/EU ETS 持续加码**：节能软件的采购决策已从"节油回本"转向"合规刚需"（CII 纠正计划机制 + 2026 年法规复审可能进一步收紧），利好一切可量化节油的技术。
+4. **分层协同成为方向**：决策层优化（航速/航线/纵倾指令）与控制层执行（自动舵）正在打通——MPC 代价函数可直接计入操舵能量项，自动舵可向上输出舵机磨损/能耗统计，形成"控制层节能 + 决策层节能"的组合闭环（见 5.2 节长期建议）。
 
 ### 5.2 对本项目（auto_rudder）的建议
 
@@ -276,7 +273,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 35. [Anschütz — 双舵 Toe Angle 节油](https://www.anschuetz.com/news/article/anschuetz-autopilots-save-up-to-5-fuel-on-twin-rudder-vessels)；[舵动作减少 25%](https://www.anschuetz.com/news/article/want-to-know-how-efficiently-your-ship-steers)
 36. [van Amerongen — MRAS 自适应自动舵实船试验](https://www.dynamicalsystems.nl/intelligentcontrol/Intelligent_Control_MRAS.pdf)
 
-**部署案例与法规**
+**部署案例**
 37. [ABB OCTOPUS 官方资料](https://library.e.abb.com/public/b92c10c2533647b08601322d2f9ffef4/Detailed%20Description_ABB%20Ability%20Marine%20Advisory%20Suite%20-%20OCTOPUS.pdf)；[ABB 2022 资本市场日](https://global.abb/content/dam/abb/global/group/investors/documents/ir-events/2022/pa-cmd/ABB-PA-CMD-Digital.pdf)
 38. [Wärtsilä 收购 Eniram, 2016](https://www.wartsila.com/media/news/30-06-2016-wartsila-enhances-its-digital-offering-by-acquiring-eniram)；[Navigator, 2017](https://navigatormagazine.fi/news/eniram-optimising-through-data/)；[VLCC 案例](https://safety4sea.com/study-on-vlcc-impact-of-real-fuel-savings-from-trim-optimization-and-hull-fouli/)
 39. [Yara FuelOpt / Teekay, 2023](https://www.ship-technology.com/news/teekay-tankers-to-install-yara-marines-fuelopt-technology-on-25-vessels/)；[Riviera 独立测试报道](https://www.rivieramm.com/news-content-hub/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433)
@@ -285,7 +282,8 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 42. [DeepSea × Nabtesco 汽车船实测](https://www.hellenicshippingnews.com/nabtesco-combines-telegraph-agent-and-cassandra-to-deliver-unmatched-fuel-optimisation-for-eastern-car-liner-co/)；[EPS 船队油耗预报误差 0.8%](https://vesselperformance.info/2024/11/15/eastern-pacific-uses-deepsea-to-improve-fuel-consumption-forecasts-to-within-1-per-cent/)
 43. [Anschütz NP5000 NX, 2023](https://www.anschuetz.com/news/article/nautopilot-5000-nx-reduces-fuel-consumption-and-emissions)；[Syberg 产品页（2.5% 出处）](https://www.syberg.no/products/nautopilot-5000)
 44. [Orca AI / Seaspan 部署](https://www.rivieramm.com/news-content-hub/news-content-hub/seaspan-cuts-fuel-navigation-incidents-using-ai-85840)；[Orca AI 融资与数据](https://www.rivieramm.com/news-content-hub/news-content-hub/us725m-investment-drives-further-autonomous-navigation-development-84755)
-45. [IMO EEXI/CII 官方 FAQ](https://www.imo.org/en/MediaCentre/HotTopics/Pages/EEXI-CII-FAQ.aspx)；[EEXI/CII 生效报道, 2023](https://ports.marinelink.com/ports/port/port-allen-uspal/news/imos-eexi-and-cii-decarbonization-regulations-enter-enforcement-in-2023)
+
+（注：第三轮修订删除了原第 45 条 IMO EEXI/CII 法规类参考文献，全文转为纯技术视角。）
 
 ---
 
@@ -312,4 +310,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 | 17 | 四、Kongsberg | "DP 工况节油 8–10%" | **无法证实**（发布稿无数字、会议 PDF 抓取失败），已删除该数字 |
 | 18 | 四、Anschütz NP | "2.5%"挂 Anschütz 官网 | 修正出处为 Syberg 经销商页（官网新闻无此数；旧 URL 404 已更正）；首装型号正名 NautoPilot 5400 NX |
 | 19 | 四、DeepSea | "EPS 约 300 艘"挂 deepsea.ai | 数字正确但出处不当，改挂 2024-11 报道；补"周油耗预报误差 0.8%"出处 |
-| 20 | 新增 | — | 新增 2.4（实时性与嵌入式求解器）、2.5（稳定性与安全性）、EEXI/CII 详细法规背景、Orca AI 案例、PID 整定公式与出处 |
+| 20 | 新增 | — | 新增 2.4（实时性与嵌入式求解器）、2.5（稳定性与安全性）、Orca AI 案例、PID 整定公式与出处 |
+
+**第三轮修订记录（2026-08-07，去除法规内容、改纯技术视角）**：
+① 删除第一章"法规驱动"整段（EEXI/CII 机制、MEPC 决议、EU ETS），替换为"能耗痛点驱动"；② 3.1 节减速航行优点"直接改善 CII 评级"改为"单位运输功油耗直接下降"；③ 5.1 节趋势 ④"法规持续加码"替换为"分层协同"技术趋势；④ 删除参考文献第 45 条（IMO EEXI/CII 法规类）；⑤ 参考文献分组"部署案例与法规"更名"部署案例"。保留说明：IMO GreenVoyage2050 / GloMEEP 的节能潜力数据为**技术评估数据**，与法规内容无关，予以保留。
