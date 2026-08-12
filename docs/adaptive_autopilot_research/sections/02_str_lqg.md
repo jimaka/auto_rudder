@@ -36,12 +36,14 @@ $$
 u(t)=-\frac{G(z^{-1})}{B(z^{-1})F(z^{-1})}\,y(t).
 $$
 
-船舶航向保持的真正目标并非航向误差方差最小，而是**操舵引起的附加阻力最小**。Koyama（1967）与 Norrbin（1972）给出的近似关系（被 Källström 等直接用作自校正器的损失函数）为
+船舶航向保持的真正目标并非航向误差方差最小，而是**操舵引起的附加阻力最小**。Koyama（1967）与 Norrbin（1972）给出的近似关系（被 Källström 等直接用作自校正器的损失函数，见 [TFRT-3145](https://lucris.lub.lu.se/ws/files/4680687/8777572.pdf) 式 (2.2)）为
 
 $$
 \frac{\Delta R}{R}\approx k\left(\overline{\psi_e^{2}}+\lambda\,\overline{\delta^{2}}\right),\qquad
 k\approx 0.014\ \mathrm{deg}^{-2},\quad \lambda=1/12,
 $$
+
+其中 $k$、$\lambda$ 的具体数值为 Norrbin（1972）针对典型油轮所给（推导见 1.4 节），TFRT-3145 在其全部仿真中恒定取 $\lambda=1/12$ 计算损失函数。
 
 即航向误差均方值与舵角均方值的加权和正比于阻力增量。这自然导出广义最小方差型准则
 
@@ -66,6 +68,39 @@ $$
 
 上图概括了 1970–80 年代自适应自动舵的典型结构：RLS 在线辨识 + 最小方差/LQG 控制器 + Kalman 滤波（含波浪滤波），航速变化由**增益调度**快速补偿、其余慢变因素（载况、海况）交由自适应环路处理。
 
+#### 1.4 GMV 损失函数中 λ 与操舵附加阻力关系的推导
+
+TFRT-3145 式（2.2）的经验关系 $\Delta R/R\approx k(\overline{\psi_e^2}+\lambda\overline{\delta^2})$ 并非纯曲线拟合，其结构可由小角度假设下的船体/舵水动力二阶展开推出。按 [TFRT-3145](https://lucris.lub.lu.se/ws/files/4680687/8777572.pdf) 对航向保持问题的归因，附加阻力来自三部分：艏摇角速度–横漂速度耦合的减速力、漂角增大引起的船体阻力增量、航向偏离造成的航程损失（最后一项较小，通常忽略）。前两项分别对应损失函数中的两项：
+
+- **船体项（航向误差）**：定常航速 $V$ 下船体阻力对漂角 $\beta$ 是对称（偶）函数，小角度泰勒展开的一阶项为零，得 $R(\beta)\approx R_0(1+k_\beta\beta^2)$。航向误差振荡时船体平均漂角与航向误差同量级，$\overline{\beta^2}\propto\overline{\psi_e^2}$，故 $\Delta R_{hull}/R_0\propto\overline{\psi_e^2}$；
+- **舵项（操舵）**：舵角 $\delta$ 产生舵升力 $L=\tfrac12\rho V^2A_R C_{L\alpha}\delta$，其诱导阻力 $D_i=L^2/(\tfrac12\rho V^2A_R\cdot\pi e\,\Lambda_R)\propto\delta^2$（$\Lambda_R$ 为舵展弦比），叠加舵型阻随迎角的二次增长，得 $\Delta R_{rudder}/R_0\propto\overline{\delta^2}$。
+
+两式合并即得 $\Delta R/R_0 = k\,\overline{\psi_e^2}+k_\delta\,\overline{\delta^2}=k\left(\overline{\psi_e^2}+\lambda\,\overline{\delta^2}\right)$，其中
+
+$$
+\lambda=\frac{k_\delta}{k}=\frac{\text{单位均方舵角的附加阻力}}{\text{单位均方航向误差的附加阻力}} .
+$$
+
+Norrbin（1972）对典型油轮估算得 $k\approx0.014\ \mathrm{deg}^{-2}$、$\lambda=1/12\approx0.083$（经 Källström 等引用为工程取值）。一个直观算例：$\psi_{e,rms}=1^\circ$、$\delta_{rms}=3^\circ$ 时，两项对损失函数的贡献分别为 $1$ 与 $\lambda\cdot 9=0.75$，同量级——说明"为压航向误差而多打舵"本身就在消耗推进能量，这正是不能只最小化航向误差方差的原因。
+
+由此，GMV 准则 $J=E[\psi_e^2+\lambda\delta^2]$ 中的权重 $\lambda$ 有了明确的物理标定：$\lambda$ 偏大则惩罚操舵、舵机磨损小但航向保持差；$\lambda$ 偏小则航向紧、舵动剧烈，附加阻力反而上升；$\lambda=1/12$ 给出（该型油轮）阻力最优的折中点。需要注意该关系是**定常速、小舵角、航向保持工况**下的二阶近似，$k$ 与 $\lambda$ 均随船型与工况（载况、航速、水深）变化；大转向等非线性工况不适用。
+
+#### 1.5 辨识残差白性检验的工程做法
+
+RLS 类辨识的一致性依赖于一个可检验的前提：**预报误差（创新序列）$\varepsilon(t)$ 为白噪声**。若噪声模型 $C(z^{-1})$ 的阶次不足——例如把波浪引起的有色扰动当作白噪声——残差必然有色，参数估计随之有偏。TFRT-3145 明确记载，"RLS + LQ（解 Riccati 方程）"版本性能反不如结构更简单的最小方差自校正器，原因正是有色波浪扰动导致参数估计有偏。因此残差白性检验不是理论装饰，而是辨识质量的在线仪表。工程上的标准做法：
+
+1. **滑动窗口样本自相关 + Bartlett 置信带**：在最近 $N$ 个样本上计算归一化自相关 $\hat\rho(\tau)=\hat r(\tau)/\hat r(0)$。白噪声假设下 $\hat\rho(\tau)\sim\mathcal N(0,1/N)$（Bartlett 渐近结果），故 95% 置信带为 $\pm1.96/\sqrt{N}$；若出带滞后点显著超过 5%，判定残差非白。
+2. **Ljung–Box 混成检验**：$Q=N(N+2)\sum_{\tau=1}^{m}\hat\rho^2(\tau)/(N-\tau)$ 在白性假设下近似服从 $\chi^2(m)$，$m$ 取 10–20，$Q$ 超临界值即拒绝白性假设——比逐点看置信带更不易被偶然出带误导。
+3. **残差–输入互相关检验**：$\hat r_{\varepsilon u}(\tau)$ 用于检验对象动态模型是否充分（白性检验暴露噪声模型缺陷，互相关检验暴露对象模型缺陷），两者应同时监控。
+4. **在线实现要点**：用与遗忘因子一致的指数加权递推估计 $\hat r(\tau)$，避免存储全窗；窗口长度应覆盖若干波浪遭遇周期（遭遇频率典型 0.05–0.3 Hz，1 Hz 采样时 $N$ 取数百至数千）；检验统计量本身应低通后再触发报警，避免在海况瞬变时抖动。
+
+   ![RLS 辨识残差白性检验示意](../figs/fig_02_residual_whiteness.png)
+
+   上图为数值演示：噪声模型匹配时残差自相关几乎全部落在 Bartlett 带内（出带 2%，左）；未建波浪有色噪声模型时，二阶波浪成型滤波器（谐振峰约 0.1 Hz）产生的有色残差大量出带（90%，右），其缓慢起伏形态正是波浪谱在滞后域的指纹。
+
+5. **判定非白后的处置**：(a) 增广噪声模型——提高 ARMAX 中 $C(z^{-1})$ 阶次，或显式并入二阶波浪成型滤波器 $H(z)=\sigma^2 z^{-1}/(1-2\zeta\omega_0 z^{-1}+\omega_0^2 z^{-2})$；(b) 对输入输出数据做高通/陷波预处理，把波浪频段隔离在辨识带宽之外；(c) 在白性恢复之前冻结参数更新或收紧参数限幅，防止有偏估计进入控制律。
+6. **对本项目的映射**：对 Nomoto $K/T$ 在线辨识的残差做同样的白性监控，可作为"海况升高导致 $K/T$ 估计系统性偏移"的**早期预警量**——残差在波浪频段出现能量集中时，先于控制性能恶化给出信号，触发波浪滤波或噪声模型增广。
+
 ### 2. 代表性工作与工程应用
 
 - **船舶操纵动力学辨识奠基**：Åström & Källström, *Identification of ship steering dynamics*, Automatica, 1976——用极大似然法从油轮实船试航数据辨识 Nomoto 型操纵模型及波浪扰动模型，为后续自适应设计提供了模型与噪声统计基础（引自 [船舶航向保持控制研究综述, 2022](http://www.aquaticjournal.com/article/doi/10.3969/j.issn.1673-9159.2022.06.006) 文献列表）。
@@ -78,7 +113,7 @@ $$
 
 ![不同方案相对精调 PID 自动舵的燃油节省](../figs/fig_02_fuel_saving.png)
 
-关键量化结论（[Källström et al., LTH Report TFRT-3145](https://lucris.lub.lu.se/ws/files/4680687/8777572.pdf)，仿真 + 实船一致）：满载工况下 KADPIL 2 相对精调 PID 节省燃油约 **0.3–0.9%**；海况越恶劣收益越大——17–20 m/s 大风（8 级风）下 KADPIL 2 相对 KADPIL 1 的增益达 **1.4%**，远高于 6–8 m/s 和风时的 0.5–0.6%；低速航行时收益同样显著增大。叠加 Schilling 关于"PID 从通常整定到最优整定可省 1–2%"的估计，自适应自动舵相对粗放整定的常规 PID 总节省可达 **2–3%**。
+关键量化结论（[Källström et al., LTH Report TFRT-3145](https://lucris.lub.lu.se/ws/files/4680687/8777572.pdf) 第 3 节仿真总结，实船试验趋势一致）：满载工况下 KADPIL 2 相对精调 PID 节省燃油约 **0.3–0.9%**（低值对应 PID 使用 Kalman 滤波估计、高值对应 PID 直接用未滤波测量）；海况越恶劣收益越大——255,000 tdw 满载油轮仿真中，17–20 m/s 大风（fresh gale，蒲福 8 级）下 KADPIL 2 相对 KADPIL 1 的增益达 **1.4%**，远高于 6–8 m/s 和风（moderate breeze）时的 0.5–0.6%（报告引言按 0.5% 估计，仿真节给出 0.6%）；低速航行时收益同样显著增大。报告同时指出：仿真略微高估了精调 PID 的性能，**实船试验中自适应自动舵的收益比仿真更大**。叠加 Schilling 关于"PID 从通常整定到最优整定可省 1–2%"的估计，自适应自动舵相对粗放整定的常规 PID 总节省可达 **2–3%**。
 
 ### 3. 工程优缺点
 
@@ -108,8 +143,8 @@ $$
 
 ### 5. 参考资料
 
-1. [Källström C.G., Åström K.J., Thorell N.E., Eriksson J., Sten L., "Adaptive Autopilots for Steering of Large Tankers", LTH Report TFRT-3145, 1977（全文 PDF，隆德大学）](https://lucris.lub.lu.se/ws/files/4680687/8777572.pdf)
-2. Källström C.G., Åström K.J., Thorell N.E., Eriksson J., Sten L., "Adaptive autopilots for tankers", *Automatica*, 15(3):241–254, 1979（题录见 [智能船舶远程驾驶控制技术研究现状与趋势](https://www.opticsjournal.net/Articles/OJcce32d184bc6b11b/FullText) 文献[86]）
+1. [Källström C.G., Åström K.J., Thorell N.E., Eriksson J., Sten L., "Adaptive Autopilots for Steering of Large Tankers", LTH Report TFRT-3145（报告编号 LUTFD2/(TFRT-3145)/1-66/(1977)），1977 年 7 月，66 页（全文 PDF，隆德大学）](https://lucris.lub.lu.se/ws/files/4680687/8777572.pdf)
+2. Källström C.G., Åström K.J., Thorell N.E., Eriksson J., Sten L., "Adaptive autopilots for tankers", *Automatica*, 15(3):241–254, 1979, [DOI: 10.1016/0005-1098(79)90042-6](https://doi.org/10.1016/0005-1098(79)90042-6)（题录见 [隆德大学研究门户](https://portal.research.lu.se/sv/publications/adaptive-autopilots-for-tankers/) 与 [智能船舶远程驾驶控制技术研究现状与趋势](https://www.opticsjournal.net/Articles/OJcce32d184bc6b11b/FullText) 文献[86]）
 3. Åström K.J., Källström C.G., "Identification of ship steering dynamics", *Automatica*, 12(1):9–22, 1976（题录见 [船舶航向保持控制研究综述](http://www.aquaticjournal.com/article/doi/10.3969/j.issn.1673-9159.2022.06.006)）
 4. Åström K.J., Wittenmark B., "On self-tuning regulators", *Automatica*, 9:185–199, 1973, [DOI](https://doi.org/10.1016/0005-1098(73)90073-3)
 5. Åström K.J., "Why use adaptive techniques for steering large tankers", *Int. J. Control*, 32(4):689–708, 1980（题录见 [Automation for the Maritime Industries, DIGITAL.CSIC](https://digital.csic.es/bitstream/10261/2906/1/Maritime_Industries.pdf) 文献[15]）

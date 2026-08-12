@@ -21,11 +21,51 @@
 | 8 | 狂涛（Very high） | 9.0–14.0 |
 | 9 | 怒涛（Phenomenal） | >14.0 |
 
-需要注意三点：其一，WMO 官方建议在工程上直接使用波高而非海况码，因为海况码不描述波陡、周期、波向与涌浪成分 [1]；其二，对自动舵真正起作用的是**遭遇谱**（encounter spectrum），即波谱经船速与波向多普勒频移后的形式，遭遇频率 $\omega_e = \omega - \frac{\omega^2 U}{g}\cos\chi$（$\chi$ 为浪向角，迎浪时谱峰向高频移动、随浪时向低频移动）[3]；其三，有义波高只是统计量，单波可显著大于 $H_{1/3}$。
+需要注意三点：其一，WMO 电码规则（WMO-No. 306）规定船舶一旦报告了有义波高即不再报告海况码，且 Code 3700 本身注明"描述术语优先、波高数值仅供观测参考"，因为海况码不描述波陡、周期、波向与涌浪成分——工程设计应直接使用波谱参数（$H_{1/3}$、谱峰周期、浪向）而非海况码 [1]；其二，对自动舵真正起作用的是**遭遇谱**（encounter spectrum），即波谱经船速与波向多普勒频移后的形式，遭遇频率 $\omega_e = \omega - \frac{\omega^2 U}{g}\cos\chi$（$\chi$ 为浪向角，迎浪时谱峰向高频移动、随浪时向低频移动）[3]；其三，有义波高只是统计量，单波可显著大于 $H_{1/3}$。
+
+#### ITTC 推荐波谱与遭遇谱计算
+
+海况码只给出 $H_{1/3}$ 一个数，而自动舵的滤波器设计、仿真验证都需要完整的波谱形状。ITTC 推荐的标准做法是按工况选用两类解析谱 [28]：
+
+**Pierson–Moskowitz（PM）谱**——充分发展风浪（风时、风区足够长），原始单参数形式以 19.5 m 高度风速 $V$ 为参数：
+
+$$
+S(\omega) = \frac{0.0081\,g^2}{\omega^5}\exp\!\left[-0.74\left(\frac{g}{\omega V}\right)^{4}\right]
+$$
+
+工程上更常用 ITTC/ISSC 双参数形式（以 $H_{1/3}$ 与平均周期 $T_1 = 2\pi m_0/m_1$ 为参数）：
+
+$$
+S(\omega) = \frac{A}{\omega^5}\exp\!\left(-\frac{B}{\omega^4}\right),\qquad A = \frac{173\,H_{1/3}^2}{T_1^4},\quad B = \frac{691}{T_1^4}
+$$
+
+其中谱矩 $m_n = \int_0^\infty \omega^n S(\omega)\,\mathrm{d}\omega$，有义波高 $H_{1/3} = 4\sqrt{m_0}$。
+
+**JONSWAP 谱**——风区受限（近岸、风正在增强）的发展中浪，在 PM 谱上乘峰升因子，谱峰显著变尖变高：
+
+$$
+S_J(\omega) = A_\gamma\, S_{PM}(\omega)\,\gamma^{\exp\!\left[-\frac{(\omega-\omega_p)^2}{2\sigma^2\omega_p^2}\right]},\qquad
+\sigma=\begin{cases}0.07 & \omega\le\omega_p\\ 0.09 & \omega>\omega_p\end{cases}
+$$
+
+$\gamma$ 为峰升因子（无实测时取典型值 3.3），$A_\gamma$ 为保持总能量 $m_0$ 不变的归一化因子。同样的 $H_{1/3}$ 下，JONSWAP 的谱峰更高更窄，意味着波浪能量更集中、对滤波器中心频率的失配更敏感。
+
+**遭遇谱**：波频 $\omega$ 与遭遇频率 $\omega_e$ 的映射为
+
+$$
+\omega_e = \left|\omega - \frac{\omega^2 U}{g}\cos\chi\right|,\qquad
+S_e(\omega_e) = \frac{S(\omega)}{\left|1 - \dfrac{2\omega U}{g}\cos\chi\right|}
+$$
+
+迎浪（$\chi=180°$）时映射单调、谱峰移向高频，与操纵频段的间隔反而拉大；横浪（$\chi=90°$）无频移；**随浪（$\chi=0°$）时映射非单调**，在 $\omega = g/(2U)$ 处折叠，高频波分量的遭遇频率被压回低频甚至为零（船速追上波速），叠加雅可比因子的放大，波频能量直接进入艏摇操纵频段——这是随浪工况航向保持困难、且波浪滤波难以奏效的频域解释。对本项目 $U=25$ kn（12.86 m/s），折叠点在 $\omega \approx 0.38$ rad/s，海况 4 的谱峰（$\omega_p \approx 0.8$–1.0 rad/s）已处于折叠区上方，随浪航行时谱峰能量被压到 $\omega_e < 0.3$ rad/s 的操纵频段内（图 8-1 右）。
+
+![ITTC 波谱与遭遇频率映射](../figs/fig_08_wave_spectrum.png)
+
+图 8-1：左为 PM/ITTC 与 JONSWAP 谱对比（$H_{1/3}=2.5$ m、$T_1=7$ s）；右为 25 kn 下三种浪向的遭遇频率映射，随浪曲线在 $\omega=g/2U$ 处折叠，波频能量被压入操纵频段（橙色区）。
 
 #### 本项目内部刻度
 
-本项目增益调度采用内部海况刻度 **0..3 级**（× 船速段），大致对应 WMO 海况 0–3（$H_{1/3} \le 1.25$ m）这一"轻浪及以下"的标称工作域。对 25 kn 级别的游艇而言，海况 4–5（$H_{1/3}$ 1.25–4 m）已是常规运营中可能遭遇的上限，应作为"最大海况"分析目标；海况 ≥6 对小型游艇通常意味着停航或极端避险工况，自动舵的任务从"精确航向保持"退化为"安全降级"。图 8-1 给出分级、浪高与主要影响的对应关系。
+本项目增益调度采用内部海况刻度 **0..3 级**（× 船速段），大致对应 WMO 海况 0–3（$H_{1/3} \le 1.25$ m）这一"轻浪及以下"的标称工作域。对 25 kn 级别的游艇而言，海况 4–5（$H_{1/3}$ 1.25–4 m）已是常规运营中可能遭遇的上限，应作为"最大海况"分析目标；海况 ≥6 对小型游艇通常意味着停航或极端避险工况，自动舵的任务从"精确航向保持"退化为"安全降级"。图 8-2 给出分级、浪高与主要影响的对应关系。
 
 ![WMO/Douglas 海况分级与影响示意](../figs/fig_08_seastate_scale.png)
 
@@ -58,7 +98,7 @@ $$
 
 #### 舵机饱和与舵速限制
 
-舵机存在两类硬约束：舵角限幅与舵速限制。SOLAS 对主操舵装置的要求是 35°→对侧 30° 不超过 28 s [9]，即大型商船平均舵速仅约 2.3°/s；游艇舵机通常更快，但 2–3°/s 至 10°/s 量级仍是常见区间。高海况下控制需求舵角大、极性翻转频繁，舵速限制使实际舵角滞后于舵令，相当于在回路中引入随幅值增大的相位滞后——大信号下相位裕度急剧下降，是波浪中振荡发散的常见诱因 [10]。自适应算法若无视饱和，辨识器会把"舵没到"误判为"舵效下降"而错误增大增益；Lauvdal & Fossen 的输入误差方案之所以对饱和鲁棒，正是因为辨识器使用的是**实际（饱和后）舵角** [8]。
+舵机存在两类硬约束：舵角限幅与舵速限制。SOLAS II-1/29.3.2 对主操舵装置的要求是：船舶在最深航海吃水、以最大前进营运航速航行时，舵能从一舷 35° 转到另一舷 35°，且同样条件下从一舷 35° 转到另一舷 30° 不超过 28 s [9]。28 s 是**最差工况下的法规合规上限**，对应平均舵速约 2.3°/s（65°/28 s）——这是下限而非典型值，实际商船舵机通常更快，游艇舵机更快，但 2–3°/s 至 10°/s 量级仍是常见区间。高海况下控制需求舵角大、极性翻转频繁，舵速限制使实际舵角滞后于舵令，相当于在回路中引入随幅值增大的相位滞后——大信号下相位裕度急剧下降，是波浪中振荡发散的常见诱因 [10]。自适应算法若无视饱和，辨识器会把"舵没到"误判为"舵效下降"而错误增大增益；Lauvdal & Fossen 的输入误差方案之所以对饱和鲁棒，正是因为辨识器使用的是**实际（饱和后）舵角** [8]。
 
 #### 舵机磨损与打舵频率
 
@@ -72,9 +112,19 @@ $$
 
 高海况常伴降速航行。船速 $U$ 下降时 Nomoto 增益 $K \propto U$（时间常数 $T \propto 1/U$ 变化更复杂），舵效减弱；同时风与二阶漂力的相对权重上升，船以大漂角（leeway angle）航行，舵的有效来流角为舵角与漂角之差，进一步压缩可用舵效裕度 [14]。低速 + 大浪 + 大漂角是自动舵最恶劣的组合工况。
 
+#### 舵减摇（RRS）与航向保持的耦合影响
+
+高海况下横摇往往比艏摇更危及安全与舒适性，而舵恰好同时是横摇执行器：舵力作用点位于船舶重心之下，打舵产生艏摇力矩的同时必然产生横摇力矩，舵减摇（rudder roll stabilization, RRS）即利用这一耦合，在自动舵上叠加横摇反馈，文献报告的减摇效果可达 30–60%（van Amerongen、van der Klugt 与 van Nauta Lemke 的 Automatica 经典工作及其后丹麦实船系列）[29][30]。但在最大海况下，RRS 与航向保持之间存在三组直接耦合冲突：
+
+1. **频段与舵速冲突**：横摇固有频率显著高于艏摇操纵频率，RRS 要求舵在横摇频段快速往复（文献中 RRS 舵机舵速需求常达 10–20°/s 量级），而航向保持只需低频慢舵；两者叠加在**同一台舵机的舵速限制**上，舵速饱和时 RRS 分量与航向分量互相"抢占"舵程，且饱和诱发的相位滞后对两者都是失稳诱因（Lauvdal & Fossen 专门研究过输入速率饱和下的 RRS 增益调度）[30]。
+2. **横摇–艏摇模型耦合**：横摇通过 $K$、$T$ 参数摄动与附加横漂力矩改变艏摇动态，RRS 减摇的同时会改变自动舵看到的"被控对象"；Blanke & Christensen 的鲁棒性分析表明，忽视横摇–艏摇耦合设计的 RRS 自动舵在某些浪向下会恶化航向保持 [30]。
+3. **波浪滤波冲突**：RRS 需要横摇频率处的运动信息通过，航向保持恰恰要求把该频段的一阶波浪分量滤掉——两者的滤波需求直接矛盾，必须按频率分离通道设计。
+
+对本项目（小型游艇、舵速有限、横摇阻尼大）而言，舵的横摇力臂与舵面积都小，RRS 潜力有限，不建议在最大海况下主动叠加 RRS 功能；但**被动耦合依然存在**——大横摇通过参数摄动影响 $K/T$ 辨识，ESC 调参与极点配置基线设计时应把横摇诱导的模型摄动计入不确定性。RRS 的详细分析、与本项目的适配性评估见第 10 章（舵减摇专题）。
+
 ### 各自适应算法在最大海况下的可行性分析
 
-总体框架见图 8-2：波浪滤波器在量测端剔除一阶分量，鲁棒化机制（dead-zone、泄漏项、海况自适应增益、抗饱和）保护自适应律，海况估计器在线修正滤波器中心频率与增益，超阈值时触发降速/降级保护。
+总体框架见图 8-3：波浪滤波器在量测端剔除一阶分量，鲁棒化机制（dead-zone、泄漏项、海况自适应增益、抗饱和）保护自适应律，海况估计器在线修正滤波器中心频率与增益，超阈值时触发降速/降级保护。
 
 ![高海况自动舵总体框图](../figs/fig_08_highseastate_control.png)
 
@@ -130,7 +180,7 @@ $$
 
 #### L1 自适应
 
-**代表工作**：Hovakimyan & Cao 的 L1 架构（2010），核心是在自适应律与控制输入之间插入**低通滤波器**，把"快自适应"与"鲁棒性"解耦——自适应可以很快，但进入控制通道的只有低频分量 [20][21]；已商用于 Raymarine Evolution 系列船用自动舵 [22]，并在丹麦皇家海军无人艇上实艇验证 [23]。
+**代表工作**：Hovakimyan & Cao 的 L1 架构（2010），核心是在自适应律与控制输入之间插入**低通滤波器**，把"快自适应"与"鲁棒性"解耦——自适应可以很快，但进入控制通道的只有低频分量 [20][21]；据 L1 理论提出者 Hovakimyan 的报告，该架构已商用于 Raymarine Evolution 系列船用自动舵 [22]（厂商未公开算法细节，此说法目前仅见学术侧来源），并在丹麦皇家海军无人艇上实艇验证 [23]。
 
 **风险点**：低通滤波器带宽选择是与波浪滤波的同一权衡——带宽过高放进波频分量，过低牺牲响应；本质上 L1 补偿的是低频不确定项（二阶漂力、参数摄动），对一阶波频仍需前置波浪滤波。
 
@@ -177,21 +227,21 @@ $$
 
 1. **补波浪滤波是第一优先级**。本项目当前方案未见专门的波浪滤波环节，而文献共识是：无论控制器多先进，一阶波频分量必须先于反馈与辨识被滤除 [4][8]。建议为 ESC 的 Nomoto $K/T$ 辨识输入与 PD 反馈分别增加陷波器（中心频率由遭遇频率估计器在线设定），这是所有后续自适应机制能在海况 3 以上正常工作的前提。
 2. **ESC 辨识器需要"高海况保护三件套"**：dead-zone（航向误差能量低于阈值时冻结更新）、泄漏项（防参数漂移）、以及**使用实际舵角而非舵令**作为辨识输入（对舵饱和鲁棒，这是 Lauvdal & Fossen 方案的关键经验 [8]）。ESC 的激励抖动频率应避开遭遇谱峰，否则抖动本身会被波浪响应淹没、梯度估计失真。
-3. **增益调度域应显式外推到海况 4–5 并设兜底**：内部 0..3 级之上增加"超阈值"处理逻辑——海况估计超上限时冻结 ESC、切换到预存的保守 PD 参数、限制舵角/舵速并建议降速（图 8-2 的降速保护支路）。
-4. **舵机约束要进入控制与辨识两级**：舵速限制（2–3°/s 量级）造成的相位滞后应在极点配置基线的带宽设计中显式留裕度（闭环带宽建议低于舵速限制等效带宽的 1/3–1/5）；抗积分饱和与舵角软限幅（避开 35° 失速区）应为标配 [9][12]。
+3. **增益调度域应显式外推到海况 4–5 并设兜底**：内部 0..3 级之上增加"超阈值"处理逻辑——海况估计超上限时冻结 ESC、切换到预存的保守 PD 参数、限制舵角/舵速并建议降速（图 8-3 的降速保护支路）。
+4. **舵机约束要进入控制与辨识两级**：舵速限制（2–3°/s 量级）造成的相位滞后应在极点配置基线的带宽设计中显式留裕度——"闭环带宽低于舵速限制等效带宽的 1/3–1/5"是常用工程经验值（待核实，未见明确文献出处；可核实的替代依据是 Fossen 教材要求设计时显式检验闭环对舵幅值/速率饱和的鲁棒性 [4]）；抗积分饱和与舵角软限幅（避开 35° 失速区）应为标配 [9][12]。
 5. **若未来升级自适应方案，L1 架构是最贴合的路径**：它在商用船用自动舵（Raymarine Evolution）上验证了"快自适应 + 低通滤波"的分层思路 [22]，与本项目"ESC 慢调参 + PD 基线"的时间尺度分离思想同构，迁移成本低。
 
 ### 参考资料
 
 1. [WMO Marine Frequently Asked Questions（海况码与波高建议）](https://community.wmo.int/site/knowledge-hub/programmes-and-initiatives/marine-services/frequently-asked-questions)
-2. [Douglas Sea Scale 海况表（WMO Code 3700 复录）](https://pdfs.semanticscholar.org/7408/1010a7255dc5206e1ccdbdb36e83b25d7f1e.pdf)
+2. [WMO Code Table 3700 海况分级官方表（NOAA NODC 镜像）](https://www.nodc.noaa.gov/gtspp/document/codetbls/wmocodes/table3700.html)
 3. [Fossen, A nonlinear unified state-space model for ship maneuvering and control in a seaway (2005)](https://www.fossen.biz/publications/2005%20Fossen%20IJBC.pdf)
 4. [Fossen, High performance ship autopilot with wave filter (1993)](https://www.fossen.biz/publications/1993%20Fossen%20SCSS.pdf)
 5. [Söding, Wave drift force and moment in deep and shallow water (2025)——二阶漂力 ∝ 波幅平方](https://www.mdpi.com/2077-1312/13/1/64)
 6. [一阶振荡运动与二阶平均漂力/艏摇力矩综述（arXiv）](https://arxiv.org/html/2401.03254v2)
 7. [Kalman 滤波抑制一阶波浪扰动的自动舵应用（Mathematics, MDPI）](https://pure.port.ac.uk/ws/portalfiles/portal/80428585/mathematics-11-03554.pdf)
 8. [Lauvdal & Fossen, Robust adaptive ship autopilot with wave filter and integral action (1998)](https://www.fossen.biz/publications/1998%20Lauvdal%20and%20Fossen%20IJACSP.pdf)
-9. [SOLAS 操舵装置要求（35°→30° ≤ 28 s）](https://www.amnautical.com/blogs/the-mariners-blog/understanding-steering-gear-ships)
+9. [SOLAS II-1/29.3.2 操舵装置要求（最深吃水+最大营运航速下 35°→对侧 30° ≤ 28 s）](https://www.imorules.com/GUID-CF547534-23B3-4162-8415-6C806370E406.html)
 10. [ENSTA 课程资料：现代自动舵组成与状态估计](https://www.ensta-paris.fr/sites/default/files/fichiers/Bibliotheque/compendium_extraits_basse_definition.pdf)
 11. [智能船舶自动舵历史综述（Roberts 2003，含 van Amerongen 模糊舵）](https://www.sciencedirect.com/science/article/abs/pii/S0957415803000448)
 12. [ScienceDirect Topics: Rudder——典型失速角 35–45°，舵角限幅 35°](https://www.sciencedirect.com/topics/engineering/rudder)
@@ -210,3 +260,6 @@ $$
 25. [滑模 + 扰动观测器降切换增益抑制抖振（ROV 案例）](https://rgu-repository.worktribe.com/preview/1625120/MOTOI%202022%20Sliding%20mode%20control.pdf)
 26. [MARIN：波浪中航向保持的强化学习](https://www.marin.nl/en/research/artificial-intelligence-applications/ship-course-keeping-in-waves-using-reinforcement-learning)
 27. [波浪中航向保持的样本高效 RL（Eng. Appl. AI, 2024）](https://dl.acm.org/doi/10.1016/j.engappai.2024.109848)
+28. [ITTC 推荐规程 7.5-02-07-01.2：水池波浪建模（PM/JONSWAP 谱与参数）](https://www.ittc.info/media/9697/75-02-07-012.pdf)
+29. [van Amerongen, van der Klugt & van Nauta Lemke, Rudder Roll Stabilization for Ships（Automatica, 1990）](https://www.sciencedirect.com/science/article/pii/000510989090039B)
+30. [舵减摇与航向保持的时间尺度分解综述（含 Blanke & Christensen 1993 鲁棒性分析、Lauvdal & Fossen 舵速饱和 RRS 增益调度）](https://www.mdpi.com/2077-1312/9/9/1024)
