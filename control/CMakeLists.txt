@@ -11,6 +11,7 @@ endif()
 
 option(AR_BUILD_TESTS "Build GoogleTest unit tests" ON)
 option(AR_BUILD_SIM    "Build closed-loop simulation"  ON)
+option(AR_BUILD_TOOLS  "Build debug/commissioning tools" ON)
 
 # 算法库为 header-only，作为 INTERFACE 库供 tests/sim 复用
 add_library(ar_headers INTERFACE)
@@ -25,4 +26,8 @@ endif()
 
 if(AR_BUILD_SIM)
     add_subdirectory(sim)
+endif()
+
+if(AR_BUILD_TOOLS)
+    add_subdirectory(tools)
 endif()

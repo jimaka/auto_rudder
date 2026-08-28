@@ -171,3 +171,52 @@ bash tools/gen_maneuver_matrix.sh
 ```
 
 每个视频含多子图（航向/舵角/转首率/误差/增益）+ 极坐标机动轨迹，标题标注船型与干扰状态。
+
+# 实船调试接口（tuner_debug_api.hpp + ar_tuner_debug）
+
+面向实船调试/标定：`include/tuner_debug_api.hpp` 把 `AutoTuner` 的每个功能摊平为
+**可单独调用**的调试方法（经 `friend` 暴露，不改动任何在线行为），`tuner_debug_cli.cpp`
+把它们包装为逐行命令工具 `ar_tuner_debug`——每行一条命令，每条命令恰好调用一个功能，
+输出 `key=value` 便于上位机/脚本解析，可经 ssh/串口终端在船上直接使用。
+
+> **安全约束**：`force*` 系列（forcegains/forcebase/forcephase/forcegrad/forceenabled）
+> 旁路稳定门，仅限受控调试场景；正常航行控制回路严禁接入本接口。
+
+## 构建
+
+```bash
+cd control/build && cmake .. && make ar_tuner_debug   # AR_BUILD_TOOLS 默认 ON
+```
+
+## 使用示例
+
+```bash
+$ ./build/tools/ar_tuner_debug
+> pole 0.2 8                     # 只算极点配置：OK Kp=1.600000 Kd=8.600000
+> check 0.2 8 1.6 8.6 0          # 只验稳定门：OK pass=1
+> baseline 0.2 8                 # 只建基线：OK established=1
+> forceenabled 1                 # 单独打开 ESC 门控（调试前置）
+> dither 1.6 8.6                 # 只打一拍载波：OK Kp=1.600000 Kd=9.030000
+> accum 1.0 2.0 1                # 只喂一拍样本（成本/振荡/解调）
+> step 1.6 8.6                   # 只做一次窗末梯度结算
+> status                         # 全量快照（增益/基线/ESC/窗口/振荡）
+> tick 10 9 1 12 0.02 1.0 2.0 1 1 0.2 8   # 跑一拍完整在线编排
+> quit
+```
+
+脚本化：`./ar_tuner_debug < cmds.txt`，成功输出 `OK ...`、失败输出 `ERR <原因>`。
+
+## 命令分组（help 可查全表）
+
+| 组 | 命令 | 对应功能 |
+|---|---|---|
+| 观测 | `status` / `j` / `osc` / `params` | 快照 / 当前窗口 ITAE / 实测振荡 / 参数表 |
+| 层2 | `pole` / `check` / `baseline` / `eval` | 极点配置 / 稳定门 / 建基线 / 辨识评估原语 |
+| ESC | `dither` / `accum` / `step` / `clamp` | 载波注入 / 样本累积+解调 / 窗末结算 / 限幅 |
+| 振荡 | `oscfeed` / `oscreset` | 只喂/清零振荡检测器 |
+| 生命周期 | `revert` / `rebase` / `suspend` / `reset` | 回退基线 / ESC 重锚 / 挂起 / 全复位 |
+| 主流程 | `tick` | 与在线路径同一函数的一拍编排 |
+| 强制注入 | `forcegains` / `forcebase` / `forcephase` / `forcegrad` / `forceenabled` | 旁路稳定门，仅调试 |
+
+单元测试：`control/tests/test_tuner_debug_api.cpp`（11 个用例，含"force 确属旁路"
+与"经 API 的 tick 与直接 tick 逐位一致"两条关键保证）。

@@ -21,6 +21,7 @@ set(AR_TEST_SOURCES
     test_maneuver_sequencer
     test_param_store
     test_autopilot_core
+    test_tuner_debug_api
 )
 
 foreach(t ${AR_TEST_SOURCES})

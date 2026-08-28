@@ -294,6 +294,9 @@ public:
     const OscillationDetector& oscDetector() const { return oscDetector_; }
 
 private:
+    // 实船调试接口（tuner_debug_api.hpp）：逐函数暴露内部机制，仅调试用
+    friend class TunerDebugApi;
+
     // ==================== 内部机制（R1 起为模块私有，经 tick/establishBaseline 驱动） ====================
 
     // 设置基线增益（来自极点配置或人工标定）
