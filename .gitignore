@@ -17,3 +17,9 @@ __pycache__/
 *~
 docs/ship_energy_research/venv/
 .venv-ppt/
+
+# 本地缓存与大体量产物
+graphify-out/
+.codegraph/
+.scratch/tools/
+.scratch/fonts/
