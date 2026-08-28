@@ -218,8 +218,15 @@ $ ./build/tools/ar_tuner_debug
 | 主流程 | `tick` | 与在线路径同一函数的一拍编排 |
 | 强制注入 | `forcegains` / `forcebase` / `forcephase` / `forcegrad` / `forceenabled` | 旁路稳定门，仅调试 |
 
-单元测试：`control/tests/test_tuner_debug_api.cpp`（11 个用例，含"force 确属旁路"
+单元测试：`control/tests/test_tuner_debug_api.cpp`（13 个用例，含"force 确属旁路"
 与"经 API 的 tick 与直接 tick 逐位一致"两条关键保证）。
+
+端到端验收：`tools/tuner_debug_accept.py` 驱动 CLI 对 9 个功能组 49 项断言
+（每条命令的预期数值均经手工核算），退出码可直接接入 CI：
+
+```bash
+python3 tools/tuner_debug_accept.py     # 全绿输出 "49 PASS / 0 FAIL"，退出码 0
+```
 
 # 调试参数实时监控（tuner_debug_monitor.py）
 
