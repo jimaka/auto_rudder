@@ -18,11 +18,13 @@ static void printHelp() {
     std::printf("  --ident             跑 RLS 闭环辨识场景\n");
     std::printf("  --trial             跑自动 Z 形辨识试验（试验后自动出辨识 K/T 并应用极点配置增益）\n");
     std::printf("  --esc               跑 ESC 长期场景\n");
+    std::printf("  --tune              跑自动调参收敛试验（RLS→极点配置→ESC 全链路，导出 K̂/T̂/J/增益轨迹）\n");
     std::printf("  --maneuver <name>   跑六机动形态场景 (williamson/uturn/zigzag/circles/cloverleaf/search)\n");
     std::printf("  --validate          跑全验证矩阵 + 实时性测量\n");
     std::printf("  --K <val>           覆盖船参数 K\n");
     std::printf("  --T <val>           覆盖船参数 T\n");
     std::printf("  --speed <val>       覆盖船速 (kn)\n");
+    std::printf("  --leg <val>         覆盖 Z 形参考翻转周期 (s，仅 --tune/--esc 激励相关；默认 15)\n");
     std::printf("  --sea <val>         覆盖海况 (0-3)，缩放风/浪/噪声扰动强度（1=基准）\n");
     std::printf("  --dist              启用风/浪/噪声干扰\n");
     std::printf("  --seconds <val>     覆盖总时长 (s)\n");
@@ -63,10 +65,11 @@ int main(int argc, char** argv) {
     bool runIdent = false;
     bool runTrial = false;
     bool runEscMode = false;
+    bool runTuneMode = false;
     bool runValidateMode = false;
     bool runManeuverMode = false;
     double Koverride = -1.0, Toverride = -1.0, secOverride = -1.0;
-    double speedOverride = -1.0;
+    double speedOverride = -1.0, legOverride = -1.0;
     int    seaOverride = -1;
     bool   distOverride = false;
     bool   hasDistOverride = false;
@@ -90,6 +93,7 @@ int main(int argc, char** argv) {
         else if (a == "--ident") runIdent = true;
         else if (a == "--trial") runTrial = true;
         else if (a == "--esc") runEscMode = true;
+        else if (a == "--tune") runTuneMode = true;
         else if (a == "--validate") runValidateMode = true;
         else if (a == "--dist") { distOverride = true; hasDistOverride = true; }
         else if (a == "--maneuver") {
@@ -100,7 +104,7 @@ int main(int argc, char** argv) {
             if (!takeVal("--scenario", v)) { printHelp(); return 1; }
             scenarioName = v;
         }
-        else if (a == "--K" || a == "--T" || a == "--seconds" || a == "--speed") {
+        else if (a == "--K" || a == "--T" || a == "--seconds" || a == "--speed" || a == "--leg") {
             if (!takeVal(a.c_str(), v)) { printHelp(); return 1; }
             double d = 0.0;
             if (!parseDouble(v, d)) {
@@ -110,7 +114,8 @@ int main(int argc, char** argv) {
             if (a == "--K") Koverride = d;
             else if (a == "--T") Toverride = d;
             else if (a == "--seconds") secOverride = d;
-            else speedOverride = d;
+            else if (a == "--speed") speedOverride = d;
+            else legOverride = d;
         }
         else if (a == "--sea") {
             if (!takeVal("--sea", v)) { printHelp(); return 1; }
@@ -174,6 +179,43 @@ int main(int argc, char** argv) {
         const bool ok = r.applied && std::abs(errK) <= 25.0 && std::abs(errT) <= 25.0;
         std::printf("%s\n", ok ? "PASS" : "FAIL");
         return ok ? 0 : 1;
+    }
+
+    // --tune 跑自动调参收敛试验（R1 全链路：RLS 辨识 → 极点配置基线 → ESC 窗口寻优）
+    if (runTuneMode) {
+        Simulator sim;
+        sim.dt = 0.02;
+        const double K = (Koverride > 0) ? Koverride : 0.2;
+        const double T = (Toverride > 0) ? Toverride : 8.0;
+        const double sec = (secOverride > 0) ? secOverride : 1200.0;
+        const double speedKn = (speedOverride > 0) ? speedOverride : 10.0;
+        const double leg = (legOverride > 0) ? legOverride : 15.0;
+        auto r = sim.runTuneConvergence(K, T, speedKn, sec, leg);
+        std::printf("调参收敛: K=%.2f/T=%.1f v=%.1fkn %ds\n", K, T, speedKn, (int)sec);
+        std::printf("  辨识: K̂=%.4f (%.1f%%), T̂=%.4f (%.1f%%), valid=%d\n",
+                    r.Khat, (r.Khat - K) / K * 100.0, r.That, (r.That - T) / T * 100.0,
+                    (int)r.identValid);
+        std::printf("  基线: %s (t=%.0fs)  增益 Kp %.4f→%.4f  Kd %.4f→%.4f\n",
+                    r.baselineEstablished ? "建立" : "未建立", r.baselineSec,
+                    r.Kp0, r.KpFinal, r.Kd0, r.KdFinal);
+        std::printf("  ESC: 窗口数=%d  J %.1f→%.1f  末3窗散布≤10%%=%d  stable=%d  converged=%d\n",
+                    r.winCount, r.Jfirst, r.Jlast,
+                    (r.winCount >= 4 && [&]{
+                        const auto& sv = r.settles;
+                        const double jMin = std::min(std::min(sv[sv.size()-3].Jwindow,
+                                                              sv[sv.size()-2].Jwindow),
+                                                     sv[sv.size()-1].Jwindow);
+                        const double jMax = std::max(std::max(sv[sv.size()-3].Jwindow,
+                                                              sv[sv.size()-2].Jwindow),
+                                                     sv[sv.size()-1].Jwindow);
+                        return jMin > 0.0 && (jMax - jMin) / jMin <= 0.10;
+                    }()) ? 1 : 0,
+                    (int)r.stable, (int)r.converged);
+        if (!outPath.empty()) {
+            sim.exportTuneCsv(r, outPath);
+            std::printf("CSV 导出: %s\n", outPath.c_str());
+        }
+        return r.converged ? 0 : 1;
     }
 
     // --esc 跑 ESC 长期场景

@@ -2,6 +2,10 @@
 // Nomoto 一阶模型在线辨识（对应文档 §3.9.4 Z 形试验辨识 / §3.10.3 RLS 在线辨识）
 //   模型： T·dr + r = K·δ  →  r_k = K·δ_k - (T/Δt)·(r_k - r_{k-1})
 //   回归： φ_k = [δ_k, -(r_k - r_{k-1})/Δt]^T,  y_k = r_k,  θ = [K, T]^T
+//   自降频（架构深化 R1）：update() 可以任意频率调用，内部累计满 beatSec 才做
+//   一次 RLS 拍；差分 Δt 由模块自测（两次 RLS 拍之间的真实间隔），与调用频率无关。
+//   旧设计把"50 Hz × 1 s"的降频约定放在调用方（计数器 + 改写 Params.dt），
+//   调用频率一变差分即静默出错——该语义陷阱已随 Params.dt 一并删除。
 #pragma once
 #include <array>
 #include <cmath>
@@ -12,7 +16,7 @@ class NomotoIdentifier {
 public:
     struct Params {
         double lambda = 0.98;     // 遗忘因子
-        double dt = 0.02;         // 采样周期 (s)
+        double beatSec = 1.0;     // RLS 拍间隔 (s)（P3：降频以减轻 ECU 负担、保证差分信噪比）
         double deltaMin = 3.0;    // 激励阈值：舵角 (deg)
         double rMin = 0.5;        // 激励阈值：转向率 (deg/s)
         double drMin = 0.2;       // 激励阈值：转向加速度 (deg/s²)，保留过零瞬态以辨识 T
@@ -34,24 +38,33 @@ public:
         P_[0][0] = p_.p0; P_[0][1] = 0.0;
         P_[1][0] = 0.0;   P_[1][1] = p_.p0;
         prevR_ = 0.0;
+        elapsed_ = 0.0;
         first_ = true;
         excited_ = false;
     }
 
-    // 输入：舵角 δ (deg)、转向率 r (deg/s)
-    // 输出：是否本次更新被接受（满足激励条件）
-    bool update(double delta, double r) {
+    // 输入：舵角 δ (deg)、转向率 r (deg/s)、距上次调用的真实间隔 dtNow (s)
+    // 可以任意频率调用；内部累计满 beatSec 才做一次 RLS 拍（点采样：取拍时刻的样本）
+    // 输出：是否本拍 RLS 更新被接受（满足激励条件）；未到期/被拒一律 false
+    bool update(double delta, double r, double dtNow) {
         // P6 整改：入口范围校验，超限丢弃该拍（不污染 θ）
         // P11 整改：被拒绝的拍不再写入 prevR_——否则 NaN/毛刺会成为下一拍差分锚点，
-        //           dr=(r-prevR_)/dt 被污染后经激励门控进入 φ，永久毒化 θ/P
+        //           dr=(r-prevR_)/Δt 被污染后经激励门控进入 φ，永久毒化 θ/P
         if (!std::isfinite(delta) || !std::isfinite(r)) return false;
         if (std::abs(delta) > 35.0 || std::abs(r) > 30.0) return false;
+        if (!(dtNow > 0.0)) return false;  // 非法采样周期丢弃（防除零/时间倒流）
+
+        // 自降频：未满一个 RLS 拍间隔只累计时间，不做递推
+        elapsed_ += dtNow;
+        if (elapsed_ < p_.beatSec) return false;
+        const double beatDt = elapsed_;  // 自测拍长（≈beatSec，消除调用频率假设）
+        elapsed_ = 0.0;
 
         // §3.10.3 激励条件：舵角足够大，且转向率或转向加速度足够大
         // （保留 r 过零附近的高 dr 瞬态，否则 T 欠定）
         double dr = 0.0;
         if (first_) { first_ = false; }
-        else        { dr = (r - prevR_) / p_.dt; }
+        else        { dr = (r - prevR_) / beatDt; }
         excited_ = (std::abs(delta) > p_.deltaMin &&
                     (std::abs(r) > p_.rMin || std::abs(dr) > p_.drMin));
         if (!excited_) {
@@ -114,7 +127,8 @@ private:
     Params p_;
     double theta_[2];
     double P_[2][2];
-    double prevR_ = 0.0;
+    double prevR_ = 0.0;     // 上一次 RLS 拍时刻的转向率
+    double elapsed_ = 0.0;   // 距上一次 RLS 拍的累计时间 (s)（自降频）
     bool   first_ = true;
     bool   excited_ = false;
 };

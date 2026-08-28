@@ -66,9 +66,9 @@ public:
         dist.setSeaState(seaState);
         // M1 阶段禁用自动优化（P3/P6 未修，辨识器未收敛会给出坏增益覆盖调度表）
         {
-            auto tp = ap.tunerMut().params();
+            auto tp = ap.tuner().params();
             tp.highSpeedDeactivateKn = -1.0;  // 任意正船速都去激活
-            ap.tunerMut().setParams(tp);
+            ap.setTunerParams(tp);
         }
 
         const int totalSteps = static_cast<int>(totalSec / dt);
@@ -165,9 +165,9 @@ public:
         const double Kd = (2.0 * zetaTarget * wnTarget * T - 1.0) / K;
         ap.scheduleMut().setTable({{0.0, 100.0, 0, Kp, Kd}});
         // 启用自动优化路径让辨识器运行
-        auto tp = ap.tunerMut().params();
+        auto tp = ap.tuner().params();
         tp.highSpeedDeactivateKn = 100.0;  // 始终启用
-        ap.tunerMut().setParams(tp);
+        ap.setTunerParams(tp);
 
         const int totalSteps = static_cast<int>(totalSec / dt);
         // Z 形激励：每 10 s 翻转一次 ±20°
@@ -229,9 +229,9 @@ public:
         const double Kd0 = (2.0 * zetaTarget * wnTarget * T - 1.0) / K;
         ap.scheduleMut().setTable({{0.0, 100.0, 0, Kp0, Kd0}});
         // 启用自动优化
-        auto tp = ap.tunerMut().params();
+        auto tp = ap.tuner().params();
         tp.highSpeedDeactivateKn = 100.0;
-        ap.tunerMut().setParams(tp);
+        ap.setTunerParams(tp);
 
         // Z 形（zigzag）航向参考：每 legSec 在 ±refAmp 间翻转，全程确定性激励
         const double refAmp = 40.0;  // deg
@@ -260,12 +260,9 @@ public:
             plant.step(cmd, dt, 0.0);
             KpFinal = ap.pd().params().Kp;
             KdFinal = ap.pd().params().Kd;
-            // 基线建立观测：AutopilotCore 的 baselineEstablished_ 无 getter，
-            // 但其效果可观测——接管前每拍 PD 增益恒等于调度表值 Kp0/Kd0；
-            // 接管后增益由极点配置（wn 目标不同）重写并叠加 ±5% ESC 载波，必然偏离。
-            if (!baselineSeen &&
-                (std::abs(KpFinal - Kp0) > 1e-9 * Kp0 ||
-                 std::abs(KdFinal - Kd0) > 1e-9 * Kd0)) {
+            // 基线建立观测（R1：AutoTuner 提供 baselineEstablished() 只读 getter，
+            // 替代旧版"增益偏离调度表值 1e-9 反推内部状态"的迂回断言）
+            if (!baselineSeen && ap.tuner().baselineEstablished()) {
                 baselineSeen = true;
                 baselineSec  = t;
             }
@@ -297,6 +294,195 @@ public:
         return r;
     }
 
+    // ==================== 自动调参收敛试验（RLS → 极点配置 → ESC 全链路） ====================
+    // 与 runEsc 同激励（Z 形 ±40°/15 s 参考），但记录更丰富的收敛轨迹：
+    //   每拍：实际施加增益（含载波）、去载波持久增益、辨识 K̂/T̂、valid/baseline；
+    //   每次 ESC 窗口结算：窗口 J（结算前读值，差最后一拍样本 <0.1%）、结算前后增益。
+    // 用途：输出收敛效果图 + 收敛判据（J 平台、K̂/T̂ 收敛、数值有界）。
+    struct TuneSample {
+        double t = 0.0;
+        double psi = 0.0, psiRef = 0.0, rudderCmd = 0.0, rudderAct = 0.0;
+        double rate = 0.0, err = 0.0;
+        double Kp = 0.0, Kd = 0.0;             // PD 实际增益（含 ESC 扰动载波）
+        double KpCenter = 0.0, KdCenter = 0.0; // 去载波持久增益（增益所有权投影）
+        double Khat = 0.0, That = 0.0;         // 辨识估计
+        bool   identValid = false;
+        bool   baseline = false;
+        double Jwindow = 0.0;                  // 本拍结算的窗口 J（非结算拍为 0）
+        int    winIndex = 0;                   // 已结算窗口序号（自基线建立后计数）
+    };
+
+    struct TuneResult {
+        std::vector<TuneSample> samples;  // 每 1 s 采样行
+        std::vector<TuneSample> settles;  // 窗口结算事件行
+        double Kp0 = 0.0, Kd0 = 0.0;      // 调度表起点增益
+        double KpFinal = 0.0, KdFinal = 0.0;
+        double Khat = 0.0, That = 0.0;
+        bool   identValid = false;
+        bool   baselineEstablished = false;
+        double baselineSec = -1.0;
+        int    winCount = 0;
+        double Jfirst = 0.0, Jlast = 0.0;
+        bool   converged = false;   // 收敛判据，见 runTuneConvergence 内注释
+        bool   stable = false;      // 全程数值有限且有界
+    };
+
+    // legSec：Z 形参考翻转周期 (s)。典型船 15 s 足够；慢船（T 大）需按 T 缩放
+    // （建议 ≥ 2T），否则 RLS 只观测到初始瞬态，K̂/T̂ 系统性偏大（收敛试验用例 8）。
+    TuneResult runTuneConvergence(double K, double T, double speedKn, double totalSec,
+                                  double legSec = 15.0) {
+        plant.K = K; plant.T = T; plant.reset(0.0);
+        lastSamples.clear();
+        ap.setMode(Mode::AUTO_HEADING);
+        const double Kp0 = wnTarget * wnTarget * T / K;
+        const double Kd0 = (2.0 * zetaTarget * wnTarget * T - 1.0) / K;
+        ap.scheduleMut().setTable({{0.0, 100.0, 0, Kp0, Kd0}});
+        auto tp = ap.tuner().params();
+        tp.highSpeedDeactivateKn = 100.0;   // 始终启用（速度门控不在本试验考察范围）
+        ap.setTunerParams(tp);
+
+        const double refAmp = 40.0;
+        const int legSteps  = static_cast<int>(legSec / dt);
+        const int totalSteps = static_cast<int>(totalSec / dt);
+        const int recEvery  = static_cast<int>(1.0 / dt);  // 每 1 s 记录一行
+        double curRef = refAmp;
+        ap.setHeadingRef(curRef);
+
+        TuneResult r;
+        r.Kp0 = Kp0; r.Kd0 = Kd0;
+        bool baselineSeen = false;
+        int  winIndex = 0;
+        double Jpre = 0.0;
+        double KpPre = Kp0, KdPre = Kd0;
+        bool finite = true;
+
+        for (int k = 0; k < totalSteps; ++k) {
+            const double t = k * dt;
+            if (k > 0 && k % legSteps == 0) {
+                curRef = -curRef;
+                ap.setHeadingRef(curRef);
+            }
+            SensorInput s;
+            s.headingDeg = plant.psi;
+            s.rateDegS   = plant.r;
+            s.rudderDeg  = plant.deltaAct;
+            s.speedKn    = speedKn;
+            s.seaState   = 0;
+
+            // 结算前读窗口 J（当前窗满 2999/3000 拍；结算在 tick 内清除）
+            Jpre = ap.tuner().computeJ();
+            ap.tuner().currentGains(KpPre, KdPre);
+            const double cmd = ap.step(s, dt);
+            plant.step(cmd, dt, 0.0);
+
+            // 基线建立事件
+            if (!baselineSeen && ap.tuner().baselineEstablished()) {
+                baselineSeen = true;
+                r.baselineSec = t;
+            }
+            // 窗口结算事件：tick 结算后窗口被清空（J 从 >0 掉到 0）
+            const double Jpost = ap.tuner().computeJ();
+            double KpPost = KpPre, KdPost = KdPre;
+            ap.tuner().currentGains(KpPost, KdPost);
+            if (baselineSeen && Jpre > 0.0 && Jpost == 0.0) {
+                TuneSample se;
+                se.t = t;
+                se.KpCenter = KpPre; se.KdCenter = KdPre;
+                se.Jwindow  = Jpre;
+                se.winIndex = ++winIndex;
+                se.Kp = KpPost; se.Kd = KdPost;   // 结算后持久增益
+                se.Khat = ap.identifier().K();
+                se.That = ap.identifier().T();
+                se.identValid = ap.identifier().valid();
+                se.baseline = true;
+                r.settles.push_back(se);
+                if (winIndex == 1) { r.Jfirst = Jpre; }
+                r.Jlast = Jpre;
+            }
+
+            // 每 1 s 采样行
+            if (k % recEvery == 0) {
+                TuneSample sm;
+                sm.t = t; sm.psi = plant.psi; sm.psiRef = curRef;
+                sm.rudderCmd = cmd; sm.rudderAct = plant.deltaAct;
+                sm.rate = plant.r; sm.err = curRef - plant.psi;
+                sm.Kp = ap.pd().params().Kp; sm.Kd = ap.pd().params().Kd;
+                ap.tuner().currentGains(sm.KpCenter, sm.KdCenter);
+                sm.Khat = ap.identifier().K(); sm.That = ap.identifier().T();
+                sm.identValid = ap.identifier().valid();
+                sm.baseline = ap.tuner().baselineEstablished();
+                if (Jpost == 0.0 && Jpre > 0.0) {  // 结算拍：行内携带窗口 J
+                    sm.Jwindow = Jpre;
+                    sm.winIndex = winIndex;
+                }
+                r.samples.push_back(sm);
+                lastSamples.push_back({sm.t, sm.psi, sm.psiRef, sm.rudderCmd,
+                                       sm.rudderAct, sm.rate, sm.err,
+                                       sm.Kp, sm.Kd, static_cast<int>(ap.mode())});
+            }
+            finite = finite && std::isfinite(plant.psi) && std::isfinite(plant.r)
+                          && std::isfinite(cmd) && std::isfinite(KpPost) && std::isfinite(KdPost);
+        }
+
+        r.KpFinal = ap.pd().params().Kp;  // 含载波；中心值取最后一次采样
+        r.KdFinal = ap.pd().params().Kd;
+        r.Khat = ap.identifier().K();
+        r.That = ap.identifier().T();
+        r.identValid = ap.identifier().valid();
+        r.baselineEstablished = baselineSeen;
+        r.winCount = winIndex;
+        r.stable = finite && r.KpFinal > 0.0 && r.KpFinal < Kp0 * 5.0
+                         && r.KdFinal >= 0.0 && r.KdFinal < Kd0 * 5.0;
+        // 收敛判据：
+        //   (a) 基线建立且辨识物理合理；
+        //   (b) 基线后至少结算 4 个窗口，末 3 窗 J 相对散布 ≤ 10%（平台）；
+        //   (c) 末窗 J 不劣于首窗（≤ +2%），且 K̂/T̂ 相对真值偏差 ≤ 25%；
+        //   (d) 全程数值有界。
+        if (baselineSeen && r.identValid && winIndex >= 4 && r.stable) {
+            const auto& sv = r.settles;
+            const double Jlast3[3] = {
+                sv[sv.size()-3].Jwindow, sv[sv.size()-2].Jwindow, sv[sv.size()-1].Jwindow
+            };
+            const double jMin = std::min(Jlast3[0], std::min(Jlast3[1], Jlast3[2]));
+            const double jMax = std::max(Jlast3[0], std::max(Jlast3[1], Jlast3[2]));
+            const bool jPlateau = jMin > 0.0 && (jMax - jMin) / jMin <= 0.10;
+            const bool jNotWorse = r.Jlast <= r.Jfirst * 1.02;
+            const bool identClose = std::abs(r.Khat - K) / K <= 0.25
+                                 && std::abs(r.That - T) / T <= 0.25;
+            r.converged = jPlateau && jNotWorse && identClose;
+        }
+        return r;
+    }
+
+    void exportTuneCsv(const TuneResult& r, const std::string& path) {
+        std::FILE* f = std::fopen(path.c_str(), "w");
+        if (!f) {
+            std::fprintf(stderr, "警告: 无法写入 CSV 文件: %s\n", path.c_str());
+            return;
+        }
+        std::fprintf(f, "index,t,psi,psiRef,rudderCmd,rudderAct,rate,error,Kp,Kd,"
+                        "KpCenter,KdCenter,Khat,That,identValid,baseline,Jwindow,winIndex,settle\n");
+        for (size_t i = 0; i < r.samples.size(); ++i) {
+            const auto& s = r.samples[i];
+            std::fprintf(f, "%zu,%.3f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.6f,%.6f,"
+                            "%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%d,%d\n",
+                         i, s.t, s.psi, s.psiRef, s.rudderCmd, s.rudderAct,
+                         s.rate, s.err, s.Kp, s.Kd, s.KpCenter, s.KdCenter,
+                         s.Khat, s.That, (int)s.identValid, (int)s.baseline,
+                         s.Jwindow, s.winIndex, 0);
+        }
+        size_t idx = r.samples.size();
+        for (const auto& s : r.settles) {
+            std::fprintf(f, "%zu,%.3f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.6f,%.6f,"
+                            "%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%d,%d\n",
+                         idx++, s.t, s.psi, s.psiRef, s.rudderCmd, s.rudderAct,
+                         s.rate, s.err, s.Kp, s.Kd, s.KpCenter, s.KdCenter,
+                         s.Khat, s.That, (int)s.identValid, (int)s.baseline,
+                         s.Jwindow, s.winIndex, 1);
+        }
+        std::fclose(f);
+    }
+
     // 六机动形态场景：跑预置机动，验证序列在仿真时长内真实执行完毕且数值有界
     struct ManeuverResult {
         bool   completed  = false;  // 序列真实执行完毕且全程数值有限
@@ -318,8 +504,8 @@ public:
                                    {0.0, 100.0, 1, Kp, Kd},
                                    {0.0, 100.0, 2, Kp, Kd},
                                    {0.0, 100.0, 3, Kp, Kd}});
-        auto tp = ap.tunerMut().params(); tp.highSpeedDeactivateKn = -1.0;
-        ap.tunerMut().setParams(tp);
+        auto tp = ap.tuner().params(); tp.highSpeedDeactivateKn = -1.0;
+        ap.setTunerParams(tp);
 
         const int totalSteps = static_cast<int>(totalSec / dt);
         double maxH = 0.0, maxR = 0.0;
@@ -380,8 +566,8 @@ public:
                                    {0.0, 100.0, 1, 1.0, 0.5},
                                    {0.0, 100.0, 2, 1.0, 0.5},
                                    {0.0, 100.0, 3, 1.0, 0.5}});
-        auto tp = ap.tunerMut().params(); tp.highSpeedDeactivateKn = -1.0;
-        ap.tunerMut().setParams(tp);
+        auto tp = ap.tuner().params(); tp.highSpeedDeactivateKn = -1.0;
+        ap.setTunerParams(tp);
         dist.setSeaState(0);
         ap.startIdentifyTrial(dz, phiz, cycles);
 
@@ -430,8 +616,8 @@ public:
                                    {0.0, 100.0, 1, Kp, Kd},
                                    {0.0, 100.0, 2, Kp, Kd},
                                    {0.0, 100.0, 3, Kp, Kd}});
-        auto tp = ap.tunerMut().params(); tp.highSpeedDeactivateKn = -1.0;
-        ap.tunerMut().setParams(tp);
+        auto tp = ap.tuner().params(); tp.highSpeedDeactivateKn = -1.0;
+        ap.setTunerParams(tp);
         dist.setSeaState(seaState);
         // 注意：不写成员 enableDisturbance——本函数全程使用局部 withDisturbance，
         // 避免跨调用残留状态

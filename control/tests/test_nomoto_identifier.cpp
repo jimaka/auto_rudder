@@ -1,4 +1,6 @@
 // test_nomoto_identifier.cpp — Nomoto 在线辨识（对应开发文档 §3.10.3 + P6 整改回归）
+// R1 深化：辨识器自降频——update(δ, r, dtNow) 可任意频率调用，内部满 beatSec
+//           才做一次 RLS 拍；Params.dt 语义陷阱已删除。
 #include "nomoto_identifier.hpp"
 #include "auto_tuner.hpp"
 #include <gtest/gtest.h>
@@ -13,7 +15,7 @@ static double nomotoStep(double K, double T, double delta, double rPrev, double 
 
 TEST(NomotoIdentifier, ConvergesOnNomotoData) {
     NomotoIdentifier::Params p;
-    p.dt = 1.0; p.lambda = 0.98; p.p0 = 1.0;
+    p.lambda = 0.98; p.p0 = 1.0;  // beatSec 默认 1.0 s：dtNow=1.0 时每次调用即一拍
     p.rMin = 0.1; p.deltaMin = 2.0; p.drMin = 0.2;
     NomotoIdentifier id(p);
     const double K = 0.2, T = 8.0, dt = 1.0;
@@ -24,8 +26,31 @@ TEST(NomotoIdentifier, ConvergesOnNomotoData) {
     for (int k = 0; k < 400; ++k) {
         double d = dval[phase];
         r = nomotoStep(K, T, d, r, dt);
-        id.update(d, r);
+        id.update(d, r, dt);
         if (++cnt >= hold[phase]) { cnt = 0; phase = 1 - phase; }
+    }
+    EXPECT_TRUE(id.excited());
+    EXPECT_TRUE(id.valid());
+    EXPECT_NEAR(id.K(), K, 0.05);
+    EXPECT_NEAR(id.T(), T, 2.0);
+}
+
+// R1：50 Hz 调用、内部 1 s 一拍——生产调用形态下的收敛性
+// （激励按 RLS 拍翻转：每 50 次调用 = 1 拍）
+TEST(NomotoIdentifier, SelfDecimatesAtAnyCallRate) {
+    NomotoIdentifier::Params p;
+    p.lambda = 0.98; p.p0 = 1.0;
+    p.rMin = 0.1; p.deltaMin = 2.0; p.drMin = 0.2;
+    NomotoIdentifier id(p);
+    const double K = 0.2, T = 8.0, dt = 0.02;
+    double r = 0.0;
+    int hold[2] = {8, 3}; double dval[2] = {25.0, -25.0};
+    int phase = 0, cnt = 0;
+    for (int k = 0; k < 400 * 50; ++k) {
+        const double d = dval[phase];
+        r = nomotoStep(K, T, d, r, dt);
+        id.update(d, r, dt);
+        if (k % 50 == 49 && ++cnt >= hold[phase]) { cnt = 0; phase = 1 - phase; }
     }
     EXPECT_TRUE(id.excited());
     EXPECT_TRUE(id.valid());
@@ -35,15 +60,15 @@ TEST(NomotoIdentifier, ConvergesOnNomotoData) {
 
 TEST(NomotoIdentifier, NotExcitedWhenIdle) {
     NomotoIdentifier id;
-    for (int k = 0; k < 50; ++k) id.update(1.0, 0.1);  // 小幅值，不满足激励
+    for (int k = 0; k < 50; ++k) id.update(1.0, 0.1, 0.02);  // 小幅值，不满足激励
     EXPECT_FALSE(id.excited());
 }
 
 TEST(NomotoIdentifier, RejectsOutOfRangeInput) {
     NomotoIdentifier id;
     // P6：超限输入应被丢弃，不污染 θ
-    id.update(50.0, 5.0);   // delta>35 → 丢弃
-    id.update(10.0, 50.0);  // r>30 → 丢弃
+    id.update(50.0, 5.0, 0.02);   // delta>35 → 丢弃
+    id.update(10.0, 50.0, 0.02);  // r>30 → 丢弃
     EXPECT_FALSE(id.excited());
     // θ 仍为初值
     EXPECT_NEAR(id.K(), 0.0, 1e-9);
@@ -54,7 +79,7 @@ TEST(NomotoIdentifier, RejectsOutOfRangeInput) {
 // 旧行为：NaN 写入 prevR_，下一拍差分 dr 为 NaN，经激励门控污染 θ/P，valid() 永不恢复
 TEST(NomotoIdentifier, RecoversAfterNaNInput) {
     NomotoIdentifier::Params p;
-    p.dt = 1.0; p.lambda = 0.98; p.p0 = 1.0;
+    p.lambda = 0.98; p.p0 = 1.0;
     p.rMin = 0.1; p.deltaMin = 2.0; p.drMin = 0.2;
     NomotoIdentifier id(p), ref(p);
     const double K = 0.2, T = 8.0, dt = 1.0;
@@ -66,10 +91,10 @@ TEST(NomotoIdentifier, RecoversAfterNaNInput) {
         double d = dval[phase];
         r = nomotoStep(K, T, d, r, dt);
         // 参考辨识器：全程干净数据
-        ref.update(d, r);
+        ref.update(d, r, dt);
         // 被测辨识器：第 200 拍注入单拍 NaN（舵角与转向率各来一次）
-        if (k == 200) { id.update(NaN, NaN); }
-        else          { id.update(d, r); }
+        if (k == 200) { id.update(NaN, NaN, dt); }
+        else          { id.update(d, r, dt); }
         if (++cnt >= hold[phase]) { cnt = 0; phase = 1 - phase; }
     }
     // 恢复：结果有限、物理合理，且与无 NaN 参考运行相当
@@ -84,7 +109,7 @@ TEST(NomotoIdentifier, RecoversAfterNaNInput) {
 TEST(NomotoIdentifier, InvalidWhenOutOfRange) {
     NomotoIdentifier id;
     // 通过反射式：先正常辨识一个合理值，验证 valid()=true
-    NomotoIdentifier::Params p; p.dt=1.0; p.lambda=0.98; p.p0=1.0; p.rMin=0.1; p.deltaMin=2.0;
+    NomotoIdentifier::Params p; p.lambda=0.98; p.p0=1.0; p.rMin=0.1; p.deltaMin=2.0;
     NomotoIdentifier id2(p);
     const double K = 0.2, T = 8.0, dt = 1.0;
     double r = 0.0;
@@ -93,7 +118,7 @@ TEST(NomotoIdentifier, InvalidWhenOutOfRange) {
     for (int k = 0; k < 400; ++k) {
         double d = dval[phase];
         r = nomotoStep(K, T, d, r, dt);
-        id2.update(d, r);
+        id2.update(d, r, dt);
         if (++cnt >= hold[phase]) { cnt = 0; phase = 1 - phase; }
     }
     EXPECT_TRUE(id2.valid());  // K=0.2∈(0,2], T=8∈[1,60]

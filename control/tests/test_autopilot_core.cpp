@@ -142,9 +142,9 @@ TEST(AutopilotCore, EnterAutoHeadingSeedsRudderBaseline) {
 TEST(AutopilotCore, EscDitherReachesPdGainsAfterBaseline) {
     AutopilotCore ap;
     // 加快载波便于观察（1 s 周期）
-    auto tp = ap.tunerMut().params();
+    auto tp = ap.tuner().params();
     tp.escFreq = 2.0 * M_PI;
-    ap.tunerMut().setParams(tp);
+    ap.setTunerParams(tp);
     ap.setMode(Mode::AUTO_HEADING);
     ap.setHeadingRef(0.0);
     SensorInput s{0, 0, 0, 10, 0};
@@ -190,15 +190,19 @@ TEST(AutopilotCore, EscDitherReachesPdGainsAfterBaseline) {
     EXPECT_GT(mx - mn, 0.5 * 2.0 * tp.escAmp * 1.6);  // 至少一半理论峰-峰
 }
 
-TEST(AutopilotCore, RunEscTuningNoBaselineNoop) {
-    // P9 整改：基线未建立时 runEscTuning 不应崩溃也不改增益
+TEST(AutopilotCore, NoBaselinePassesScheduleGainsThrough) {
+    // R1（替代被删除的 runEscTuning 的 P9 用例）：基线未建立时，
+    // tick 不结算、不扰动——调度增益原样直通到 PD
     AutopilotCore ap;
+    ap.scheduleMut().setTable({{0.0, 100.0, 0, 1.2, 0.5}});  // 辨识度高的调度值
     ap.setMode(Mode::AUTO_HEADING);
     ap.setHeadingRef(0.0);
-    double Kp0 = ap.pd().params().Kp, Kd0 = ap.pd().params().Kd;
-    ap.runEscTuning();  // 基线未建立，应 no-op
-    EXPECT_NEAR(ap.pd().params().Kp, Kp0, 1e-9);
-    EXPECT_NEAR(ap.pd().params().Kd, Kd0, 1e-9);
+    SensorInput s{0, 0, 0, 10, 0};
+    EXPECT_FALSE(ap.tuner().baselineEstablished());
+    for (int k = 0; k < 100; ++k) ap.step(s, 0.02);
+    EXPECT_NEAR(ap.pd().params().Kp, 1.2, 1e-9);
+    EXPECT_NEAR(ap.pd().params().Kd, 0.5, 1e-9);
+    EXPECT_FALSE(ap.tuner().baselineEstablished());  // 无激励，基线不建立
 }
 
 // P12 整改回归：ESC 拥有增益后，辨识更新不再盲目覆写；
@@ -210,10 +214,10 @@ TEST(AutopilotCore, RunEscTuningNoBaselineNoop) {
 //   重基线，增益跳到新 placement≈(2.12, 12.54) 并保持。
 TEST(AutopilotCore, IdentUpdatesDoNotOverwriteEscGains) {
     AutopilotCore ap;
-    auto tp = ap.tunerMut().params();
+    auto tp = ap.tuner().params();
     tp.escFreq = 2.0 * M_PI;   // 1 s 载波：50 拍均值恰好整周期去抖
     tp.windowSec = 10.0;       // 缩短 ESC 窗口加快测试
-    ap.tunerMut().setParams(tp);
+    ap.setTunerParams(tp);
     ap.setMode(Mode::AUTO_HEADING);
     ap.setHeadingRef(0.0);
     SensorInput s{0, 0, 0, 10, 0};
@@ -277,10 +281,10 @@ TEST(AutopilotCore, IdentUpdatesDoNotOverwriteEscGains) {
 //   窗口结算被稳定门拒绝 → revert 回基线。
 TEST(AutopilotCore, EscFallbackRestoresBaselineOnOscillation) {
     AutopilotCore ap;
-    auto tp = ap.tunerMut().params();
+    auto tp = ap.tuner().params();
     tp.escFreq = 2.0 * M_PI;   // 1 s 载波（50 拍整周期）
     tp.windowSec = 10.0;       // 500 拍窗口
-    ap.tunerMut().setParams(tp);
+    ap.setTunerParams(tp);
     ap.setMode(Mode::AUTO_HEADING);
     ap.setHeadingRef(0.0);
     SensorInput s{0, 0, 0, 10, 0};
@@ -397,8 +401,8 @@ TEST(AutopilotCore, ManeuverHeadingLegAppliesScheduledGains) {
 TEST(AutopilotCore, IdentTrialIdentifiesAndAppliesGains) {
     AutopilotCore ap;
     ap.scheduleMut().setTable({{0.0, 100.0, 0, 1.0, 0.5}});  // 未标定冷启动
-    auto tp = ap.tunerMut().params(); tp.highSpeedDeactivateKn = -1.0;  // 无 ESC 载波
-    ap.tunerMut().setParams(tp);
+    auto tp = ap.tuner().params(); tp.highSpeedDeactivateKn = -1.0;  // 无 ESC 载波
+    ap.setTunerParams(tp);
     ap.startIdentifyTrial(20.0, 20.0, 4);
     EXPECT_EQ(ap.mode(), Mode::AUTO_MANEUVER);
     EXPECT_EQ(ap.identTrialState(), IdentTrialState::RUNNING);

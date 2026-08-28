@@ -16,10 +16,38 @@ PDF_DIR = os.path.join(BASE_DIR, "pdf_output")
 FONT_FAMILY = "'Noto Sans CJK SC', 'Noto Serif CJK SC', 'AR PL UKai CN', sans-serif"
 MONO_FONT = "'Noto Sans Mono CJK SC', 'DejaVu Sans Mono', monospace"
 
-KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
-KATEX_AUTORENDER = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-MERMAID_JS = "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"
+CDN_KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+CDN_KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+CDN_KATEX_AUTORENDER = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+CDN_MERMAID_JS = "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"
+
+
+def _find_asset_dir():
+    """优先使用本地 KaTeX/Mermaid 资源（离线环境），否则回退 CDN。"""
+    candidates = [
+        os.environ.get("MD2PDF_ASSET_DIR", ""),
+        "/home/jim/.cursor/extensions/allwin-antony.md-viewer-1.1.4-universal/resources",
+        "/home/jim/.vscode/extensions/yzhang.markdown-all-in-one-3.6.3/resources",
+        "/home/jim/.trae-cn/extensions/yzhang.markdown-all-in-one-3.6.3/resources",
+    ]
+    for base in candidates:
+        if (base and os.path.isdir(os.path.join(base, "katex"))
+                and os.path.isdir(os.path.join(base, "mermaid"))):
+            return base
+    return None
+
+
+_ASSET_DIR = _find_asset_dir()
+if _ASSET_DIR:
+    def _asset_url(rel):
+        return "file://" + os.path.abspath(os.path.join(_ASSET_DIR, rel))
+    KATEX_CSS = _asset_url("katex/katex.min.css")
+    KATEX_JS = _asset_url("katex/katex.min.js")
+    KATEX_AUTORENDER = _asset_url("katex/auto-render.min.js")
+    MERMAID_JS = _asset_url("mermaid/mermaid.min.js")
+else:
+    KATEX_CSS, KATEX_JS, KATEX_AUTORENDER, MERMAID_JS = (
+        CDN_KATEX_CSS, CDN_KATEX_JS, CDN_KATEX_AUTORENDER, CDN_MERMAID_JS)
 
 CSS = f"""
 * {{ box-sizing: border-box; }}
@@ -171,6 +199,88 @@ def build_md_parser() -> MarkdownIt:
     return md
 
 
+def protect_math(md_text: str):
+    r"""把 $...$/$$...$$ 数学块替换为占位符，避免 markdown-it 转义数学反斜杠。
+
+    markdown-it 会把 `\\`、`\,`、`\;` 等按 CommonMark 转义处理（如 `\\`→`\`、
+    `\,`→`,`），导致 KaTeX 公式被破坏。这里先按原样取出数学内容、用占位符渲染
+    Markdown，渲染后再还原，保证 KaTeX 收到未经转义的原始公式。
+    """
+    lines = md_text.split("\n")
+    out_lines = []
+    placeholders = {}
+    in_fence = False
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        stripped = line.strip()
+
+        # 围栏代码块（```...```）原样保留，不扫描数学
+        if stripped.startswith("```"):
+            in_fence = not in_fence
+            out_lines.append(line)
+            i += 1
+            continue
+        if in_fence:
+            out_lines.append(line)
+            i += 1
+            continue
+
+        # 显示公式 $$...$$（可跨行）
+        if stripped.startswith("$$"):
+            if line.count("$$") >= 2:  # 单行 $$...$$
+                content = line[line.index("$$") + 2: line.rindex("$$")]
+                token = f"@@MATH{len(placeholders)}@@"
+                placeholders[token] = "$$" + content + "$$"
+                out_lines.append(token)
+                i += 1
+                continue
+            buf = [line[line.index("$$") + 2:]]
+            j = i + 1
+            closed = False
+            while j < len(lines):
+                ls = lines[j].strip()
+                if ls.startswith("$$"):
+                    buf.append(ls[2:].rstrip())
+                    closed = True
+                    break
+                buf.append(lines[j])
+                j += 1
+            if closed:
+                token = f"@@MATH{len(placeholders)}@@"
+                placeholders[token] = "$$\n" + "\n".join(buf).strip() + "\n$$"
+                out_lines.append(token)
+                i = j + 1
+                continue
+            out_lines.append(line)  # 未闭合：按普通行处理
+            i += 1
+            continue
+
+        # 行内公式 $...$（跳过行内代码 `...`）
+        code_tokens = []
+
+        def repl_code(m):
+            token = f"@@CODE{len(code_tokens)}@@"
+            code_tokens.append(m.group(0))
+            return token
+
+        line_masked = re.sub(r"`[^`]*`", repl_code, line)
+
+        def repl_math(m):
+            token = f"@@MATH{len(placeholders)}@@"
+            placeholders[token] = m.group(0)
+            return token
+
+        line_masked = re.sub(
+            r"(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)", repl_math, line_masked)
+        for k, v in enumerate(code_tokens):
+            line_masked = line_masked.replace(f"@@CODE{k}@@", v)
+        out_lines.append(line_masked)
+        i += 1
+
+    return "\n".join(out_lines), placeholders
+
+
 def fix_relative_links(html_body: str, md_dir: str) -> str:
     """将相对路径的图片/链接转换为 file:// 绝对路径。"""
     def repl_img(m):
@@ -192,8 +302,11 @@ def md_to_html(md_path: str) -> str:
     with open(md_path, "r", encoding="utf-8") as f:
         md_content = f.read()
 
+    md_content, math_placeholders = protect_math(md_content)
     md = build_md_parser()
     body = md.render(md_content)
+    for token, original in math_placeholders.items():
+        body = body.replace(token, original)
     md_dir = os.path.dirname(md_path)
     body = fix_relative_links(body, md_dir)
 
@@ -263,6 +376,7 @@ def html_to_pdf(html_content: str, pdf_path: str):
         "--disable-gpu",
         "--no-sandbox",
         "--disable-software-rasterizer",
+        "--user-data-dir=/tmp/md2pdf-chrome-profile",
         "--print-to-pdf=" + os.path.abspath(pdf_path),
         "--print-to-pdf-no-header",
         "--no-pdf-header-footer",

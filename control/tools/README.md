@@ -2,6 +2,8 @@
 
 `plot_sim.py` 读取 `ar_sim` 导出的 CSV，生成多子图分析图与机动极坐标轨迹图。
 `animate_sim.py` 读取 CSV，生成时间演化的动画视频（MP4/GIF）。
+`plot_convergence.py` 读取 `ar_sim --tune` 导出的收敛轨迹 CSV，生成 RLS 辨识收敛、
+ESC 增益/J 收敛与全链路概览三张效果图（见 `docs/auto_tuning/自动调参测试用例.md` §6.4）。
 
 ## 依赖
 
@@ -42,7 +44,29 @@ python3 tools/plot_sim.py out/validate_*.csv --grid -o out/validate.png --metric
 ./build/sim/ar_sim --all --out out/all.csv
 python3 tools/plot_sim.py out/all_step_typical.csv out/all_step_fast.csv out/all_step_slow.csv \
     -o out/compare.png --metrics
+
+# 7) 自动调参收敛试验 + 收敛效果图（U24：典型船全链路收敛）
+./build/sim/ar_sim --tune --K 0.2 --T 8 --seconds 1200 --out out/tune.csv
+python3 tools/plot_convergence.py out/tune.csv --trueK 0.2 --trueT 8 -o out/figures
 ```
+
+## 调参收敛试验（ar_sim --tune）
+
+`--tune` 跑自动调参全链路收敛试验：Z 形参考激励 → RLS 辨识收敛 → 极点配置建立基线 →
+ESC 窗口寻优。CSV 每 1 s 记录 K̂/T̂、去载波持久增益（KpCenter/KdCenter）、实际 PD 增益，
+窗口结算行（settle=1）携带窗口 ITAE J 与结算前后增益。收敛判据：
+
+- 基线建立且辨识 `valid()`；
+- 基线后 ≥ 4 个 ESC 窗口，末 3 窗 J 相对散布 ≤ 10%；
+- 末窗 J ≤ 首窗 J × 1.02；
+- K̂/T̂ 相对真值偏差 ≤ 25%，全程数值有界。
+
+```bash
+./build/sim/ar_sim --tune --K 0.2 --T 8 --seconds 1200 --out out/tune.csv
+python3 tools/plot_convergence.py out/tune.csv --trueK 0.2 --trueT 8 -o out/figures
+```
+
+慢船激励适配：`--leg 60` 可把 Z 形参考翻转周期从默认 15 s 放大到 60 s（建议 ≥ 2T）。
 
 ## 子图说明（多子图模式）
 
@@ -147,4 +171,3 @@ bash tools/gen_maneuver_matrix.sh
 ```
 
 每个视频含多子图（航向/舵角/转首率/误差/增益）+ 极坐标机动轨迹，标题标注船型与干扰状态。
-
