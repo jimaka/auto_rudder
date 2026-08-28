@@ -165,6 +165,28 @@ TEST(TunerDebugApi, ForceGainsBypassesGate_DebugOnly) {
     EXPECT_DOUBLE_EQ(s.baselineKp, kpExp);
 }
 
+TEST(TunerDebugApi, SettleWindowOnceAcceptsOrReverts) {
+    AutoTuner t;
+    TunerDebugApi api(t);
+    ASSERT_TRUE(api.establishBaseline(K_SHIP, T_SHIP));
+    api.forceEnabled(true);
+    for (int i = 0; i < 100; ++i) api.accumulateOnce(1.0, 2.0, true);
+    const double kpBefore = api.snapshot().curKp;
+    // 辨识估计有效：裁决后 curKp 被持久化（或回退到基线），窗口被清空
+    api.settleWindowOnce(true, K_SHIP, T_SHIP);
+    auto s = api.snapshot();
+    EXPECT_EQ(s.windowSamples, 0u);
+    EXPECT_TRUE(s.baselineEstablished);
+    // 强制注入必过门的坏增益（Kp 极大 → 带宽超上限），裁决应回退基线
+    api.forceGains(1e6, 1e6);
+    api.forceGradient(1e6, 1e6);
+    for (int i = 0; i < 10; ++i) api.accumulateOnce(1.0, 1.0, true);
+    api.settleWindowOnce(true, K_SHIP, T_SHIP);
+    s = api.snapshot();
+    EXPECT_LT(s.curKp, 100.0);  // 被稳定门拦下并回退，而非接受 1e6 级增益
+    (void)kpBefore;
+}
+
 TEST(TunerDebugApi, TickThroughApiMatchesDirectTick) {
     AutoTuner t1, t2;
     TunerDebugApi api(t1);

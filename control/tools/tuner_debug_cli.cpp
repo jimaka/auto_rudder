@@ -6,14 +6,26 @@
 // 输出约定：成功 "OK ..."，失败/拒绝 "ERR <原因>"；观测类输出 key=value 序列。
 #include "tuner_debug_api.hpp"
 #include <cstdio>
-#include <cstring>
 #include <sstream>
 #include <string>
 #include <iostream>
+#ifdef _WIN32
+  #include <io.h>
+  #define AR_ISATTY _isatty
+  #define AR_STDIN_FILENO 0
+#else
+  #include <unistd.h>
+  #define AR_ISATTY isatty
+  #define AR_STDIN_FILENO STDIN_FILENO
+#endif
 
 using namespace ar;
 
 namespace {
+
+// 典型船参数（settle 命令缺省辨识估计用）
+constexpr double K_SHIP_DEFAULT = 0.2;
+constexpr double T_SHIP_DEFAULT = 8.0;
 
 void printHelp() {
     std::cout <<
@@ -32,6 +44,7 @@ void printHelp() {
         "  dither <Kp> <Kd>                    对给定增益打一拍载波，返回叠加后值\n"
         "  accum <e_deg> <delta_deg> [oscOk]   喂一拍样本（成本/振荡/解调）\n"
         "  step <Kp> <Kd>                      做一次窗末梯度结算，返回新增益\n"
+        "  settle [valid K T]                  做一次窗末裁决（结算+稳定门+接受/回退）\n"
         "  clamp <new> <old>                   单次更新限幅\n"
         "---- 振荡检测 ----\n"
         "  oscfeed <e_deg>                     只喂振荡检测器\n"
@@ -91,9 +104,11 @@ int main() {
     AutoTuner tuner;
     TunerDebugApi api(tuner);
     std::string line;
-    std::printf("ar_tuner_debug ready. 'help' 查看命令表。\n");
+    // 仅交互终端打印横幅与提示符——脚本/管道模式保持输出纯净（key=value 可解析）
+    const bool interactive = AR_ISATTY(AR_STDIN_FILENO) != 0;
+    if (interactive) std::printf("ar_tuner_debug ready. 'help' 查看命令表。\n");
 
-    while (std::printf("> ") && std::getline(std::cin, line)) {
+    while ((interactive ? (std::printf("> ") > 0) : true) && std::getline(std::cin, line)) {
         std::istringstream ss(line);
         std::string cmd;
         if (!(ss >> cmd)) continue;
@@ -162,6 +177,14 @@ int main() {
             double Kp = v[0], Kd = v[1];
             api.escStepOnce(Kp, Kd);
             std::printf("OK Kp=%.6f Kd=%.6f\n", Kp, Kd);
+            continue;
+        }
+        if (cmd == "settle") {
+            double v[3] = {1, K_SHIP_DEFAULT, T_SHIP_DEFAULT};
+            readN(ss, v, 3);  // 全可选：缺省 valid=1 + 典型船估计
+            api.settleWindowOnce(v[0] != 0.0, v[1], v[2]);
+            const auto s = api.snapshot();
+            std::printf("OK curKp=%.6f curKd=%.6f\n", s.curKp, s.curKd);
             continue;
         }
         if (cmd == "clamp") {

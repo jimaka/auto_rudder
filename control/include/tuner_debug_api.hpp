@@ -16,7 +16,6 @@
 //   3. 所有方法均无堆分配、无 IO，可在 ECU 上经串行/以太网命令通道驱动。
 #pragma once
 #include "auto_tuner.hpp"
-#include <string>
 
 namespace ar {
 
@@ -106,6 +105,12 @@ public:
     }
     // 只做一次窗末梯度结算：归一化 → LPF → 梯度下降 → 限幅 → 清窗（等价 escStep）
     void escStepOnce(double& Kp, double& Kd) { t_.escStep(Kp, Kd); }
+    // 只做一次窗末裁决：escStep → 稳定门 → 接受/回退（等价 settleWindow_，
+    // 即 tick() 每 3000 拍自动执行的那一步；辨识估计由调用方给，便于注入测试值）
+    void settleWindowOnce(bool idValid, double K, double T) {
+        IdSnapshot id; id.excited = idValid; id.valid = idValid; id.K = K; id.T = T;
+        t_.settleWindow_(id);
+    }
     // 只算一次更新限幅（无状态）
     double clampUpdate(double newVal, double oldVal) const {
         return t_.clampUpdate(newVal, oldVal);
@@ -137,7 +142,10 @@ public:
     // 直接改写当前增益——不过稳定门、不动基线。仅用于执行器响应试验等
     // 受控场景；调用方自行保证增益安全。正常航行严禁使用。
     void forceGains(double Kp, double Kd) { t_.curKp_ = Kp; t_.curKd_ = Kd; }
-    // 直接改写基线并置基线标志——旁路极点配置与稳定门，仅人工标定注入用
+    // 直接改写基线并置基线标志——旁路极点配置与稳定门，仅人工标定注入用。
+    // 注意：不记录 baseK_/baseT_（保持 0），此后 driftGate=true 的漂移判据会
+    // 把任何 K/T 都视为超阈值漂移（分母走 floor），即下一次评估恒重基线——
+    // 这是保守的安全方向，但调用方应知情。
     void forceBaseline(double Kp, double Kd) {
         t_.setBaseline(Kp, Kd);
         t_.curKp_ = Kp; t_.curKd_ = Kd;
