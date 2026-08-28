@@ -1,0 +1,481 @@
+=== CHUNK 11 — 本节图片映射（图号 -> 相对路径）===
+Fig.40 -> images/fig40_p30.png | Fig.41 -> images/fig41_p31.png | Fig.42 -> images/fig42_p31.png | Fig.43 -> images/fig43_p32.png | Fig.44 -> images/fig44_p32.png | Fig.45 -> images/fig45_p33.png | Fig.46 -> images/fig46_p34.png | Fig.47 -> images/fig47_p35.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+18. Patents
+As described above, the various versions of ES, which continue
+to grow as it is an active field of research, are applicable to an
+incredibly wide range of dynamic systems. Furthermore, because
+ES is by design useful for uncertain systems, it has been widely
+applied outside of academic studies for real world problems,
+including scientific studies and industrial settings. It is worth
+noting the significant impact of ES on industry which can be
+somewhat quantified by the large volume and diversity of ESrelated patents. First of all, there is of course the original 1922
+paper of Leblanc which reads more like a patent/design than
+a typical academic article and now has 277 citations (Leblanc,
+1922). Moving on, a simple public search of the US Patent and
+Trademark Office for the two terms ‘‘extremum’’ and ‘‘seeking’’
+returns 1919 records. To give a few concrete examples, a search
+for ‘‘extremum seeking patent’’ was performed in Google Scholar,
+which returns 9750 results (many of which are articles rather
+than patents). These results are ranked by ‘‘relevance’’ as determined by Google’s algorithms. If one starts to browse through
+the patents they include ES applications for regulating the airflow into a building (Seem, 2010), a method for predicting and
+
+(275)
+28
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 40. Extremum Seeking Zoo: Several major forms of the ES algorithm discussed in this survey.
+
+29
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 41. ES for finding a maximum of an unknown function y(x1 , x2 ). Classical ES (red) slowly converges to the local maximum equilibrium dictated by a predefined
+control structure whereas stabilizing ES (black) quickly finds the global maximum. (For interpretation of the references to color in this figure legend, the reader is
+referred to the web version of this article.)
+
+equations for the motion of a rigid body in an ideal fluid
+dL
+
+dA
++ Ω k × L = 0,
+= k([U V ]T × L) = 0,
+(277)
+dt
+dt
+where L and A are the linear and angular momenta of the body
+fluid system and U, V , and Ω are the translational and rotational
+velocities.
+For the three-linked fish model shown in Fig. 42 the ES control
+law used to maximize the analytically unknown cost function J is
+given by
+
+θ̇1 = aω sin(ωt) − c η cos(ωt),
+θ̇2 = aω cos(ωt) + c η cos(ωt),
+
+(278)
+
+η=
+
+(280)
+
+s
+
+s+h
+
+[J ].
+
+(279)
+
+For the Joukowski foil model, the ES controller used is
+
+η̇ = aω cos(ωt) + c η sin(ωt),
+)2
+(
+s
+.
+η = H(s)[J ], H(s) =
+s+h
+
+(281)
+(282)
+
+It was shown that both of the simulated fish models could utilized ES algorithms to autonomously track source J(x, y, t) whose
+signal strengths fall off with distance, as shown in Fig. 43.
+20. Active flow control
+
+Fig. 42. Fish model setup for a three-linked fish (top) and a Joukowski foil
+(bottom).
+Source: Figure adapted from Cochran, Kanso, Kelly, Xiong, and Krstić (2009).
+
+Active flow control is a method which exploits flow instabilities in order to enhance the region of operation of an aircraft
+over a wide range of operating conditions, including providing
+extra lift at very a high angle of attack. Airflow is a highly
+stochastic and time-varying process with various environmental
+disturbances and requires a very robust and fast online feedback, which makes ES a very strong candidate. ES has been
+utilized for active flow control (Becker, King, Petz, & Nitsche,
+2007; Brunn, Henning, Nitsche, & King, 2008; Henning et al.,
+2008; Kim, Kasnakoglu, Serrani, & Samimy, 2009; King et al.,
+2006), and for aeropropulsion (Moeck, Bothien, Paschereit, Gelbert, & King, 2007; Wiederhold et al., 2009). In Becker et al. (2007)
+the authors developed a Multi-input multi-output (MIMO) ES
+method for maximizing the lift of a wing by actively controlling
+pulsating jets in order to control flow separation, as shown in
+Fig. 44. For the MIMO ES setup the three ES controllers used,
+(ES1 , ES2 , ES3 ) were each of the form
+
+stabilizing compressor stall (Krener & Krstić, 2000), for chilled
+water plant control (Salsbury & House, 2019), for vapor compression (Burns, Guay, & Weiss, 2017), for RF impedance matching (Burry, Radomski, Aung, & Klein, 2020), and for flight formation (Ryan, 2018). In the following sections, we present several
+detailed overviews of ES applications.
+19. Autonomous vehicle control
+Autonomous underwater vehicles, which do not need input
+from an operator, are being utilized for scientific and commercial exploration including seafloor mapping and chemical concentration mapping, and for various military applications. Extremum seeking methods have been developed for such systems,
+for steering vehicles towards a source in GPS-denied environments. In Cochran et al. (2009) and Cochran and Krstić (2009), the
+authors modeled the mechanics of a fish in two different ways,
+as a three linked fish and as a Joukowski foil, as shown in Fig. 42.
+For both of the fish models considered in Cochran et al. (2009)
+the equations governing locomotion are variations of Kirchhoff’s
+
+ui = u0 + a sin(ωt + θi ) + û,
+
+∫ t
+
+η(τ )dτ ,
+
+(284)
+
+ω
+ξ sin(ωt + θi ),
+ωl + s
+
+(285)
+
+û = K
+
+η(t) =
+30
+
+(283)
+
+0
+l
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 43. A fish model utilizing ES to track a stationary and a moving source.
+Source: Figure adapted from Cochran et al. (2009).
+
+∆∗ ψ = −µ0 rjxt (r , z , t),
+∆∗ ψ = 0 ,
+
+in the conductors,
+
+elsewhere,
+
+(288)
+(289)
+
+where ψ (r , z) is the poloidal flux per radian, µ0 is the vacuum
+magnetic permeability, jext is the toroidal current density in the
+external conductors, p is the kinetic pressure profile, f is the
+poloidal current function profile, and the operator ∆∗ is defined
+as
+
+∂
+∆ =r
+∂r
+∗
+
+(
+
+1 ∂ψ
+
+)
+
+µr r ∂ r
+
+∂
++
+∂z
+
+(
+
+1 ∂ψ
+
+)
+
+µr ∂ z
+
+.
+
+(290)
+
+It can be shown that
+
+σ
+
+σ
+
+y = δ IAT δ Ip δ Zc
+
+)T
+
+ψ̇ +
+u,
+(291)
+r
+2π r
+where u is the voltage applied to the coils and σ is the electric
+conductivity, with the equation integrated over the conductor
+regions. The measured outputs were defined as
+jext = −
+
+(
+
+,
+
+(292)
+
+where δ IA are the deviations of the circuit currents from equilibrium values, δ Ip is the deviation of the plasma current from
+equilibrium, and δ Zc is the deviation of the vertical position of the
+plasma centroid from equilibrium. This input was passed into a
+Kalman filter to generate a Lyapunov-like function V = x̂2 of the
+unstable plasma state for minimization by using the stabilizing
+feedback-based ES method of the form
+u=α
+
+Fig. 44. MIMO ES-based airfoil control.
+Source: Figure adapted from King et al.
+(2006).
+
+√
+
+√
+ω cos(ωt) − k ω sin(ωt)V (x̂),
+
+(293)
+
+as shown in Fig. 44, where each ESi utilized the same frequency
+ES dithers, but with different phase shifts θi for the 3 different
+controllers.
+
+as shown in Fig. 45(C). Various examples of plasma stabilization
+were demonstrated. In Fig. 45 we show just the response of the
+plasma to two different disturbances: VDE of 5 cm and MD, where
+a VDE is an instantaneous motion of the system’s state along an
+unstable mode resulting in vertical displacement of the plasma
+centroid and MD represents a loss of plasma thermal energy. The
+ES method was shown to be incredibly robust over a wide range
+of conditions with the various Equation numbers in the figure
+referring to plasma characteristics as described in the paper.
+
+21. Plasma control
+
+22. Particle accelerator control
+
+ξ (t) =
+
+s
+s + ωh
+
+y
+
+(286)
+
+Particle accelerators are some of the most powerful scientific
+tools for studying fundamental physics, biology, and material
+science. Large accelerators are kilometers in length and are composed of thousands of coupled components such as resonant radio
+frequency (RF) electromagnetic accelerating cavities and magnets
+and their associated power sources and amplifiers. The performance of large collections of electromagnetic components is constantly being perturbed by environmental disturbances such as
+temperature drifts, high voltage ripple, and vibrations, all components face uncertainty in terms of precise alignment at the sub
+µm scale, and components such as magnets suffer from hysteresis
+effects which introduces in an uncertainty in the mapping between a control parameter such as a power supply current and
+
+High energy plasmas, such as those created inside of Tokomak
+reactors, are extremely complex dynamic systems which are very
+difficult to control, for which various ES methods have been
+developed (Centioli et al., 2008; Luo & Schuster, 2009; Ou et al.,
+2008). Recently, an innovative Kalman filter-based ES controller
+was designed for plasma control in Dubbioso et al. (2022) and
+Tommasi, Dubbioso, Mele, and Pironti (2021).
+The Kalman-based ES setup is shown in Fig. 45. The tokamak
+plasma model used was based on the Grad–Shafranov PDE which,
+in cylindrical coordinates, is given by
+
+∆∗ ψ = − f
+
+df
+dψ
+
+− µ0 r 2
+
+dp
+dψ
+
+,
+
+in plasma region,
+
+(287)
+31
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 45. Tokomak Kalman-based ES controller.
+Source: Figure adapted from Dubbioso et al.
+(2022).
+
+the controlled variable which may be the magnetic field which
+focuses charged particles. Furthermore, charged particle beams
+themselves are time-varying with typical beams composed of
+109 − 1014 individual particles whose dynamics are governed by
+complex collective effects such as space charge forces. The result
+is that a measurable output function of an accelerator, such as a
+beam current monitor at a particular location, is an analytically
+unknown function of a control parameter such as a magnet power
+supply setting, and is governed by an uncertain and time-varying
+dynamic system.
+Two ES feedbacks running at multiple time-scales have been
+utilized for online multi-objective optimization at the plasma
+wakefield accelerator (AWAKE) at CERN for simultaneous emittance and orbit control (Scheinker et al., 2020) as shown in
+Fig. 46(A). In Scheinker et al. (2020) one set of 5 ES parameters that were slowly tuned were 2 solenoid magnets and 3
+quadrupole magnets which had an influence over the electron
+beam size at electron–proton overlap region of the AWAKE beamline, denoted as
+p1 = (p11 , p12 , . . . , p15 ).
+
+f1 (p, t) = w1 XRMSE (p, t),
+
+ṗ1i =
+ṗ2i =
+
+p
+
+p
+
+√
+√
+
+α1 ω1i cos(ω1i t + kF (p, t)),
+
+(298)
+
+α2 ω2i cos(ω2i t + kF (p, t)),
+
+(299)
+
+where the two time-scale ES dithering frequencies were defined
+as
+
+ω1i = ω0 r1i , r1i ∈ {1.0, . . . , 1.75}, i = 1, . . . , 5
+ω2i = 3 × ω0 r2i , r2i ∈ {1.0, . . . , 1.75}, i = 1, . . . , 10,
+with the initial beam shaping magnets moving much slower than
+the trajectory-controlling magnets further down stream.
+ES has been applied for maximizing free electron laser (FEL)
+pulse energy at two of the most advanced FEL facilities in the
+world: the Linac Coherent Light Source (LCLS) at SLAC National
+Accelerator Laboratory and the European X-ray FEL (EuXFEL) at
+DESY laboratory, as shown with ES automatically more than
+doubling the average light output energy of the EuXFEL within
+4 minutes in Fig. 46(B) (Scheinker et al., 2019).
+ES has also been combined with machine learning-based neural network tools for automatically controlling the (z , E) longitudinal phase space of electron beams at the LCLS FEL as shown in
+Fig. 46 (C) (Scheinker, Edelen, Bohler, Emma, & Lutman, 2018).
+Various other ES applications for accelerator tuning include
+accelerator magnet tuning (Scheinker, Pang, & Rybarcyk, 2013),
+adaptive electron beam profile prediction (Scheinker & Gessner,
+2015), time varying resonance control (Scheinker, 2016), for min-
+
+(294)
+
+(295)
+
+to keep the beam centered on a screen during the beam shape
+optimization. Considering all 15 tuned ES parameters as p =
+(p1 , p2 ), the multi-objective ES problem was of the form:
+min {F (p, t)} = min {f1 (p, t), f2 (p, t)} ,
+
+(297)
+
+where XRMSE denotes RMS error of the beam trajectory and σxy is
+a measure of the (x, y) beam size on the screen.
+The two time-scale ES controllers were defined as
+
+However, because the beam is not perfectly aligned, changing
+the solenoid and quadruople magnets not only affected the beam
+shape, but also its trajectory. Therefore, another set of 10 ES
+parameters running at a 3× faster rate controlled 10 (x, y) downstream steering magnets, denoted as
+p2 = (p21 , p22 , . . . , p210 ),
+
+f2 (p, t) = w2 σxy (p, t),
+
+(296)
+32
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 46. (A) Application of two ES loops running simultaneously at two different time scales for real-time multi-objective optimization (beam trajectory control
+and emittance growth minimization) at the AWAKE accelerator at CERN. (B) Application of ES for automatic pulse energy maximization at the European X-ray free
+electron laser at DESY. (C) Combination of ES and a neural network for direct tuning of the 2D (z , E) longitudinal phase space distribution of the electron beam at
+the LCLS free electron laser at SLAC National Accelerator Laboratory.
+
+23. Maximum power point tracking
+
+imizing beam oscillations in a time-varying magnetic lattice at
+SPEAR3 at SLAC (Scheinker, Huang, & Wu, 2017), and is now
+regularly used as a beam tuning tool at the Los Alamos National Laboratory linear particle accelerator LANSCE for beam loss
+minimization (Scheinker, Huang, & Taylor, 2021).
+
+Photovoltaic generators which convert solar energy into electricity have current–voltage and power–voltage characteristics
+which strongly depend on temperature as shown in Fig. 47(A)
+33
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Γ̂˙ = −ωl Ĝ + ωl M(t)Pac (t),
+
+(306)
+
+where M(t) is a matrix of ES perturbation signals. The performance and advantages of the Newton ES-based MPPT approach
+are shown in Fig. 48. MPPT is an important problem well suited
+for ES-based methods and has been studied with numerous additional ES-based approaches (Bazzi & Krein, 2011; Bizon, 2016;
+Brunton, Rowley, Kulkarni, & Clarkson, 2009, 2010; Heydaridoostabad, Keypour, Khalghani, & Khooban, 2013; Li, Li, Seem, &
+Lei, 2011, 2015; Reisi, Moradi, & Jamasb, 2013; Yau & Wu, 2011).
+24. Bioreactor growth rate optimization
+An innovative combination of ES with neural networks has
+also been applied for the control of complex nonlinear bioreactor systems with unknown growth kinetics for biomass production rate maximization (Guay et al., 2004). The authors consider
+microbial growth dynamics of the form
+
+Fig. 47. Voltage, current, power relationships as a function of temperature (0
+to 75 degrees C).
+Source: Figure adapted from Leyva et al. (2006).
+
+16
+a2
+4
+
+sin2 (ωj t) −
+
+1
+2
+
+[
+si (z) = exp
+
+The general ES methods described above have proven to be
+useful for many real-world applications and there are many approaches and applications which were beyond the scope of this
+survey, some of which we mention here briefly. Beyond what
+was described, ES has been implemented for cooling systems (Li,
+Li, & Seem, 2009; Li, Rotea, Chiu, Mongeau, & Paek, 2005), wind
+energy (Creaby, Li, & Seem, 2009), photovoltaics (Lei, Li, Chen, &
+Seem, 2010), human exercise machines (Zhang, Dawson, Dixon,
+& Xian, 2006), optimizing the control of nonisothermal continuously stirred tank reactors (Guay, Dochain, & Perrier, 2005),
+reducing the impact velocity of an electromechanical valve actuator (Peterson & Stefanopoulou, 2004), Newton-like ES for thermoacousic instability control (Moase et al., 2010), torque maximization of motors (Antonello, Carraro, & Zigliotto, 2013), optimization of variable CAM timing engine operation (Popovic,
+Jankovic, Magner, & Teel, 2006), ES for cascaded Raman optical
+
+,
+
+1
+
+˙
+
+D̃ = −Kn Γ Ĝ,
+
+(304)
+
+Γ̇ = ρ Γ − ρ Γ Ĥ Γ ,
+
+(305)
+
+i = 1, 2, . . . , l,
+

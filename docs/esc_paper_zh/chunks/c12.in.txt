@@ -1,0 +1,759 @@
+=== CHUNK 12 — 本节图片映射（图号 -> 相对路径）===
+Fig.48 -> images/fig48_p36.png | Fig.49 -> images/fig49_p36.png；本段含结论与全部参考文献（参考文献条目保留英文原文，仅翻译小节标题）
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+25. Conclusions
+
+(301)
+
+WQ T HQ + WQ T H D̃ + O(a),
+(303)
+2
+where Pac is the alternating component of the measured output
+power and
+W (t)Pac =
+
+]
+−(z − φi )T (z − φi )
+,
+σi2
+
+with centers φi and standard deviations σi . The method is demonstrated to perform incredibly well with and without Gaussian
+measurement noise added to the biomass and substrate concentration measurements, as shown in Fig. 49.
+
+sin(ωj t) sin(ωk t), j ̸ = k,
+(302)
+a2
+is used to extract an estimate of the Hessian via the first term of
+the product
+Wjk =
+
+(310)
+
+S(z) = [s1 (z), s2 (z), . . . , sl (z)]T ,
+
+where ωi ̸ = ωj . A matrix W of perturbation signals of the form
+Wjj =
+
+(309)
+
+where W ∗ is unknown, µl (t) is the neural network error, and S(z)
+is an RBF basis function vector
+
+where H is the unknown Hessian matrix, D = D + D̃ + Q (t), with
+D̃ = D̂ − D an estimation error, R represents higher order terms,
+and Q (t) is a vector of ES dither signals of the form
+
+)
+
+(308)
+
+y = k2 µ(x, s)x,
+
+ϕ (z) = W ∗T S(z) + µl (t),
+
+∗
+
+(
+
+(307)
+
+ṡ = −k1 µ(s, x)x + u(s0 − s),
+
+where x, s ∈ R+ denote biomass and substrate concentrations,
+respectively, u ≥ 0 is the dilution rate, y is the production rate
+of the reaction product, s0 is the concentration of the substrate
+in the feed, and k1 , k2 > 0 are yield coefficients. The authors
+consider a case in which only x and s are measurable and y is
+not available for measurement and control. The goal of the ES
+controller is to maximize the steady-state production rate y∗ by
+finding the optimal dilution rate u∗ .
+In this work, the substrate-dependent growth rate expression
+µ(x, s) is considered to be unknown and is approximated by a radial basis function (RBF)-based neural network giving an estimate
+of the form
+
+and vary in response to atmospheric conditions. Therefore, the
+problem of maximum power point tracking (MPPT), becomes an
+adaptive optimization problem for which ES methods were first
+demonstrated in Leyva et al. (2006, 2011) and Leyva, Artillan,
+Cabal, Estibals, and Alonso (2011). The authors present an ESbased MPPT algorithm for efficient extraction of PV array energy
+by automatic adjustment of the array voltage via modulation
+of the duty cycle of a switched mode power converter while
+ensuring the stability of the adjusting process for sudden or fast
+variations of the external conditions. The ES MPPT setup is shown
+in Fig. 47(B).
+A multivariable Newton ES-based method for MPPT has also
+been developed for photo-voltaic power optimization (Ghaffari
+et al., 2014). In that approach the power to be maximized, P(D, t),
+is considered as a function of switching pulse duration D =
+[D1 , D2 , . . . , Dn ]T and is assumed to have a Taylor series expansion at its optimal pulse duration point D∗ = [D∗1 , D∗2 , . . . , D∗n ]T of
+the form
+1
+P = P ∗ + (D̃ + Q (t))T H(D̃ + Q (t)) + R(D̃ + Q (t)),
+(300)
+2
+
+Q (t) = a[sin(ω1 t), . . . , sin(ωn t)]T ,
+
+ẋ = µ(s, d)x − ux,
+
+34
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 48. MPPT with Newton-based ES. Power output as a function of pulse duration for a two-pulse setup D = [D1 , D2 ], is shown (A). Following an initial transient
+time, the Newton-based ES approach has faster settling time than a gradient method alone (B). The Newton-based ES shows superior response to fast power level
+changes (C, D).
+Source: Figure adapted from Ghaffari, Krstić, and Seshagiri (2014).
+
+Fig. 49. ES for bioreactor optimization with and without Gaussian measurement noise.
+Source: Figure adapted from Guay, Dochain, and Perrier (2004).
+
+amplifiers (Dower, Farrell, & Nesic, 2008), ES for traffic congestion
+control (Yu, Koga, Oliveira, & Krstić, 2021), GPS-denied source
+localization (Ghadiri-Modarres et al., 2016a), ES for maximizing
+RF heating (Carnevale et al., 2009), electromagnetic actuator control (Benosman & Atınç, 2015), for high voltage converter modulator optimization (Scheinker, Bland, Krstić, & Audia, 2013), multiobjective ES has been implemented for mineral grinding (Lu,
+Krstić, Chai, & Fu, 2020), and sampled-data ES for constrained
+optimization (Hazeleger, Nešić, & van de Wouw, 2022). The field
+of ES research is active and continuously growing.
+Various extensions and modifications of the ES method continue to generalize to larger classes of systems and to find new
+applications for real-time control, stabilization, and optimization.
+Some of the particularly active topics in ES these days include
+further work on finite time convergence, ES for PDEs, and the
+combination of ES with machine learning in order to increase the
+robustness of standard ML techniques for time-varying systems
+and for input distribution shift. This survey has only brushed
+the surface of the many published results. As clearly seen from
+just the few topics in Fig. 2, ES methods continue to branch
+out and also to overlap. Existing techniques are constantly being
+generalized for larger class of systems while new techniques are
+also being developed. ES is a very active field of research with a
+growing number of approaches and applications.
+
+Abdelgalil, M., & Taha, H. (2022). Recursive averaging with application to
+bio-inspired 3-D source seeking. IEEE Control Systems Letters, 6, 2816–2821.
+Adetola, V., & Guay, M. (2006). Adaptive output feedback extremum seeking
+receding horizon control of linear systems. Journal of Process Control, 16(5),
+521–533.
+Adetola, V., & Guay, M. (2007). Parameter convergence in adaptive extremumseeking control. Automatica, 43(1), 105–110.
+Albertini, F., & Sontag, E. D. (1997). Control-Lyapunov functions for time-varying
+set stabilization. In 1997 European control conference (pp. 1999–2004). IEEE.
+Amato, F., Ambrosino, R., Ariola, M., Cosentino, C., Tommasi, G. De, et al. (2014).
+Finite-time stability and control, volume 453. Springer.
+Antonello, R., Carraro, M., & Zigliotto, M. (2013). Maximum-torque-per-ampere
+operation of anisotropic synchronous permanent-magnet motors based on
+extremum seeking control. IEEE Transactions on Industrial Electronics, 61(9),
+5086–5093.
+Ariyur, K. B., & Krstić, M. (2003). Real-time optimization by extremum-seeking
+control. Hoboken, NJ: John Wiley & Sons.
+Åström, K. J., & Wittenmark, B. (1995a). Adaptive control. Reading, MA: Addison
+Wesley.
+Åström, K. J., & Wittenmark, B. (1995b). A survey of adaptive control applications.
+In Proceedings of 1995 34th IEEE conference on decision and control, volume 1
+(pp. 649–654). IEEE.
+Bazzi, A. M., & Krein, P. T. (2011). Concerning ‘‘Maximum power point tracking
+for photovoltaic optimization using ripple-based extremum seeking control’’.
+IEEE Transactions on Power Electronics, 26(6), 1611–1612.
+Becker, R., King, R., Petz, R., & Nitsche, W. (2007). Adaptive closed-loop separation control on a high-lift configuration using extremum seeking. AIAA
+journal, 45(6), 1382–1392.
+Benosman, M. (2016). Multi-parametric extremum seeking-based iterative feedback gains tuning for nonlinear control. International Journal of Robust and
+Nonlinear Control, 26(18), 4035–4055.
+Benosman, M., & Atınç, G. M. (2015). Extremum seeking-based adaptive control
+for electromagnetic actuators. International Journal of Control, 88(3), 517–530.
+
+References
+Abdelgalil, M., Aboelkassem, Y., & Taha, H. (2022). Sea urchin sperm exploit
+extremum seeking control to find the egg. Physical Review E, 106(6), Article
+L062401.
+35
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Freeman, R., & Kokotovic, P. V. (1996). Robust nonlinear control design: State-space
+and Lyapunov techniques. Boston: Birkhauser.
+Frihauf, P., Krstić, M., & Basar, T. (2011). Nash equilibrium seeking in
+noncooperative games. IEEE Transactions on Automatic Control, 57(5),
+1192–1207.
+Frihauf, P., Krstić, M., & Başar, T. (2013). Finite-horizon LQ control for unknown
+discrete-time linear systems via extremum seeking. European Journal of
+Control, 19(5), 399–407.
+Ge, S. S., Yang, C., & Lee, T. H. (2008). Adaptive robust control of a class
+of nonlinear strict-feedback discrete-time systems with unknown control
+directions. Systems & Control Letters, 57(11), 888–895.
+Ghadiri-Modarres, M. A., Mojiri, M., & Zangeneh, H. R. Z. (2016a). New schemes
+for GPS-denied source localization using a nonholonomic unicycle. IEEE
+Transactions on Control Systems Technology, 25(2), 720–727.
+Ghadiri-Modarres, M. A., Mojiri, M., & Zangeneh, H. R. Z. (2016b). Nonholonomic
+source localization in 3-D environments without position measurement. IEEE
+Transactions on Automatic Control, 61(11), 3563–3567.
+Ghaffari, A., Krstić, M., & Nešić, D. (2012). Multivariable Newton-based extremum
+seeking. Automatica, 48(8), 1759–1767.
+Ghaffari, A., Krstić, M., & Seshagiri, S. (2014). Power optimization for photovoltaic
+microconverters using multivariable newton-based extremum seeking. IEEE
+Transactions on Control Systems Technology, 22(6), 2141–2149.
+Grushkovskaya, V., & Ebenbauer, C. (2016). Multi-agent coordination with
+Lagrangian measurements. IFAC-PapersOnLine, 49(22), 115–120.
+Grushkovskaya, V., & Ebenbauer, C. (2021). Extremum seeking control of nonlinear dynamic systems using Lie bracket approximations. International Journal
+of Adaptive Control and Signal Processing, 35(7), 1233–1255.
+Grushkovskaya, V., Michalowsky, S., Zuyev, A., May, M., & Ebenbauer, C. (2018). A
+family of extremum seeking laws for a unicycle model with a moving target:
+Theoretical and experimental studies. In 2018 European control conference
+(pp. 1–6). IEEE.
+Grushkovskaya, V., Zuyev, A., & Ebenbauer, C. (2018a). On a class of generating
+vector fields for the extremum seeking problem: Lie bracket approximation
+and stability properties. Automatica, 94, 151–160.
+Grushkovskaya, V., Zuyev, A., & Ebenbauer, C. (2018b). On extremum seeking controllers based on the Lie bracket approximation in domains with
+obstacles. Proceedings in Applied Mathematics and Mechanics, 18(1), Article
+e201800298.
+Guay, M. (2014). A time-varying extremum-seeking control approach for
+discrete-time systems. Journal of Process Control, 24(3), 98–112.
+Guay, M. (2016). A perturbation-based proportional integral extremum-seeking
+control approach. IEEE Transactions on Automatic Control, 61(11), 3370–3381.
+Guay, M., & Benosman, M. (2021). Finite-time extremum seeking control for a
+class of unknown static maps. International Journal of Adaptive Control and
+Signal Processing, 35(7), 1188–1201.
+Guay, M., & Dochain, D. (2015a). A multi-objective extremum-seeking controller
+design technique. International Journal of Control, 88(1), 38–53.
+Guay, M., & Dochain, D. (2015b). A time-varying extremum-seeking control
+approach. Automatica, 51, 356–363.
+Guay, M., & Dochain, D. (2017). A proportional-integral extremum-seeking
+controller design technique. Automatica, 77, 61–67.
+Guay, M., Dochain, D., & Perrier, M. (2004). Adaptive extremum seeking control of continuous stirred tank bioreactors with unknown growth kinetics.
+Automatica, 40(5), 881–888.
+Guay, M., Dochain, D., & Perrier, M. (2005). Adaptive extremum-seeking control
+of nonisothermal continuous stirred tank reactors. Chemical Engineering
+Science, 60(13), 3671–3681.
+Guay, M., Dochain, D., Perrier, M., & Hudon, N. (2007). Flatness-based extremumseeking control over periodic orbits. IEEE Transactions on Automatic Control,
+52(10), 2005–2012.
+Guay, M., Moshksar, E., & Dochain, D. (2015). A constrained extremum-seeking
+control approach. International Journal of Robust and Nonlinear Control, 25(16),
+3132–3153.
+Guay, M., Vandermeulen, I., Dougherty, S., & McLellan, P. J. (2018). Distributed
+extremum-seeking control over networks of dynamically coupled unstable
+dynamic agents. Automatica, 93, 498–509.
+Guay, M., & Zhang, T. (2003). Adaptive extremum seeking control of nonlinear dynamic systems with parametric uncertainties. Automatica, 39(7),
+1283–1293.
+Gurvits, L. (1992). Averaging approach to nonholonomic motion planning. In
+Proceedings 1992 IEEE international conference on robotics and automation (pp.
+2541–2542). IEEE Computer Society.
+Gurvits, L., & Li, Z. (1992). Smooth time-periodic solutions for nonholonomic
+motion planning, In Z. X. Li, & J. F. Canny (Eds.), Nonholonomic motion planning: Vol. 1, (1st ed.). Alphen aan den Rijn, Netherlands: Kluwer Academic
+Publishers.
+Haring, M., van de Wouw, N., & Nešić, D. (2013). Extremum-seeking control
+for nonlinear systems with periodic steady-state outputs. Automatica, 49(6),
+1883–1891.
+
+Benosman, M., Farahmand, A. M., & Xia, M. (2019). Learning-based iterative
+modular adaptive control for nonlinear systems. International Journal of
+Adaptive Control and Signal Processing, 33(2), 335–355.
+Berkenkamp, F., Schoellig, A. P., & Krause, A. (2016). Safe controller optimization
+for quadrotors with Gaussian processes. In 2016 IEEE international conference
+on robotics and automation (pp. 491–496). IEEE.
+Bhattacharjee, D., & Subbarao, K. (2021). Extremum seeking control with
+attenuated steady-state oscillations. Automatica, 125, Article 109432.
+Bizon, N. (2016). Global maximum power point tracking (GMPPT) of photovoltaic
+array using the extremum seeking control (ESC): A review and a new GMPPT
+ESC scheme. Renewable and Sustainable Energy Reviews, 57, 524–539.
+Blackman, P. F. (1962). Extremum-seeking regulators, In J. H.Westcott (Ed.), An
+exposition of adaptive control: Vol. 2, (1st ed.). (pp. 125–247). New York:
+Macmillan.
+Brunn, A., Henning, L., Nitsche, W., & King, R. (2008). Application of slopeseeking to a generic car model for active drag control. In 26th AIAA applied
+aerodynamics conference (p. 6734).
+Brunton, S. L., Rowley, C. W., Kulkarni, S. R., & Clarkson, C. (2009). Maximum
+power point tracking for photovoltaic optimization using extremum seeking.
+In 2009 34th IEEE photovoltaic specialists conference (pp. 000013–000016).
+IEEE.
+Brunton, S. L., Rowley, C. W., Kulkarni, S. R., & Clarkson, C. (2010). Maximum power point tracking for photovoltaic optimization using ripple-based
+extremum seeking control. IEEE Transactions on Power Electronics, 25(10),
+2531–2540.
+Burns, D., Guay, M., & Weiss, W. (2017). Time-varying extremum seeking for
+controlling vapor compression systems. US Patent 9,625,274.
+Burry, A. M., Radomski, A. T., Aung, T. O. E., & Klein, J. N. (2020). Extremum
+seeking control apparatus and method for automatic frequency tuning for
+RF impedance matching. US Patent 10,741,363.
+Carnevale, D., Astolfi, A., Centioli, C., Podda, S., Vitale, V., & Zaccarian, L. (2009). A
+new extremum seeking technique and its application to maximize RF heating
+on FTU. Fusion Engineering and Design, 84(2–6), 554–558.
+Centioli, C., Iannone, F., Mazza, G., Panella, M., Pangione, L., Podda, S., et al.
+(2008). Maximization of the lower hybrid power coupling in the Frascati
+Tokamak upgrade via extremum seeking. Control Engineering Practice, 16(12),
+1468–1478.
+Choi, J. Y., Krstić, M., Ariyur, K. B., & Lee, J. S. (2002). Extremum seeking
+control for discrete-time systems. IEEE Transactions on Automatic Control,
+47(2), 318–323.
+Cochran, J., Kanso, E., Kelly, S. D., Xiong, H., & Krstić, M. (2009). Source seeking for
+two nonholonomic models of fish locomotion. IEEE Transactions on Robotics,
+25(5), 1166–1176.
+Cochran, J., & Krstić, M. (2009). Nonholonomic source seeking with tuning of
+angular velocity. IEEE Transactions on Automatic Control, 54(4), 717–731.
+Conway, J. B. (1990). A course in functional analysis, volume 96. New York, NY:
+Springer.
+Creaby, J., Li, Y., & Seem, J. E. (2009). Maximizing wind turbine energy capture
+using multivariable extremum seeking control. Wind Engineering, 33(4),
+361–387.
+DeHaan, D., & Guay, M. (2005). Extremum-seeking control of state-constrained
+nonlinear systems. Automatica, 41(9), 1567–1574.
+Dower, P. M., Farrell, P. M., & Nesic, D. (2008). Extremum seeking control
+of cascaded Raman optical amplifiers. IEEE Transactions on Control Systems
+Technology, 16(3), 396–407.
+Draper, C. S., & Li, Y. Y. (1951). Principles of optimalizing control systems and
+an application to the internal combustion engine, In R. Oldenburger (Ed.),
+Optimal and self-optimizing control: Vol. 1, (1st ed.). Boston, MA: M.I.T. Press.
+Dubbioso, S., di Grazia, L. E., Tommasi, G. De, Mattei, M., Mele, A., & Pironti, A.
+(2022). Vertical stabilization of tokamak plasmas via extremum seeking. IFAC
+Journal of Systems and Control, 21, Article 100203.
+Dürr, H. B., Krstić, M., Scheinker, A., & Ebenbauer, C. (2015). Singularly perturbed
+lie bracket approximation. IEEE Transactions on Automatic Control, 60(12),
+3287–3292.
+Dürr, H. B., Krstić, M., Scheinker, A., & Ebenbauer, C. (2017). Extremum seeking
+for dynamic maps using Lie brackets and singular perturbations. Automatica,
+83, 91–99.
+Dürr, H. B., Stanković, M. S., Ebenbauer, C., & Johansson, K. H. (2013). Lie bracket
+approximation of extremum seeking systems. Automatica, 49(6), 1538–1552.
+Dürr, H. B., Stanković, M. S., Johansson, K. H., & Ebenbauer, C. (2014). Extremum seeking on submanifolds in the Euclidian space. Automatica, 50(10),
+2591–2596.
+Dürr, H. B., Zeng, C., & Ebenbauer, C. (2013). Saddle point seeking for convex
+optimization problems. IFAC Proceedings Volumes, 46(23), 540–545.
+Favache, A., Dochain, D., Perrier, M., & Guay, M. (2008). Extremum-seeking
+control of retention for a microparticulate system. The Canadian Journal of
+Chemical Engineering, 86(5), 815–827.
+Feiling, J., Koga, S., Krstić, M., & Oliveira, T. R. (2018). Gradient extremum
+seeking for static maps with actuation dynamics governed by diffusion PDEs.
+Automatica, 95, 197–206.
+36
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Li, Y., Rotea, M. A., Chiu, G. T.-C., Mongeau, L. G., & Paek, I.-S. (2005). Extremum
+seeking control of a tunable thermoacoustic cooler. IEEE Transactions on
+Control Systems Technology, 13(4), 527–536.
+Liao, C.-K., Manzie, C., Chapman, A., & Alpcan, T. (2019). Constrained extremum
+seeking of a MIMO dynamic system. Automatica, 108, Article 108496.
+Liu, S.-J., & Krstić, M. (2010). Stochastic averaging in continuous time and its
+applications to extremum seeking. IEEE Transactions on Automatic Control,
+55(10), 2235–2250.
+Liu, S.-J., & Krstić, M. (2012). Stochastic averaging and stochastic extremum seeking.
+Berlin, Germany: Springer Science & Business Media.
+Liu, S.-J., & Krstić, M. (2014). Newton-based stochastic extremum seeking.
+Automatica, 50(3), 952–961.
+Liu, S.-J., & Krstić, M. (2015). Stochastic averaging in discrete time and its
+applications to extremum seeking. IEEE Transactions on Automatic control,
+61(1), 90–102.
+Lu, X., Krstić, M., Chai, T., & Fu, J. (2020). Hardware-in-the-loop multiobjective
+extremum-seeking control of mineral grinding. IEEE Transactions on Control
+Systems Technology, 29(3), 961–971.
+Luo, L., & Schuster, E. (2009). Mixing enhancement in 2D magnetohydrodynamic
+channel flow by extremum seeking boundary control. In 2009 American
+control conference (pp. 1530–1535). IEEE.
+Luxat, J. C., & Lees, L. H. (1971). Stability of peak-holding control systems. IEEE
+Transactions on Industrial Electronics and Control Instrumentation, (1), 11–15.
+Manzie, C., & Krstić, M. (2009). Extremum seeking with stochastic perturbations.
+IEEE Transactions on Automatic Control, 54(3), 580–585.
+Matveev, A. S., Hoy, M. C., & Savkin, A. V. (2014). 3D environmental extremum
+seeking navigation of a nonholonomic mobile robot. Automatica, 50(7),
+1802–1815.
+Meerkov, S. M. (1967). Asymptotic methods for investigating a class of
+forced states in extremal systems. Automation and Remote Control, 28(12),
+1916–1920.
+Mele, A., Tommasi, G. De, & Pironti, A. (2021). Finite-time stabilization of
+linear systems with unknown control direction via extremum seeking. IEEE
+Transactions on Automatic Control, 67(10), 5594–5601.
+Menon, A., & Baras, J. S. (2014). Collaborative extremum seeking for welfare
+optimization. In 53rd IEEE conference on decision and control (pp. 346–351).
+IEEE.
+Michalowsky, S., & Ebenbauer, C. (2013). Swinging up the stephenson-Kapitza
+pendulum. In 52nd IEEE conference on decision and control (pp. 3981–3987).
+IEEE.
+Michalowsky, S., Gharesifard, B., & Ebenbauer, C. (2018). On the Lie
+bracket approximation approach to distributed optimization: Extensions and
+limitations. In 2018 European control conference (pp. 119–124). IEEE.
+Mills, G., & Krstić, M. (2018). Maximizing map sensitivity and higher derivatives via extremum seeking. IEEE Transactions on Automatic Control, 63(10),
+3232–3247.
+Moase, W. H., & Manzie, C. (2011). Semi-global stability analysis of observerbased extremum-seeking for Hammerstein plants. IEEE Transactions on
+Automatic Control, 57(7), 1685–1695.
+Moase, W. H., & Manzie, C. (2012). Fast extremum-seeking for Wiener–
+Hammerstein plants. Automatica, 48(10), 2433–2443.
+Moase, W. H., Manzie, C., & Brear, M. J. (2009). Newton-like extremum-seeking
+part I: Theory. In Proceedings of the 48h IEEE conference on decision and control
+held jointly with 2009 28th Chinese control conference (pp. 3839–3844). IEEE.
+Moase, W. H., Manzie, C., & Brear, M. J. (2010). Newton-like extremum-seeking
+for the control of thermoacoustic instability. IEEE Transactions on Automatic
+Control, 55(9), 2094–2105.
+Moeck, J., Bothien, M., Paschereit, C., Gelbert, G., & King, R. (2007). Twoparameter extremum seeking for control of thermoacoustic instabilities and
+characterization of linear growth. In 45th AIAA aerospace sciences meeting and
+exhibit (p. 1416).
+Moreau, L., & Aeyels, D. (2000). Practical stability and stabilization. IEEE
+Transactions on Automatic Control, 45(8), 1554–1558.
+Morosanov, I. S. (1957). Method of extremum control. Automatic and Remote
+Control, 18, 1077–1092.
+Mudgett, D., & Morse, A. (1985). Adaptive stabilization of linear systems with
+unknown high-frequency gains. IEEE Transactions on Automatic Control, 30(6),
+549–554.
+Nesic, D., Mohammadi, A., & Manzie, C. (2012). A framework for extremum
+seeking control of systems with parameter uncertainties. IEEE Transactions
+on Automatic Control, 58(2), 435–448.
+Nešić, D., Nguyen, T., Tan, Y., & Manzie, C. (2013). A non-gradient approach
+to global extremum seeking: An adaptation of the shubert algorithm.
+Automatica, 49(3), 809–815.
+Nesić, D., Tan, Y., Moase, W. H., & Manzie, C. (2010). A unifying approach to
+extremum seeking: Adaptive schemes based on estimation of derivatives. In
+49th IEEE conference on decision and control (pp. 4625–4630). IEEE.
+Nussbaum, R. D. (1983). Some remarks on a conjecture in parameter adaptive
+control. Systems & Control Letters, 3(5), 243–246.
+Obabkov, V. K. (1967). Theory of multichannel extremal control systems with
+sinusoidal probe signals. Automation and Remote Control, 28, 48–54.
+
+Hazeleger, L., Haring, M., & van de Wouw, N. (2020). Extremum-seeking control
+for optimization of time-varying steady-state responses of nonlinear systems.
+Automatica, 119, Article 109068.
+Hazeleger, L., Nešić, D., & van de Wouw, N. (2022). Sampled-data extremumseeking framework for constrained optimization of nonlinear dynamical
+systems. Automatica, 142, Article 110415.
+Henning, L., Becker, R., Feuerbach, G., Muminovic, R., King, R., Brunn, A., et
+al. (2008). Extensions of adaptive slope-seeking for active flow control.
+Proceedings of the Institution of Mechanical Engineers, Part I (Journal of Systems
+and Control Engineering), 222(5), 309–322.
+Heydari-doostabad, H., Keypour, R., Khalghani, M. R., & Khooban, M. H. (2013).
+A new approach in MPPT for photovoltaic array based on extremum seeking
+control under uniform and non-uniform irradiances. Solar Energy, 94, 28–36.
+Kazakevich, V. V. (1943). Technique of automatic control of different processes
+to maximum or to minimum. Avtorskoe svidetelstvo, (USSR Patent), (66335).
+Kazakevich, V. V. (1944). On extremum seeking (Ph.D. thesis), Moscow High
+Technical University.
+Khong, S. Z., Nešić, D., & Krstić, M. (2016). Iterative learning control based on
+extremum seeking. Automatica, 66, 238–245.
+Khong, S. Z., Nešić, D., Tan, Y., & Manzie, C. (2013). Unified frameworks for
+sampled-data extremum seeking control: Global optimisation and multi-unit
+systems. Automatica, 49(9), 2720–2733.
+Kim, K., Kasnakoglu, C., Serrani, A., & Samimy, M. (2009). Extremum-seeking
+control of subsonic cavity flow. AIAA journal, 47(1), 195–205.
+King, R., Becker, R., Feuerbach, G., Henning, L., Petz, R., Nitsche, W., et al.
+(2006). Adaptive flow control using slope seeking. In 2006 14th Mediterranean
+conference on control and automation (pp. 1–6). IEEE.
+Krener, A. J., & Krstić, M. (2000). Method and apparatus for predicting and
+stabilizing compressor stall. US Patent 6,098,010.
+Krstić, M., & Deng, H. (1998). Stabilization of nonlinear uncertain systems. New
+York, NY: Springer.
+Krstić, M., Kokotovic, P. V., & Kanellakopoulos, I. (1995). Nonlinear and adaptive
+control design. New York, NY: John Wiley & Sons, Inc..
+Krstić, M., & Wang, H. H. (2000). Stability of extremum seeking feedback for
+general nonlinear dynamic systems. Automatica, 36(4), 595–602.
+Kurzweil, J., & Jarník, J. (1988). Iterated Lie brackets in limit processes in ordinary
+differential equations. Results in Mathematics, 14, 125–137.
+Kvaternik, K., & Pavel, L. (2011). Interconnection conditions for the stability
+of nonlinear sampled-data extremum seeking schemes. In 2011 50th IEEE
+conference on decision and control and European control conference (pp.
+4448–4454). IEEE.
+Kvaternik, K., & Pavel, L. (2012a). Analysis of decentralized extremum seeking
+schemes: Technical report, Toronto: Systems Control Group, University of
+Toronto.
+Kvaternik, K., & Pavel, L. (2012b). An analytic framework for decentralized extremum seeking control. In 2012 American control conference (pp.
+3371–3376). IEEE.
+Labar, C., Ebenbauer, C., & Marconi, L. (2022). ISS-like properties in Lie-bracket
+approximations and application to extremum seeking. Automatica, 136,
+Article 110041.
+Labar, C., Garone, E., Kinnaert, M., & Ebenbauer, C. (2019a). Constrained extremum seeking: A modified-barrier function approach. IFAC-PapersOnLine,
+52(16), 694–699.
+Labar, C., Garone, E., Kinnaert, M., & Ebenbauer, C. (2019b). Newton-based
+extremum seeking: A second-order Lie bracket approximation approach.
+Automatica, 105, 356–367.
+Leblanc, M. (1922). Sur l’electri"cation des chemins de fer au moyen de courants
+alternatifs de frequence elevee. Revue Generale de l’Electricite, 12(8), 275–277.
+Lei, P., Li, Y., Chen, Q., & Seem, J. E. (2010). Extremum seeking control based
+integration of MPPT and degradation detection for photovoltaic arrays. In
+Proceedings of the 2010 American control conference (pp. 3536–3541). IEEE.
+Leyva, R., Alonso, C., Queinnec, I., Cid-Pastor, A., Lagrange, D., & MartinezSalamero, L. (2006). MPPT of photovoltaic systems using extremum-seeking
+control. IEEE Transactions on Aerospace and Electronic Systems, 42(1), 249–258.
+Leyva, R., Artillan, P., Cabal, C., Estibals, B., & Alonso, C. (2011). Dynamic
+performance of maximum power point tracking circuits using sinusoidal
+extremum seeking control for photovoltaic generation. International Journal
+of Electronics, 98(4), 529–542.
+Leyva, R., Olalla, C., Zazo, H., Cabal, C., Cid-Pastor, A., Queinnec, I., et al. (2011).
+MPPT based on sinusoidal extremum-seeking control in PV generation.
+International Journal of Photoenergy, 2012.
+Li, P., Li, Y., & Seem, J. E. (2009). Extremum seeking control for efficient
+and reliable operation of air-side economizers. In 2009 American control
+conference (pp. 20–25). IEEE.
+Li, X., Li, Y., Seem, J. E., & Lei, P. (2011). Maximum power point tracking for
+photovoltaic systems using adaptive extremum seeking control. In Dynamic
+systems and control conference: Vol. 54754, (pp. 803–810).
+Li, X., Li, Y., Seem, J. E., & Lei, P. (2015). Detection of internal resistance change
+for photovoltaic arrays using extremum-seeking control MPPT signals. IEEE
+Transactions on Control Systems Technology, 24(1), 325–333.
+37
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Scheinker, A. (2013b). Simultaneous stabilization and optimization of unknown,
+time-varying systems. In 2013 American control conference (pp. 2637–2642).
+IEEE.
+Scheinker, A. (2016). Application of extremum seeking for time-varying systems
+to resonance control of RF cavities. IEEE Transactions on Control Systems
+Technology, 25(4), 1521–1528.
+Scheinker, A. (2017). Bounded extremum seeking for angular velocity actuated
+control of nonholonomic unicycle. Optimal Control Applications & Methods,
+38(4), 575–585.
+Scheinker, A. (2021a). Adaptive machine learning for robust diagnostics and control of time-varying particle accelerator components and beams. Information,
+12(4), 161.
+Scheinker, A. (2021b). Adaptive machine learning for time-varying systems: Low
+dimensional latent space tuning. Journal of Instrumentation, 16(10), Article
+P10008.
+Scheinker, A., Bland, M., Krstić, M., & Audia, J. (2013). Extremum seeking-based
+optimization of high voltage converter modulator rise-time. IEEE Transactions
+on Control Systems Technology, 22(1), 34–43.
+Scheinker, A., Bohler, D., Tomin, S., Kammering, R., Zagorodnov, I., Schlarb, H.,
+et al. (2019). Model-independent tuning for maximizing free electron laser
+pulse energy. Physical Review Accelerators and Beams, 22(8), Article 082802.
+Scheinker, A., Cropp, F., & Filippetto, D. (2023). Adaptive autoencoder latent
+space tuning for more robust machine learning beyond the training set
+for six-dimensional phase space diagnostics of a time-varying ultrafast
+electron-diffraction compact accelerator. Physical Review E, 107(4), Article
+045302.
+Scheinker, A., Cropp, F., Paiagua, S., & Filippetto, D. (2021). An adaptive approach
+to machine learning for compact particle accelerators. Scientific Reports, 11(1),
+Article 19187.
+Scheinker, A., Edelen, A., Bohler, D., Emma, C., & Lutman, A. (2018). Demonstration of model-independent control of the longitudinal phase space
+of electron beams in the linac-coherent light source with femtosecond
+resolution. Physical Review Letters, 121(4), Article 044801.
+Scheinker, A., & Gessner, S. (2015). Adaptive method for electron bunch profile
+prediction. Physical Review Special Topics-Accelerators and Beams, 18(10),
+Article 102801.
+Scheinker, A., Hirlaender, S., M.Velotti, F., Gessner, S., Porta, G. Z. Della, Kain, V.,
+et al. (2020). Online multi-objective particle accelerator optimization of the
+AWAKE electron beam line for simultaneous emittance and orbit control. AIP
+Advances, 10(5).
+Scheinker, A., Huang, E.-C., & Taylor, C. (2021). Extremum seeking-based control
+system for particle accelerator beam loss minimization. IEEE Transactions on
+Control Systems Technology, 30(5), 2261–2268.
+Scheinker, A., Huang, X., & Wu, J. (2017). Minimization of betatron oscillations
+of electron beam injected into a time-varying lattice via extremum seeking.
+IEEE Transactions on Control Systems Technology, 26(1), 336–343.
+Scheinker, A., & Krstić, M. (2012a). Minimum-seeking for CLFs: Universal
+semiglobally stabilizing feedback under unknown control directions. IEEE
+Transactions on Automatic Control, 58(5), 1107–1122.
+Scheinker, A., & Krstić, M. (2012b). A universal extremum seeking-based stabilizer for unknown LTV systems with unknown control directions. In 2012
+American control conference (pp. 1129–1136). IEEE.
+Scheinker, A., & Krstić, M. (2014a). Extremum seeking with bounded update
+rates. Systems & Control Letters, 63, 25–31.
+Scheinker, A., & Krstić, M. (2014b). Non-C 2 Lie bracket averaging for nonsmooth
+extremum seekers. Journal of Dynamic Systems, Measurement, and Control,
+136(1), Article 011010.
+Scheinker, A., & Krstić, M. (2017). Model-free stabilization by extremum seeking.
+Cham, Switzerland: Springer.
+Scheinker, A., Pang, X., & Rybarcyk, L. (2013). Model-independent particle
+accelerator tuning. Physical Review Special Topics-Accelerators and Beams,
+16(10), Article 102803.
+Scheinker, A., & Pokharel, R. (2020). Adaptive 3D convolutional neural networkbased reconstruction method for 3D coherent diffraction imaging. Journal of
+Applied Physics, 128(18).
+Scheinker, A., & Scheinker, D. (2016). Bounded extremum seeking with
+discontinuous dithers. Automatica, 69, 250–257.
+Scheinker, A., & Scheinker, D. (2018). Constrained extremum seeking stabilization
+of systems not affine in control. International Journal of Robust and Nonlinear
+Control, 28(2), 568–581.
+Scheinker, A., & Scheinker, D. (2021). Extremum seeking for optimal control
+problems with unknown time-varying systems and unknown objective
+functions. International Journal of Adaptive Control and Signal Processing, 35(7),
+1143–1161.
+Seem, J. E. (2010). Adaptive real-time optimization control. US Patent 7,827,813.
+Sepulchre, R., Jankovic, M., & Kokotovic, P. V. (2012). Constructive nonlinear
+control. Berlin, Germany: Springer Science & Business Media.
+Shao, G., Teel, A. R., Tan, Y., Liu, K.-Z., & Wang, R. (2019). Extremum seeking
+control with input dead-zone. IEEE Transactions on Automatic Control, 65(7),
+3184–3190.
+
+Oliveira, T. R., Feiling, J., Koga, S., & Krstić, M. (2020). Multivariable extremum
+seeking for PDE dynamic systems. IEEE Transactions on Automatic Control,
+65(11), 4949–4956.
+Oliveira, T. R., & Krstić, M. (2021). Extremum seeking feedback with wave partial
+differential equation compensation. Journal of Dynamic Systems, Measurement,
+and Control, 143(4), Article 041002.
+Oliveira, T. R., Krstić, M., & Tsubakino, D. (2016). Extremum seeking for static
+maps with delays. IEEE Transactions on Automatic Control, 62(4), 1911–1926.
+Oliveira, T. R., Peixoto, A. J., & Hsu, L. (2012). Global real-time optimization by
+output-feedback extremum-seeking control with sliding modes. Journal of
+the Franklin Institute, 349(4), 1397–1415.
+Ostrovsky, Y. I. (1957). Extremum regulation. Avtomatika i Telemekhanika, 18,
+852–858.
+Ou, Y., Xu, C., Schuster, E., Luce, T. C., Ferron, J. R., Walker, M. L., et al. (2008).
+Design and simulation of extremum-seeking open-loop optimal control of
+current profile in the DIII-D tokamak. Plasma Physics and Controlled Fusion,
+50(11), Article 115001.
+Peterson, K. S., & Stefanopoulou, A. G. (2004). Extremum seeking control
+for soft landing of an electromechanical valve actuator. Automatica, 40(6),
+1063–1069.
+Popovic, D., Jankovic, M., Magner, S., & Teel, A. R. (2006). Extremum seeking
+methods for optimization of variable cam timing engine operation. IEEE
+Transactions on Control Systems Technology, 14(3), 398–407.
+Poveda, J. I., Benosman, M., & Teel, A. R. (2017). Distributed extremum seeking
+in multi-agent systems with arbitrary switching graphs. IFAC-PapersOnLine,
+50(1), 735–740.
+Poveda, J. I., Benosman, M., Teel, A. R., & Sanfelice, R. G. (2021). Robust
+coordinated hybrid source seeking with obstacle avoidance in multivehicle
+autonomous systems. IEEE Transactions on Automatic Control, 67(2), 706–721.
+Poveda, J. I., Benosman, M., & Vamvoudakis, K. G. (2021). Data-enabled extremum
+seeking: A cooperative concurrent learning-based approach. International
+Journal of Adaptive Control and Signal Processing, 35(7), 1256–1284.
+Poveda, J. I., & Krstić, M. (2020a). Fixed-time gradient-based extremum seeking.
+In 2020 American control conference (pp. 2838–2843). IEEE.
+Poveda, J. I., & Krstić, M. (2020b). Fixed-time Newton-like extremum seeking.
+IFAC-PapersOnLine, 53(2), 5356–5361.
+Poveda, J. I., & Krstić, M. (2021). Nonsmooth extremum seeking control
+with user-prescribed fixed-time convergence. IEEE Transactions on Automatic
+Control, 66(12), 6156–6163.
+Poveda, J. I., Krstić, M., & Başar, T. (2022). Fixed-time Nash equilibrium seeking
+in time-varying networks. IEEE Transactions on Automatic Control, 68(4),
+1954–1969.
+Poveda, J. I., Kutadinata, R., Manzie, C., Nešić, D., Teel, A. R., & Liao, C-K. (2018).
+Hybrid extremum seeking for black-box optimization in hybrid plants: An
+analytical framework. In 2018 IEEE conference on decision and control (pp.
+2235–2240). IEEE.
+Poveda, J. I., & Li, N. (2021). Robust hybrid zero-order optimization algorithms
+with acceleration via averaging in time. Automatica, 123, Article 109361.
+Poveda, J. I., & Quijano, N. (2013). Extremum seeking for multi-population games.
+In 52nd IEEE conference on decision and control (pp. 409–414). IEEE.
+Poveda, J. I., & Quijano, N. (2015). Shahshahani gradient-like extremum seeking.
+Automatica, 58, 51–59.
+Poveda, J. I., & Teel, A. R. (2017a). A framework for a class of hybrid extremum
+seeking controllers with dynamic inclusions. Automatica, 76, 113–126.
+Poveda, J. I., & Teel, A. R. (2017b). A robust event-triggered approach for fast
+sampled-data extremization and learning. IEEE Transactions on Automatic
+Control, 62(10), 4949–4964.
+Premaratne, U., Halgamuge, S., Tan, Y., & Mareels, I. M. Y. (2019). Extremum
+seeking control with sporadic packet transmission for networked control
+systems. IEEE Transactions on Control of Network Systems, 7(2), 758–769.
+Reisi, A. R., Moradi, M. H., & Jamasb, S. (2013). Classification and comparison
+of maximum power point tracking techniques for photovoltaic system: A
+review. Renewable and Sustainable Energy Reviews, 19, 433–443.
+Rotea, M. A. (2000). Analysis of multivariable extremum seeking algorithms.
+In Proceedings of the 2000 American control conference. ACC (IEEE Cat. No.
+00CH36334), volume 1 (pp. 433–437). IEEE.
+Rušiti, D., Evangelisti, G., Oliveira, T. R., Gerdts, M., & Krstić, M. (2018). Stochastic
+extremum seeking for dynamic maps with delays. IEEE Control Systems
+Letters, 3(1), 61–66.
+Rušiti, D., Oliveira, T. R., Krstić, M., & Gerdts, M. (2021). Newton-based extremum
+seeking of higher-derivative maps with time-varying delays. International
+Journal of Adaptive Control and Signal Processing, 35(7), 1202–1216.
+Ryan, J. J. (2018). Formation flight system extremum-seeking-control using
+blended performance parameters. US Patent 9,864,380.
+Salsbury, T. I., & House, J. M. (2019). Extremum-seeking control system for a
+chilled water plant. US Patent 10,352,576.
+Scheinker, A. (2012). Extremum seeking for stabilization. San Diego: University of
+California.
+Scheinker, A. (2013a). Model independent beam tuning. In Proceedings of the
+2013 international particle accelerator conference (pp. 12–17).
+38
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Williams, A., Krstić, M., & Scheinker, A. (2023). Semi-global practical extremum
+seeking with practical safety. arXiv preprint arXiv:2309.15401.
+Williams, A., Scheinker, A., Huang, E-C., Taylor, C., & Krstić, M. (2023). Experimental safe extremum seeking for accelerators. arXiv preprint arXiv:
+2308.15584.
+Yau, H.-T., & Wu, C.-H. (2011). Comparison of extremum-seeking control techniques for maximum power point tracking in photovoltaic systems. Energies,
+4(12), 2180–2195.
+Ye, M., & Hu, G. (2016). Distributed extremum seeking for constrained networked
+optimization and its application to energy consumption control in smart grid.
+IEEE Transactions on Control Systems Technology, 24(6), 2048–2058.
+Ye, M., Hu, G., & Xu, S. (2020). An extremum seeking-based approach for Nash
+equilibrium seeking in N-cluster noncooperative games. Automatica, 114,
+Article 108815.
+Yin, C., Chen, Y., & Zhong, S.-M. (2014). Fractional-order sliding mode based
+extremum seeking control of a class of nonlinear systems. Automatica, 50(12),
+3173–3181.
+Yu, H., Koga, S., Oliveira, T. R., & Krstić, M. (2021). Extremum seeking for
+traffic congestion control with a downstream bottleneck. Journal of Dynamic
+Systems, Measurement, and Control, 143(3), Article 031007.
+Zhang, C., Arnold, D., Ghods, N., Siranosian, A., & Krstić, M. (2007). Source
+seeking with non-holonomic unicycle without position measurement and
+with tuning of forward velocity. Systems & Control Letters, 56(3), 245–252.
+Zhang, X. T., Dawson, D. M., Dixon, W. E., & Xian, B. (2006). Extremum-seeking
+nonlinear controllers for a human exercise machine. IEEE/ASME Transactions
+on Mechatronics, 11(2), 233–240.
+Zhang, C., & Ordóñez, R. (2011). Extremum-seeking control and applications: A
+numerical optimization-based approach. Berlin, Germany: Springer Science &
+Business Media.
+Zhang, C., Siranosian, A., & Krstić, M. (2007). Extremum seeking for moderately unstable systems and for autonomous vehicle target tracking without
+position measurements. Automatica, 43(10), 1832–1839.
+Zhu, Y., & Fridman, E. (2022). Extremum seeking via a time-delay approach to
+averaging. Automatica, 135, Article 109965.
+
+Sontag, E. D. (1989). A ‘universal’construction of Artstein’s theorem on nonlinear
+stabilization. Systems & Control Letters, 13(2), 117–123.
+Stanković, M. S., Johansson, K. H., & Stipanović, D. M. (2010). Distributed seeking
+of Nash equilibria in mobile sensor networks. In 49th IEEE conference on
+decision and control (pp. 5598–5603). IEEE.
+Stanković, M. S., & Stipanović, D. M. (2010). Extremum seeking under stochastic
+noise and applications to mobile sensors. Automatica, 46(8), 1243–1251.
+Strizic, T., Poveda, J. I., & Teel, A. R. (2017). Hybrid gradient descent for robust
+global optimization on the circle. In 2017 IEEE 56th annual conference on
+decision and control (pp. 2985–2990). IEEE.
+Sui, Y., Gotovos, A., Burdick, J., & Krause, A. (2015). Safe exploration for
+optimization with Gaussian processes. In International conference on machine
+learning (pp. 997–1005). PMLR.
+Sussmann, H. J. (1992). New differential geometric methods in nonholonomic
+path finding. In Systems, models and feedback: theory and applications:
+Proceedings of a US-Italy workshop in honor of Professor Antonio Ruberti, Capri,
+15–17, June 1992.
+Sussmann, H. J., & Liu, W. (1991). Limits of highly oscillatory controls and
+the approximation of general paths by admissible trajectories. In [1991]
+Proceedings of the 30th IEEE conference on decision and control (pp. 437–442).
+IEEE.
+Suttner, R. (2019). Extremum seeking control with an adaptive dither signal.
+Automatica, 101, 214–222.
+Suttner, R. (2020). Extremum seeking control for a class of nonholonomic
+systems. SIAM Journal on Control and Optimization, 58(4), 2588–2615.
+Suttner, R., & Dashkovskiy, S. (2017). Exponential stability for extremum seeking
+control systems. IFAC-PapersOnLine, 50(1), 15464–15470.
+Suttner, R., & Sun, Z. (2018). Formation shape control based on distance
+measurements using Lie bracket approximations. SIAM Journal on Control and
+Optimization, 56(6), 4405–4433.
+Tan, Y., Moase, W. H., Manzie, C., Nešić, D., & Mareels, I. M. Y. (2010). Extremum
+seeking from 1922 to 2010. In Proceedings of the 29th Chinese control
+conference (pp. 14–26). IEEE.
+Tan, Y., Nešić, D., & Mareels, I. (2006). On non-local stability properties of
+extremum seeking control. Automatica, 42(6), 889–903.
+Tan, Y., Nešić, D., & Mareels, I. (2008). On the choice of dither in extremum
+seeking systems: A case study. Automatica, 44(5), 1446–1450.
+Tan, Y., Nešić, D., Mareels, I. M. Y., & Astolfi, A. (2009). On global extremum
+seeking in the presence of local extrema. Automatica, 45(1), 245–251.
+Teel, A. R., & Popovic, D. (2001). Solving smooth and nonsmooth multivariable
+extremum seeking problems by the methods of nonlinear programming. In
+Proceedings of the 2001 American control conference. (Cat. No. 01CH37148),
+volume 3 (pp. 2394–2399). IEEE.
+Tommasi, G. De, Dubbioso, S., Mele, A., & Pironti, A. (2021). Stabilizing elongated
+plasmas using extremum seeking: The ITER tokamak case study. In 2021 29th
+Mediterranean conference on control and automation (pp. 472–478). IEEE.
+Tsien, H. S. (1954). Engineering cybernetics. New York, NY: The Macmillan
+Company.
+Wang, L., Chen, S., & Ma, K. (2016). On stability and application of extremum
+seeking control without steady-state oscillation. Automatica, 68, 18–26.
+Wiederhold, O., King, R., Noack, B., Neuhaus, L., Neise, W., Enghardt, L., et al.
+(2009). Extensions of extremum-seeking control to improve the aerodynamic
+performance of axial turbomachines. In 39th AIAA fluid dynamics conference
+(p. 4175).
+Williams, A., Krstić, M., & Scheinker, A. (2022). Practically safe extremum seeking.
+In 2022 IEEE 61st conference on decision and control (pp. 1993–1998). IEEE.
+
+Alexander Scheinker received undergraduate degrees
+in Mathematics and Physics from Washington University in St. Louis in 2006 and a M.S. in Mathematics
+and a Ph.D. in control theory from the University of
+California, San Diego in 2008 and 2012, respectively. He
+has been a staff researcher at Los Alamos National Laboratory since 2011 where he is the Adaptive Machine
+Learning team leader in the Applied Electrodynamics
+group. His research focus is on applying advanced
+control theory and machine learning methods to electrodynamics and for the stabilization and optimization
+of noisy and analytically unknown complex time-varying systems. He has been
+developing ES algorithms, proving their stability properties, and applying them
+for non-invasive diagnostics and for the control of intense charged particle
+beams in large particle accelerator facilities. Recently he has been focused on
+combining ES with deep learning methods such as 3D convolutional neural
+networks, to develop AI tools that are robust for time-varying systems with
+distribution shift. Alexander has coauthored over 20 journal papers on extremum seeking theory and applications and the book Model-Free Stabilization
+by Extremum Seeking.
+
+39
+

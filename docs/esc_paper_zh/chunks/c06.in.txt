@@ -1,0 +1,617 @@
+=== CHUNK 06 — 本节图片映射（图号 -> 相对路径）===
+Fig.17 -> images/fig17_p16.png | Fig.18 -> images/fig18_p17.png | Fig.19 -> images/fig19_p17.png | Fig.20 -> images/fig20_p18.png | Fig.21 -> images/fig21_p18.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+8. Bounded ES and weak limit averaging
+In Scheinker (2013a) a new bounded form of ES was developed
+in which the feedback control output has analytically guaranteed
+bounds despite acting on analytically unknown, noisy, and timevarying functions. This bounded form of ES was developed for
+systems of the form
+
+(116)
+
+where ci > 0, hi > 0 are design parameters including gains
+and filter coefficients which remove DC offsets, the ri are utility
+functions, and ei are filtered versions of the ri after passing
+through a high-pass filter represented in state space as s/(s +
+hi ), and the potential function to be maximized, Q (x, y), satisfies
+∇xi ,yi Q (x, y) = ∇xi ,yi ri (x, y).
+The Lie bracket averaged system (112) of (116) is given by
+x̄˙ i =
+
+ẋ = f (x, t) + g(x, t)u,
+
+(118)
+
+where f (x, t) and g(x, t) are unknown, the system may be openloop unstable, and y is a noise-corrupted measurement of an
+analytically unknown function h(x, t). The ES feedback controller
+in this case is given by
+
+1(
+ci αi ∇x̄i ri (x̄, ȳ) cos(ϕi ) + ci αi ∇ȳi ri (x̄, ȳ) sin(ϕi )
+2
+)
+− ci2 ∇ȳi ri (x̄, ȳ) cos(ϕi )(ri (x̄, ȳ) − ēi hi ) ,
+
+1(
+ȳ˙ i =
+ci αi ∇ȳi ri (x̄, ȳ) cos(ϕi ) − ci αi ∇x̄i ri (x̄, ȳ) sin(ϕi )
+2
+)
++ ci2 ∇x̄i ri (x̄, ȳ) cos(ϕi )(ri (x̄, ȳ) − ēi hi ) ,
+ē˙ i = −ēi hi + ri ,
+
+y = h(x, t) + n(t),
+
+√
+u=
+
+αω cos(ωt + ky),
+
+(119)
+
+and the closed-loop average dynamics are
+x̄˙ = f (x̄, t) −
+
+kα
+
+g(x̄, t)g T (x̄, t)∇x̄ h(x̄, t).
+(120)
+2
+In the case of optimization, h(x, t) is an analytically unknown cost
+function which is minimized. In the case of stabilization, where
+h(x, t) may be chosen, by picking a Lyapunov-type function (such
+as h = xT x) stabilization is achieved. This simple bounded ES
+setup is shown in Fig. 17. Although there are no bounds assumed
+
+(117)
+
+which can be shown to converge to the maximum of Q by a
+Lyapunov analysis with V (x̄, ȳ) = Q (x∗ , y∗ ) − Q (x̄, ȳ). Simulation
+results showing the proximity of agent dynamics to their Lie
+bracket averages for ω = 100 are shown in Fig. 16.
+14
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+bi (x, t) = g(x, t)ki (ψ (x, t), t ) ,
+
+(130)
+
+where the functions defined as
+
+∫ t
+Hi,ω (t) =
+
+hi,ω (τ )dτ
+
+(131)
+
+t0
+
+satisfy the uniform limits and weak limits
+Fig. 17. Bounded ES as an optimizer or as a stabilizing feedback.
+
+lim Hi,ω (t) = 0,
+
+ω→∞
+
+x̄˙ = f (x̄, t) −
+
+(121)
+
+m
+∑
+
+λi,j (t)
+
+i̸ =j=1
+
+which makes the algorithm especially well suited for in-hardware
+applications for sensitive systems in which tight control is required over parameter settings while optimizing an analytically
+unknown and time-varying cost function. Recently a group of
+researchers confirmed that this exact bonded ES mechanism is
+utilized by sea urchin sperm when finding the egg (Abdelgalil,
+Aboelkassem, & Taha, 2022).
+In Scheinker and Scheinker (2016) the authors extended
+bounded ES to a much more general class systems for ES-based
+stabilization of vector-valued nonlinear time-varying systems
+which are not periodic and whose ES controllers are not periodic,
+not differentiable, and not even required to be continuous by
+utilizing the general weak limit averaging approach from the
+field of functional analysis (Conway, 1990). We start with a brief
+reminder and some definitions. Riemann–Lebesgue Lemma: If f ∈
+L1 (K ), then
+
+∫
+
+f (x)e−iωx dx = 0.
+
+lim
+
+ω→∞
+
+lim
+
+fk (τ )g(τ )dτ =
+
+0
+
+f (τ )g(τ )dτ ,
+
+Definition 2. Considering ϵ = ω1 and denoting a trajectory of
+(127), (128) with x(t0 ) = x0 as φ ϵ (t , t0 , x0 ), an equilibrium point
+of (127), (128) is said to be ϵ -SPUAS if it satisfies the following
+three conditions:
+
+• Uniform Stability: For every c2 ∈ (0, ∞) there exists c1 ∈ (0, ∞)
+and ϵ̂ ∈ (0, ∞) such that for all t0 ∈ R and for all x0 ∈ Rn with
+∥x0 ∥ < c1 and for all ϵ ∈ (0, ϵ̂ ),
+∥φ ϵ (t , t0 , x0 )∥ < c2 ∀t ∈ [t0 , ∞).
+
+∀g ∈ L [0, 1].
+
+0
+
+∥φ ϵ (t , t0 , x0 )∥ < c2 ∀t ∈ [t0 , ∞).
+
+For example, by application of the Riemann–Lebesgue Lemma,
+(123)
+
+sin (ω1 t ) sin (ω2 t ) ⇀ 0,
+
+(126)
+
+∥φ ϵ (t , t0 , x0 )∥ < c2 ∀t ∈ [t0 + T̄ , ∞).
+
+(125)
+
+y = ψ (x, t),
+
+n
+
+n
+
+(127)
+n
+
+n
+
+where x ∈ R , and the functions f : R × R → R , g : R × R →
+Rn×n , ψ : Rn × R → R are unknown.
+It is assumed that f and g are twice continuously differentiable
+with respect to x and assume that the value y of ψ (x, t) is
+available for measurement. The controller u is given by
+u(y, t) =
+
+m
+∑
+
+ki (y, t)hi,ω (t),
+
+ki : R × R → Rn ,
+
+(128)
+
+i=1
+
+where the functions ki (y, t) are continuously differentiable and
+the functions hi,ω (t) are piece-wise continuous. System (127),
+(128) has the following equivalent closed-loop form
+ẋ(t) = f (x, t) +
+
+m
+∑
+
+bi (x, t)hi,ω (t),
+
+(136)
+
+The weak limit-based ES approach has been studied for discontinuous dithers (Scheinker & Scheinker, 2016), bounded ES
+(Scheinker & Krstić, 2014a), inverted pendulum stabilization
+(Michalowsky & Ebenbauer, 2013), for systems not affine in
+control (Scheinker & Scheinker, 2018), and for generating optimal feedback controllers for unknown systems (Scheinker &
+Scheinker, 2021).
+As a simple example of the generality of the weak limit averaging approach, we consider a 2D setting in which we are seeking
+the minimum of an analytically unknown output function y =
+h(x, t) for the open-loop unstable system
+
+In Scheinker and Scheinker (2016) the authors consider a general
+class of vector-valued, time-varying, nonlinear systems
+ẋ = f (x, t) + g(x, t)u(y, t),
+
+(135)
+
+• Global Uniform Attractivity: For all c1 , c2 ∈ (0, ∞) there exists
+T̄ ∈ (0, ∞) and ϵ̂ ∈ (0, ∞) such that for all t0 ∈ R and for all
+x0 ∈ Rn with ∥x0 ∥ < c1 and for all ϵ ∈ (0, ϵ̂ ),
+
+(124)
+
+∀ ω1 ̸= ω2 .
+
+(134)
+
+• Uniform Boundedness: For every c1 ∈ (0, ∞) there exists c2 ∈
+(0, ∞) and ϵ̂ ∈ (0, ∞) such that for all t0 ∈ R and for all
+x0 ∈ Rn with ∥x0 ∥ < c1 and for all ϵ ∈ (0, ϵ̂ ),
+
+2
+
+cos (ωt ) sin (ωt ) ⇀ 0,
+1
+1
+cos2 (ωt ) ⇀ , sin2 (ωt ) ⇀ ,
+2
+2
+cos (ω1 t ) cos (ω2 t ) ⇀ 0, ∀ ω1 ̸ = ω2 ,
+
+(133)
+
+The statement of the theorem utilizes the following definitions
+of stability.
+
+A sequence of functions {fk } ⊂ L2 [0, 1] is said to converge weakly
+to f in L2 [0, 1], denoted fk ⇀ f , if
+
+k→∞
+
+x̄(0) = x(0).
+
+Theorem 4. For any compact set K ⊂ Rn , any t0 , T ∈ R≥0 ,
+and any δ > 0, there exists ω⋆ such that for each ω > ω⋆ , the
+trajectories of (129) and (133), satisfy ∥x(t) − x̄(t)∥ < δ for all
+t ∈ [t0 , t0 + T ]. Therefore, by Moreau and Aeyels (2000), uniform
+asymptotic stability of (133) over K implies that (129) is ω1 -SPUAS.
+
+(122)
+
+∫ 1
+
+∂ bi (x̄, t)
+bj (x̄, t),
+∂ x̄
+
+The stability result is given by the following theorem.
+
+K
+
+∫ 1
+
+(132)
+
+The dynamics (129) can be approximated arbitrarily accurately
+with weak limit average dynamics
+
+on the optimized function h(x, t), the control effort of bounded
+ES has analytically guaranteed bounds
+
+⏐√
+⏐ √
+|u| = ⏐ αω cos(ωt + ky)⏐ ≤ αω,
+
+hi,ω (t)Hj,ω (t) ⇀ λi,j (t).
+
+ẋ1 = x1 + 0.75x2 + u1
+
+(137)
+
+ẋ2 = 0.5x1 + 2x2 + u2 ,
+
+(138)
+
+whose open-loop eigenvalues are λ = {2.29, 0.71} > 0. Instead
+of utilizing two distinct frequencies, we can utilize sin() and cos()
+functions with a single frequency, or phase-shifted square waves,
+or triangle waves, or square waves with dead time, as these all
+satisfy the above requirements of being orthogonal in L2 [0, T ].
+If the dithering amplitudes are chosen so that all of the signals
+
+(129)
+
+i=1
+
+15
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 19. Bounded ES for 2D unicycle control setup.
+
+which is the dot product of the vehicle’s velocity with the gradient of the unknown function J. Therefore, when the vehicle
+is heading towards the minimum, along a negative gradient of
+J the rotation slows down and the vehicle spends more time
+approaching the minimum. If instead the vehicle is moving away
+from the minimum, the gradient is positive, and the rotation
+speeds up, and the vehicle spends less time moving away. This
+sort of behavior is clearly seen in Fig. 18. In Ghadiri-Modarres,
+Mojiri, and Zangeneh (2016a), this scheme was modified in order to adjust the forward velocity, while rotating the vehicle
+at a constant angular velocity. In Grushkovskaya and Ebenbauer
+(2016), this bounded ES controller was applied for multi-agent
+coordination with Lagrangian measurements.
+This simple 2D vehicle control ES setup has since been extended for 3D vehicle control in several papers. In GhadiriModarres, Mojiri, and Zangeneh (2016b) the authors considered
+a 3D unicycle and proposed the following generalization of the
+2D controller described above
+
+Fig. 18. A family of various dithering signals with identical weak limit average
+dynamics is shown.
+Source: Figure adapted from Scheinker and Scheinker (2016).
+
+have equal average power, then the average dynamics for all
+of the dithering types are identical, as shown in Fig. 18. This
+is a useful result because some analog systems can more easily
+implement continuous signals such as trigonometric functions or
+triangle waves, while digital systems are usually switching in a
+discontinuous way with dead time in between.
+To get an intuitive understanding for the simple control law
+(119), we consider a system without outside influence, where
+we only worry about control according to ẋ1 = u1 , ẋ2 = u2 , as
+is typically considered for ES applied for optimization of some
+unknown function y = J(x, t). In this case if we apply sin() and
+cos() controllers, the system dynamics are
+
+√
+αω cos(ωt + kJ) = v cos(θ ),
+√
+ẋ2 = αω sin(ωt + kJ) = v sin(θ ),
+
+ẋ1 =
+
+ẋ3 = V0 sin(φ ),
+
+(144)
+
+φ̇ = ωφ − khη,
+
+(145)
+
+θ̇ = ωθ − khη,
+[
+]
+s
+η=
+J(x1 , x2 , x3 , t),
+s+h
+
+(146)
+
+ẋ =
+
+(140)
+
+(147)
+
+ωf1 (x, t ,
+
+√
+
+ωt , ωt) + f2 (x, t ,
+
+√
+
+ωt , ωt),
+
+(148)
+
+of which a 3D unicycle is a special case with dynamics
+
+√
+√
+ẋ2 = (R 2ωe1 )2 ,
+√
+ẋ3 = (R 2ωe1 )3 ,
+Ṙ = RΩ , Ω = ϕ e1 + θ e3 ,
+µż = J(x) − z ,
+θ = ω − ż ,
+√
+ϕ = 2α 2ω sin(ωt − z + π/4),
+ẋ1 = (R 2ωe1 )1 ,
+
+dJ
+
+= ω + kv [cos(θ ), sin(θ )] · ∇x J ,
+
+
+
+
+(143)
+
+√
+
+(139)
+
+∂J
+∂J
+=ω+k
+ẋ1 + k
+ẋ2
+dt
+dt
+∂ x1
+∂ x2
+[
+]
+√
+∂J
+∂J
+= ω + k αω cos(θ )
++ sin(θ )
+∂ x1
+∂ x2
+= ω+k
+
+(142)
+
+ẋ2 = V0 cos(φ ) sin(θ ),
+
+where φ and θ are the pitch and yaw angles of the vehicle,
+respectively. The setup and a simulation result are shown in
+Fig. 20.
+In Abdelgalil and Taha (2022) the authors considered a 3D
+unicycle and proposed another generalization of the 2D controller described above in which they utilized differential geometry techniques and recursive second order averaging for an ES
+setup with two time scales for a general class of systems of the
+form
+
+which is simply a unicycle
+in a 2D environment traveling at
+√
+constant velocity v =
+αω with ES being used to control the
+heading angle θ (t) = ωt + kJ, as shown in Fig. 19.
+An intuition behind the convergence comes from considering
+the rate of change of this heading angle θ (t) which is given by
+dθ
+
+ẋ1 = V0 cos(φ ) cos(θ ),
+
+(149)
+(150)
+(151)
+(152)
+(153)
+(154)
+(155)
+
+where ei are the standard unit basis vectors, ϕ and θ are the roll
+and yaw angles of the rigid body, R ∈ SO(3) is a rotation matrix,
+
+(141)
+
+angular v elocity modulation
+
+16
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+general class of ES controllers of the form
+ur = α
+
+√
+
+ω cos(ωt)|x|r −
+
+k
+
+√
+
+1−r
+
+ω sin(ωt)|x|2−r ,
+
+(156)
+
+for x ∈ Rn . The analysis of these non-differentiable controllers
+required the extension of Lie bracket averaging and practical
+stability results to functions not differentiable over entire sets.
+The main advantage of these non-C 2 controllers is that for
+r ̸ = 0, 2 the entire high frequency oscillating control feedback
+disappears as equilibrium is reached. The average dynamics of a
+system of the form
+ẋ = f (x, t) + g(x, t)u,
+
+(157)
+
+with u as in (156) are given by
+x̄˙ = f (x̄, t) − kα g(x̄, t)g(x̄, t)T x̄,
+
+(158)
+
+which, remarkably, are independent of the choice of r.
+The studies in Scheinker (2013a) and Scheinker and Krstić
+(2014a, 2014b) led to a search for a larger class of generating
+vector fields for stabilizing ES controllers. Another form of dithering functions was introduced in Suttner and Dashkovskiy (2017)
+with guaranteed exponential stability for systems whose output
+functions have known minimum values. In Grushkovskaya, Zuyev,
+and Ebenbauer (2018a) for systems of the form
+
+√
+
+√
+
+ẋ = F1 (J(x)) ωu1 (ωt) + F2 (J(x)) ωu2 (ωt),
+
+(159)
+
+it was shown that the results of Suttner and Dashkovskiy (2017)
+and Scheinker and Krstić (2014b) could be described by a general
+family of ES controllers defined as
+
+∫
+F2 (x) = −F1 (x)
+
+F0 (x)
+F12 (x)
+
+dx,
+
+(160)
+
+for which the Lie bracket average dynamics of (159) are given by
+x̄˙ = −β2,1 ∇ J(x̄)F0 (J(x̄)),
+
+Fig. 20. Bounded ES for 3D unicycle control setup and simulation example.
+Source: Figures adapted from Ghadiri-Modarres et al. (2016a).
+
+where the constant β2,1 is defined according to the T -periodic
+dither signals u1 , u2 as
+
+β2,1 =
+
+∫ T∫ σ
+0
+
+u1 (σ )u2 (θ )dθ dσ .
+
+(162)
+
+0
+
+This general family of ES controllers can be used to generate
+feedback with nice properties such as minimal overshoot and
+with vanishing control efforts that allow the system to settle at
+equilibrium, as shown in Fig. 22.
+While the standard ES methods rely on the existence of some
+small enough ω∗ such that the averaging and singular perturbation results hold for all ω ∈ (0, ω∗ ), the Lie bracket averaging
+approach relies on the existence of a large enough ω∗ such that
+for all ω > ω∗ the averaging results hold, with the actual required
+value of ω∗ depending on the specific system being considered.
+In Suttner (2019) a form of ES was introduced in which the dither
+signal’s frequency continuously increases thereby guaranteeing
+a large enough ω relative to any system dynamics. The authors
+considered systems of the form
+
+Fig. 21. Bounded ES for 3D unicycle control simulation example.
+Source: Figure adapted from Abdelgalil and Taha (2022).
+
+√
+
+(161)
+
+√
+
+m
+
+and (R 2ωe1 )i denotes the i component of the vector R 2ωe1 . A
+simulation result for static source localization as well as trajectory
+tracking is shown in Fig. 21.
+
+ẋ = g0 (t , x) +
+
+∑
+
+uk gk (t , x),
+
+y = ψ (x),
+
+(163)
+
+k=1
+
+and utilize controllers
+
+√
+

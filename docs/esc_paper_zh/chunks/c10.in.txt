@@ -1,0 +1,244 @@
+=== CHUNK 10 — 本节图片映射（图号 -> 相对路径）===
+（本节无插图，含 Table 1，请译为 Markdown 表格）
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+16. Adaptive latent space tuning: ES for enabling machine
+learning for time-varying systems
+
+J yn (t), ŷn (t), t =
+
+(
+
+)
+
+⏐
+1 ∑∑⏐
+⏐yn (i, j, t) − ŷn (i, j, t)⏐ ,
+2
+Ny
+i
+
+Machine learning (ML) techniques, especially deep convolutional neural networks, have been growing in popularity in all
+areas of science and engineering. However, one major challenge
+faced by standard ML methods is that of time varying systems,
+known in the ML community as systems with distribution shift.
+If a system or its initial conditions change over time, then the data
+that was previously collected to train an ML model such as a deep
+convolutional neural network no longer exactly represents the
+dynamic system that is supposed to be modeled. The typical solution to this phenomenon is brute force re-training, in which once
+a big enough error is noticed an entire new set of data is collected
+to update the network weights. This solution is problematic for
+most complex systems of interest for which repeatedly gathering
+new data and network re-training is time consuming and requires
+measurements which interrupt regular system operation.
+For example, at large particle accelerator facilities detailed
+beam profile measurements use destructive processes such as
+inserting screens which intercept the charged particle beams
+and interrupt all downstream operations. Such measurements
+are typically performed only during rare dedicated experimental
+times. For such systems repeated re-training is not an option.
+Recently, a control theory-based dynamic solution was introduced to the problem of initial condition distribution shift
+(Scheinker, 2021b). The authors consider a problem in which generative encoder–decoder convolutional neural networks (CNN)
+
+(272)
+
+j
+
+The idea is to use the incredible ability of encoder–decoder CNNs
+to compress images down to a very low dimensional latent space,
+in this example, the middle of the encoder–decoder network
+pinches down to a 2D latent representation xL (t) ∈ R2 from
+which the outputs Ŷ (t) are then generated. ES is utilized to adaptively move in this low-dimensional latent space in real time to
+minimize (272) for unknown and time-varying inputs {X (t), x(t)}
+according to the bounded stabilizing ES feedback
+Ŷ (t) = FCNN (xL (t)) ,
+
+(
+(
+))
+√
+ẋL,i (t) = αωi cos ωi t + kJ yn (t), ŷn (t), t ,
+
+(273)
+(274)
+
+as shown in Fig. 39.
+Recently, a study of this adaptive latent space tuning approach
+demonstrated that incorporating ES-based feedback within the
+autoencoder architecture greatly improves the robustness of neural network-based predictions far beyond the span of the training
+data (Scheinker, Cropp, & Filippetto, 2023).
+This method was also extended to develop a robust framework combining machine learning, an online physics model, and
+adaptive tuning via ES in order to accurately predict and track 2D
+phase space distributions of charged particle beams despite timevarying initial beam conditions as well as time-varying particle
+accelerator components (Scheinker, Cropp, Paiagua, & Filippetto,
+2021). ES has also been studied for enabling more general ML
+27
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Table 1
+Comparison of the various ES methods shown in Fig. 40 relative to the assumptions made about the systems to which they are applied. In each column, the most
+general/capable ES approaches are highlighted in bold.
+Comparison of ES methods and required system assumptions
+ES method
+
+Open loop stability
+assumed
+
+Hybrid systems
+allowed
+
+Time-varying
+systems allowed
+
+Periodic time
+variation assumed
+
+Classical ES (Krstić & Wang, 2000)
+ES for games (Stanković et al., 2010)
+Stochastic ES (Liu & Krstić, 2012)
+Newton ES (Nesić et al., 2010)
+Newton ES delays (Oliveira et al., 2016)
+Newton ES PDEs (Oliveira et al., 2020)
+Finite time Newton ES (Poveda & Krstić, 2021)
+Safe ES (Williams et al., 2022)
+Hybrid ES (Poveda et al., 2018)
+Stabilizing ES (Scheinker & Krstić, 2012a)
+Bounded ES (Scheinker, 2013a)
+PI ES (Guay & Dochain, 2017)
+Adaptive latent space ES (Scheinker, 2021b)
+
+YES
+YES
+YES
+YES
+YES
+YES
+YES
+NO
+YES
+NO
+NO
+NO
+NO
+
+NO
+NO
+NO
+NO
+NO
+NO
+NO
+NO
+YES
+NO
+NO
+NO
+NO
+
+NO
+NO
+NO
+NO
+NO
+NO
+NO
+YES
+NO
+YES
+YES
+YES
+YES
+
+NA
+NA
+NA
+NA
+NA
+NA
+NA
+YES
+NA
+NO
+NO
+YES
+NO
+
+for time-varying problems (Scheinker, 2021a), and has been applied for 3D coherent diffraction imaging problems (Scheinker &
+Pokharel, 2020).
+
+rather than relying on a specific controller which constrains the
+ES to modify a parameter within the control function
+
+17. ES methods summary
+
+One possible advantage of utilizing an ES-based feedback as a
+controller directly is the added flexibility of finding and tracking unknown optimal points which may exist for analytically
+unknown systems.
+For example, if we consider the typical ES setup there is
+usually a pre-existing controller α (x, θ, t) which guarantees the
+existence of a smooth output steady state manifold l such that
+the system equilibrium f (x, α (x, θ )) = 0 is achieved at x =
+l(θ ) and the ES dynamics evolve along this manifold as they
+find the optimal value of some J(x). For a large and complex
+system with unknowns, which is the type of system for which
+ES is most useful, it is possible that some other controller may
+achieve a more optimal setting than what is constrained to l(θ )
+by having the freedom to explore the space more completely.
+Such an example is illustrated in Fig. 41 in which the classic
+ES scheme quickly converges to and evolves along l(θ ) to the
+global maximum relative to the l(θ ) manifold as enforced by a
+pre-existing controller α (x, θ ). For this same system when using
+the approach where ES is the direct feedback itself, from the same
+starting conditions it is able to find the global maximum that is
+outside of the l(θ ) constraints.
+
+ẋ = f (x, u, t),
+
+A large family of various ES-based controllers and optimization
+methods has been presented for dynamic systems. In Fig. 40 an
+incomplete summary of various ES methods is presented showing
+the signal pathways and setups for the various ES versions with
+the various methods broadly categorized in two families: (1).
+Classical ES approaches and their modifications for the optimization of an analytically unknown output function of an a priori
+stabilized dynamic system by tuning a control parameter. (2).
+ES-based feedback stabilization and optimization approaches in
+which the dynamic system is not assumed to be controlled and
+ES plays the dual role of optimizing an analytically unknown
+output function and of forcing the optimal point to be a stable
+equilibrium of the dynamic system (see Table 1).
+Starting at the top of the left column of Fig. 40, we have the
+classical ES algorithm for which the first analytic proofs were
+presented in Krstić and Wang (2000). As we continue down the
+left column we see the various modifications and additions that
+have been made to the ES method over the years including a
+stochastic version, a multi-agent version for games, a Newtonbased ES setup, the extension of the Newton approach to systems
+with delays and systems governed by a class of PDEs, finite-time
+Newton ES, a hybrid ES scheme for systems whose dynamics are
+a combination of continuous movement and discrete jumps, and
+safe ES in which analytically unknown boundary constraints must
+be satisfied by the ES dynamics while minimizing an analytically
+unknown output function.
+Starting at the top of the right column of Fig. 40, we have the
+ES-based feedback control algorithm first proposed in Scheinker
+(2012). As we continue down the right column we see various
+modifications of the ES-based feedback approach including the
+bounded form of ES, the PI-based ES feedback, and ES coupled
+with convolutional neural networks for adaptive latent space
+tuning.
+Both of the ES approaches have proven to be useful for an
+extremely large number of applications, as described below, and
+for an extremely large family of dynamic systems, as described
+above. Each family of ES approaches also has its own benefits. The
+family of classical ES-based optimizers is older, larger, and has
+many more variants. On the other hand the smaller family of ESbased feedbacks has its own advantage in the increased flexibility
+of allowing the ES to act directly as the feedback controller
+ẋ = f (x, u, t),
+
+u = uES (x, t),
+
+u = α (x, θES , t).
+
+(276)
+

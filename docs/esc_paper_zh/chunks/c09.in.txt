@@ -1,0 +1,584 @@
+=== CHUNK 09 — 本节图片映射（图号 -> 相对路径）===
+Fig.33 -> images/fig33_p25.png | Fig.34 -> images/fig34_p25.png | Fig.35 -> images/fig35_p26.png | Fig.36 -> images/fig36_p27.png | Fig.37 -> images/fig37_p27.png | Fig.38 -> images/fig38_p28.png | Fig.39 -> images/fig39_p28.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+15. Safe ES
+Constrained optimization in unknown environments is often
+performed through the use of Gaussian Processes (GPs), where
+a measure of safety can be considered statistically. Safe optimization of quadrotor controllers is described in Berkenkamp,
+Schoellig, and Krause (2016), and a general method for doing safe
+optimization via GPs is given by Sui, Gotovos, Burdick, and Krause
+(2015).
+Several approaches have been developed for using ES to solve
+constrained optimization problems, such as in Guay et al. (2015).
+Their modified ES design also involves estimating the gradient of
+the unknown functions, and they perform their analysis without
+using classical averaging and singular perturbation theory. In Liao,
+Manzie, Chapman, and Alpcan (2019) ES is blended with ‘‘boundary tracing’’. The formalization here is based on concepts taken
+from nonlinear programming techniques. ES based algorithms
+are presented in Poveda and Quijano (2015), which can handle
+both equality and inequality constraints, inspired by evolutionary
+game theory. A robust coordinated hybrid source seeking approach with obstacle avoidance has also been developed (Poveda,
+Benosman, Teel, & Sanfelice, 2021).
+A very simple approach to constrained ES was developed
+for systems of angular velocity-actuated unicycles in Scheinker
+(2017) in which autonomous agents are attempting to minimize
+an analytically unknown cost function J based only on its noisecorrupted measurement Ĵ = J + n = J0 + Jc + n where J0 is
+an unknown source function which the agents are attempting
+to minimize and Jc is an analytically unknown collision avoidance function based on the proximity to neighboring agents. For
+example each agent might generate such a function within its
+neighborhood based on a Gaussian with maximum centered at
+the agent’s location. Physically such a signal could be a temperature level or electric field strength which naturally decays with
+distance from the source. To consider a group of N agents, we
+define their coordinates as x = (x1 , . . . , xN ) where xi = (xi1 , xi2 )
+are the 2D coordinates of each agent i. In this case the dynamics
+are given by
+
+Fig. 33. Finite time Newton ES setup.
+Source: Figure adapted from Poveda
+and Krstić (2021).
+
+Fig. 34. Finite time Newton ES simulation example.
+Source: Figure adapted from Poveda and Krstić
+(2021).
+
+The Newton-like fixed-time ES controller is then defined as (in
+what follows ẋ = dx/dτ where τ = ϵ0 t)
+
+˙û = −kFu (û, ξ )
+)
+1 (
+ξ˙1 = −
+ξ1 FH (y, ũ)ξ1 − ξ1
+ϵ2
+ξ˙2 = −
+
+(245)
+
+√
+αω cos(θ ), ẋi2 = αi ωi sin(θi ),
+(
+)
+θ̇i = ωi + ki ωi2 Ĵi (xi , t) − ηi ,
+(
+)
+η̇i = −ωi2 ηi − Ĵi (x, t) ,
+
+(246)
+
+Ĵi = Ji,0 (x, t) +
+
+ẋi1 =
+
+(244)
+
+1
+
+(ξ2 − FG (y, µ̃))
+ϵ2
+2π
+µ̇ = − Rθ µ̃
+ϵ1
+
+  
+
+minimization
+
+1
+
+f (x, û + aµ̃)
+ϵ0
+û = u − aDµ,
+ẋ =
+
+√
+
+(243)
+
+(248)
+
+where D ∈ R
+is the matrix that maps a vector x = [x1 ,
+x2 , . . . , x2n ]T ∈ R2n to a vector x̃ = [x1 , x3 , . . . , x2n−1 ]T that has
+only the odd components of x, and the learning dynamics are
+defined as
+Fu (û, ξ ) = ξ1
+
+ξ2
+ξ2
++
+|ξ2 |α1
+|ξ2 |α2
+
+)
+
+,
+
+  
+
++ ni (t) .
+
+
+(251)
+(252)
+(253)
+
+noise
+
+which is summarized for a single 2D system, for simplicity, in
+Fig. 35.
+For example, given a two agent system, the goal might be for
+each agent to minimize its own analytically unknown cost function while avoiding collision with the other agent, with functions
+Ĵi given by
+
+(247)
+
+n×2n
+
+(
+
+Ji,c (x, t)
+collision avoidance
+
+(250)
+
+Ĵ1 = (x11 − 1)2 + x212
+
+
+(249)
+
+
+
+minimization
+
++ kp e
+
+
+with Fu = 0 whenever ξ2 = 0 and the parameters (α1 , α2 ) are
+selected to guarantee continuity of Fu . For rules determining the
+settings of all of the constants involved one should refer to the
+paper. A simulation result for finite time Newton ES is shown in
+Fig. 34.
+The finite time Newton ES setup is shown in Fig. 33. Several
+other finite time ES optimization methods have now been developed including finite-time ES for unknown maps (Guay & Benosman, 2021), fixed-time Newton-like ES (Poveda & Krstić, 2020b),
+and fixed-time gradient-based ES (Poveda & Krstić, 2020a).
+
+
+
+(
+)
+−ka (x11 −x21)2 +(x12 −x22 )2
+
+
+
+collision avoidance
+
+
+
++ n1 (t),
+
+noise
+
+Ĵ2 = (x21 + 1)2 + x222
+
+
+
+
+
+minimization
+
+
+
+(
+
++ kp e
+
+
+−ka (x11 −x21)2 +(x12 −x22 )2
+
+)
+
+
+
+
+
+collision avoidance
+
++ n2 (t),
+
+noise
+
+The simulation of such a system with (kp > 0) and without
+(kp = 0) collision avoidance activated is shown in Fig. 35A, B.
+24
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+this case the controlled agent’s dynamics are open-loop unstable,
+given by
+ẋ1 =
+ẋ2 =
+
+x21 (t)
+4
+x22 (t)
+
++
+
+√
+αω cos(ωt),
+
+(254)
+
++
+
+√
+αω sin(ωt),
+
+(255)
+
+4
+and the avoidance/minimization function is given as
+Ĵ(x, t) = k0 |x(t) − r1 (t)|2 + k1 e−σ |x(t)−r1 (t)|
+
+
+
+
+
+minimization
+
+
+
+
+
+
+
+2
+
+
+
+collision avoidance
+
+2
+
++ k2 e−σ |x(t)−r2 (t)| + n(t) .
+
+ 
+
+collision avoidance
+
+(256)
+
+noise
+
+A demonstration of such safe tracking is shown in Fig. 35C, D
+where the controlled agent (x1 (t), x2 (t)) is seen to temporarily
+move away from the tracked agent r1 (t) when the third agent
+r2 (t) spirals in close to r1 (t), with close tracking resuming after
+r2 (t) has moved far away again. A plot of the distances between
+the agents shows that collisions were avoided at all times.
+Another constrained ES approach is presented in Labar, Garone,
+Kinnaert, and Ebenbauer (2019a), which is described using the
+Lie bracket formalism. They approximate the solution of the constrained optimization problem by using so called ‘‘saddle point
+dynamics’’ which introduce an additional Lagrange-multiplier
+state. The authors consider the following constrained optimization problem
+min h(x)
+x∈Rn
+
+s.t.
+
+g(x) ≤ 0,
+
+(257)
+
+where h(x) is strictly convex and C 2 and the constraint g(x) is
+convex and also C 2 . The goal is to steer x(t) towards the solution
+of (257) while ensuring
+g(x(t)) ≤ β −1 ,
+
+∀t ≥ t0 ,
+
+(258)
+
+where β ∈ R>0 is a user-defined value. Towards this goal the
+authors consider the set Ω = {x ∈ Rn : −β g(x) + 1 > 0}, for
+which they utilize a modified barrier function L(x, λ) : Ω ×R>0 →
+R defined as
+L(x, λ) = h(x) − λβ −1 log (−β g(x) + 1) .
+
+(259)
+
+Intuitively, L(x, λ) tends to infinity as g(x) approaches β . L(x, λ)
+can also be seen as the Lagrangian of the constrained optimization
+problem
+−1
+
+min h(x)
+x∈Rn
+
+Fig. 35. Example of collision avoidance. The agents are seen to collide with
+collision avoidance off (A) and automatically change their trajectories to safely
+pass when it is on (B). The blue agent (x1 (t), x2 (t)) can be seen closely tracking
+r1 (t) without collision, and automatically moving away in order to avoid collision
+with a third agent r2 (t) when it moves in close to r1 (t) (C). Non-zero distances
+are retained between the controlled and the two other agents at all times (D).
+(For interpretation of the references to color in this figure legend, the reader is
+referred to the web version of this article.)
+Source: Adapted from Scheinker (2017).
+
+s.t. β −1 log(−β g(x) + 1) ≥ 0,
+
+(260)
+
+which is equivalent to (257). The solution of (260) can be
+achieved by the following dynamics, as proposed in Dürr, Zeng,
+and Ebenbauer (2013),
+ẋ = −ρx ∇x L(x, λ),
+λ̇ = ρλ λ∇λ L(x, λ) = −ρλ λβ −1 log(−β g(x) + 1),
+
+(261)
+(262)
+
+where ρx > 0 and ρλ > 0, with the following result.
+Theorem 6. Let Ω = {x ∈ Rn : −β g(x) + 1 > 0}. Let SL ⊂ Ω × R≥0
+be the set of all saddle points for L(x, λ). Assume that SL is non-empty
+and compact. Then SL is regionally uniformly asymptotically stable
+in Ω × R>0 for system (261), (262).
+
+With avoidance on, the trajectories avoid each other as they make
+their way to their respective minimizing values.
+A more complex example is given by considering a 3 agent system in which the controlled agent x(t) = (x1 (t), x2 (t)) must track
+a second agent r1 (t) = (cos(t), sin(t)) with unknown position,
+whose tracking is based only on a measure of some distancerelated function while avoiding collision with the tracked agent
+as well as avoiding collision with a third unknown agent r2 (t)
+for which a distance-related measurement is available as well. In
+
+Next, taking into account that the set of admissible values is
+a priori unknown to a user and log(−β g(x) + 1) is not defined
+for g(x) ≥ β −1 , the authors consider a modified version of the
+minimization dynamics (261), (262), considering instead
+
+(
+ẋ = −ρx
+25
+
+−β g(x) + 1
+1 + (−β g(x) + 1)
+
+)2
+
+∇x L(x, λ),
+
+(263)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 37. Safe ES setup for the method developed in Williams et al. (2022).
+
+λ̇ = −µρλ λ
+
+(
+
+−β g(x) + 1
+1 + (−β g(x) + 1)
+
+)2
+
+log(−βγ (χ ) + 1)
+
+β
+
+,
+
+where i ∈ {1, 2, . . . , n}, ω √> 0 and ki ∈ Q>0 with ki ̸ = kj
+for i ̸ = j, where the term 2ρx ωki cos (µki ωt + L(x, λ)) in the
+2ρ
+ẋi dynamics is in the form (119) with ωi = µki ω and α = µx .
+The Lie bracket averaged system associated with the bounded ES
+dynamics above is then shown to be system (263), (264). The
+authors demonstrate their approach with an example in which
+the following constrained optimization problem is solved
+min h(x) = (x1 − 4)2 + x22 + 96,
+x∈R2
+
+s.t. g(x) = x21 + x22 − 4 ≤ 0,
+
+and the results of using β = 0.5 and β = 2.0 are compared for
+guaranteeing g(x(t)) ≤ β −1 . The simulation results are shown in
+Fig. 36.
+Another safe ES approach for systems with analytically unknown safety constraints was recently proposed in Williams,
+Krstić, and Scheinker (2022). The authors consider a minimization
+problem in which one has direct control over a variable θ (t) with
+the goal of minimizing an analytically unknown cost function J(θ )
+while respecting an unknown safety constraint boundary defined
+by the level set of an unknown barrier function h(θ ) = 0.
+The overall dynamic optimization problem is then defined as
+
+Fig. 36. ES trajectories for constrained optimization.
+Source: Figure adapted from Labar et al. (2019a).
+
+(
+
+−β g(x) + 1
+λ̇ = ρλ λ
+1 + (−β g(x) + 1)
+
+)2
+
+∇λ L(x, λ),
+
+θ̇ = u,
+(264)
+
+y = J(θ ),
+
+(266)
+
+and the safe ES algorithm is defined as
+
+with ρx > 0 and ρλ > 0. Intuitively, considering the new
+dynamics (263), (264), no matter what the value of the estimated
+∇x L(x, λ) is, if g(x0 ) < β −1 , then g(x(t)) < β −1 , ∀t ≥ t0 . This
+approach ensures that the log(−β g(x) + 1) term in ∇λ L(x, λ) =
+−β −1 log(−β g(x) + 1) is always well defined. These results are
+summarized as
+
+θ̇ = −kGJ + Γ maxδ {kGTJ Gh − c ηh }Gh + S(t),
+ĠJ = −ωl GJ + ωl (J(θ ) − ηJ )M(t),
+
+η̇J = −ωh ηJ + ωh J(θ ),
+Ġh = −ωl Gh + ωl (h(θ ) − ηh )M(t),
+
+η̇h = −ωh ηh + ωh h(θ ),
+
+Theorem 7. Let Ω = {x ∈ R : −β g(x) + 1 > 0}. Let SL ⊂ Ω × R≥0
+be the set of all saddle points for L(x, λ). Assume that SL is non-empty
+and compact. Then SL is regionally uniformly asymptotically stable
+in Ω × R>0 for system (263), (264).
+n
+
+Γ̇ = ωl Γ (1 − Γ ∥Gh ∥2 ),
+
+(267)
+
+where the perturbation signal S and demodulation signal M are
+given by
+S(t) = [aωi cos(ωi t), . . . , aωi cos(ωn t)]T ,
+
+Finally, the authors generalize this approach for a system
+with an analytically unknown optimization function h(x) and
+analytically unknown barrier function g(x), relying only on their
+online measurements. For these unknown functions the gradient
+∇x L(x, λ) is also unknown and so a bounded ES-based version
+is developed using the bounded ES approach as in (119), as
+developed in Scheinker (2013a) and Scheinker and Krstić (2014a).
+This bounded ES version of (263), (264) is utilized so that the gradient can be estimated online in real-time. The bounded ES-based
+dynamics are
+ẋi =
+
+(265)
+
+[
+M(t) =
+
+2
+a
+
+sin(ωi t), . . . ,
+
+2
+a
+
+]T
+
+sin(ωn t)
+
+,
+
+(268)
+
+as summarized in Fig. 37.
+The functions J , h : Rn ↦ → R are scalar valued functions
+defined over the optimization variables θ . The terms (J(θ ) −
+ηJ )M(t) and (h(θ ) − ηh )M(t) are the estimates of the gradients
+of J and h, respectively, performed with the aid of the filter
+variables ηJ and ηh . The variables GJ and Gh are filtered versions
+of these estimates. The estimates of the gradients of J and h are
+not directly fed into the maxδ approximation because averaging
+
+−β g(x) + 1 √
+2ρx ωki cos (µki ωt + L(x, λ)) ,
+1 + (−β g(x) + 1)
+26
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 39. Adaptive machine learning setup using ES as feedback to tune a lowdimensional latent space representation xL (t) of a combined set of image and
+vector inputs {x(t), X (t)} in order to minimize a cost function J which compares a
+subset of an encoder–decoder generative convolutional neural network’s outputs
+ŷj (t) to measurements yj (t).
+
+create maps between extremely high dimensional objects such
+as input–output image pairs which may represent complex distributions at the input and output of a dynamic system
+
+Fig. 38. A safe ES trajectory compared to the classical ES approach to optimizing
+the same problem, using the method developed in Williams et al. (2022).
+
+{X (t), x(t)} 
+−→ Ŷ (t),
+
+in this case would be nearly impossible—with time varying terms
+appearing inside the argument of the non-linearity maxδ . The
+(nonlinear) Riccati filter Γ performs a dynamic computation of
+1/G2h > 0. The standard maximum operation is non-smooth and
+is therefore approximated by the function maxδ : R ↦ → R>0 given
+by
+
+(270)
+
+CNN
+
+where x(t) ∈ Rn may be a vector of time-varying parameters,
+X (t) ∈ RNx ×Nx are time-varying initial conditions represented
+as images which are incredibly high dimensional objects. For
+example, given a 256 × 256 pixel image, Nx ×Nx = 2562 = 65536.
+The outputs are
+
+)
+√
+1(
+x + x2 + δ ≈ max{x, 0},
+(269)
+2
+for a small parameter δ > 0. Note that maxδ {x} > max{x, 0} for
+all x ∈ R. An example of the scheme avoiding an unsafe region,
+compared to classical ES without safety is shown in Fig. 38.
+This safe ES method has recently been extended to provide semi-global practical stability (Williams, Krstić, & Scheinker,
+2023), and has been applied for the safe optimization of high energy charged particle beams (Williams, Scheinker, Huang, Taylor,
+& Krstić, 2023).
+maxδ {x} :=
+
+Ŷ (t) = ŷ1 (t), . . . , ŷN (t) ∈ RNy ×Ny ×N ,
+
+(
+
+)
+
+(271)
+
+Ny ×Ny
+
+stacks of N images ŷn (t) ∈ R
+, which are estimates being
+generated by the CNN of some unknown Y (t).
+In Scheinker (2021b), the authors consider the case where following initial training access to the time varying inputs
+{X (t), x(t)} is lost and the goal is to track the entire unknown
+Y (t) of which a partial measurement, a single projection yn (t) is
+available for online measurement. This measurement is compared
+to the CNN’s generated version via some cost function such as
+

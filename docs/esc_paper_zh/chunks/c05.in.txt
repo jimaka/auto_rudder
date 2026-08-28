@@ -1,0 +1,460 @@
+=== CHUNK 05 — 本节图片映射（图号 -> 相对路径）===
+Fig.13 -> images/fig13_p13.png | Fig.14 -> images/fig14_p14.png | Fig.15 -> images/fig15_p14.png | Fig.16 -> images/fig16_p15.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+6. ES as stabilizing feedback for systems with unknown timevarying control directions
+In 2012 the idea was proposed to use extremum seeking as
+a stabilizing feedback directly for unknown, unstable, and timevarying systems and to minimize their analytically unknown
+output functions (Scheinker, 2012; Scheinker & Krstić, 2012b).
+
+x(t) → bα sin(ωt) + O (1/ω) .
+11
+
+(93)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 13. Convergence of x(t) to a small neighborhood of a tracked trajectory r(t) is shown for various initial conditions for an unstable system (96) with a(t) ≡ 1.
+The columns show results for various forms of r(t) and b(t) while the rows show results for various values of k, ω. The ability to overcome the instability while
+tracking a time-varying trajectory in the face of a quickly time-varying control direction b(t) improves as the dithering frequency ω and ES gain k are increased. The
+blue curve in the right column shows a scaled down version of b(t) to demonstrate its rate of time variation relative to the system dynamics. (For interpretation of
+the references to color in this figure legend, the reader is referred to the web version of this article.)
+
+r(t))2 where r(t) = exp(−10(t − 0.75)2 ). In Fig. 13 for each
+choice of b(t) and r(t) we show how increasing k and ω improves
+convergence.
+ES-based feedback controllers have been developed for stabilizing a wide range of time-varying vector-valued linear and
+nonlinear systems (Scheinker & Krstić, 2012a), and their convergence proofs utilized a Lie bracket averaging approach, which
+is summarized in the next section. The implications of using ES
+as a feedback controller to minimize Lyapunov-like functions,
+resulting in stabilization, are summarized in Fig. 14. For example,
+consider the possibly open loop unstable vector valued nonlinear
+system
+
+This result is summarized by the following theorem.
+Theorem 2. Consider system (87), (88) and a compact set K ⊂ R,
+if kα > a/b2 then there exists ω∗ > 0 such that for all ω > ω∗ and
+for all x(0) ∈ K
+(
+
+x(t) = e
+
+)
+
+a−kα b2 t
+
+x(0) + bα sin(ωt) + O (1/ω)
+
+∀t .
+
+(94)
+
+For the more general time-varying system
+ẋ = a(t)x + b(t)u,
+
+(95)
+
+u = αω cos(ωt) − k sin(ωt)V (x, t),
+
+(96)
+
+a similar analysis as the one performed above results in an
+averaged system of the form
+dȳ
+dτ
+
+= a(t)ȳ −
+
+kα
+2
+
+b2 (t)
+
+∂ V (ȳ, t)
+,
+∂ ȳ
+
+ẋ = f (x, t) + g(x, t)u,
+
+y = V (x, t),
+
+(98)
+
+where x ∈ Rn and V (x, t) is either a function chosen by the
+user to achieve stabilization (a Lyapunov-type function) or an
+analytically unknown measurable output function of the system
+to be minimized as in classical ES applications. In either case,
+applying the ES-based feedback controller
+
+(97)
+
+which simultaneously minimizes V (x, t) and stabilizes the location of its minimum. The function V (x, t) can either be a chosen
+Lyapunov-type function or an analytically unknown output function to be minimized. We simulate the dynamics (95), (96) for
+a(t) ≡ 1 and several choice of b(t) = 1 and b(t) = cos(w t) in
+order to minimize V (x, t) of several forms including the simple
+time-invariant V = x2 and also the time-varying V (x, t) = (x(t) −
+
+u=
+
+√
+ω [α cos(ωt) − k sin(ωt)V (x, t)] ,
+
+results in average closed-loop dynamics of the form
+x̄˙ = f (x̄, t) −
+12
+
+kα
+2
+
+g(x̄, t)g T (x̄, t)∇x̄ V (x̄, t)
+
+(99)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+kα
+
+= f (x̄, t) −
+
+2
+
+)T
+
+g(x̄, t) Lg V (x̄, t)
+
+(
+
+,
+
+(100)
+
+where Lg V = ∇x̄ Vg. Note that in the average dynamics the control
+direction matrix is now of the form g(x̄, t)g T (x̄, t) ≥ 0 and the
+system can be stabilized with unknown and time-varying control
+direction.
+The form of Eq. (100) motivates two assumptions about a system for which an ES-based stabilizing feedback is being designed.
+Fig. 14. The existence of a clf with sscp is equivalent to the system being
+strong Lg V -stabilizable, which implies that the system is stabilizable. Because
+stabilizability is equivalent to the existence of a clf with scp, as shown above
+the existence of a clf with sscp implies existence of a clf with scp.
+Source: Figure adapted from Scheinker and Krstić (2012a).
+
+Assumption 4 (Strong Lg V -Stabilizability). There exists a positive
+definite, radially unbounded, continuously differentiable function
+V : Rn → R+ and β > 0 such that
+Lf V − β Lg V
+
+(
+
+)2
+
+< 0, ∀x ̸= 0.
+
+(101)
+
+It is well known that a continuous time-invariant system of the
+form (98) is stabilizable by feedback continuous at the origin and
+smooth away from the origin if and only if there exists a control
+Lyapunov function (clf) with a suitable ‘‘small control property’’
+(scp) (Sontag, 1989), defined as:
+Definition 1. A positive definite radially unbounded function W
+has small control property (scp) relative to a system of the form
+(98) if
+Lg W = 0 H⇒ Lf W < 0,
+Lf W + Lg W αc < 0, ∀x ̸ = 0,
+for some continuous function αc .
+
+Fig. 15. After an initial transient, the simultaneous stabilization and tracking of
+a time-varying trajectory by utilizing ES as a stabilizing feedback controller is
+shown.
+
+In addition, if we also make the following boundedness assumption the above clf results are extended to time-varying
+systems of the form (98) (Albertini & Sontag, 1997).
+Assumption 5. For any compact set K and r1 , r2 > 0 there exists
+Mr1 ,r2 > 0 such that
+sup |f (x, t) + g(x, t)u| ≤ Mr1 ,r2 , ∀t ∈ R,
+
+Therefore a system is strongly Lg V -stabilizable if it has a clf with
+sscp and the converse is also true by noting that (101) implies
+that Lg V = 0 implies that Lf V < 0 whenever x ̸ = 0 and therefore
+
+(102)
+
+|x|K ≤r1
+d(u,0)≤r2
+
+lim max
+
+ϵ→0 Lf V (x)>0
+
+where |x|K denotes the distance of a point from a compact set K .
+
+[ ]
+
+which is stabilizable by a simple smooth feedback u = −2x, no
+function V exists that satisfies (101) for some β > 0, and yet
+W = x2 /2 is a clf with an scp.
+However, Assumption 4 is satisfied for any stabilizable system
+whose clf W satisfies not only the clf condition Lg W = 0 H⇒
+Lf W < 0 but also a strong small control property (sscp) that
+lim max
+
+ϵ→0 Lf W (x)>0 (Lg W (x))2
+
+< ∞.
+
+ẋ1
+ẋ2
+
+u=α
+
+(105)
+
+where
+
+ρ (r) = 1 + 2 sup
+x:V (x)≤r
+
+[
+
+]
+
+x1
+cos(20t)
++
+u,
+x2
+sin(20t)
+
+(108)
+
+(109)
+
+√
+
+√
+ω cos(ωt) − k ω sin(ωt)|e(t)|2 .
+
+(110)
+
+The trajectories of this system are shown in Fig. 15.
+This stabilizing ES approach is able to simultaneously stabilize open-loop unstable systems and optimize their analytically
+unknown output functions (Scheinker, 2013b).
+
+0
+
+Lf V +
+
+][ ]
+
+we define the error e(t) = x(t) − r(t) and utilize the stabilizing
+ES feedback controller
+
+(104)
+
+ρ (r)dr ,
+
+1.2
+1ẋ2
+
+r(t) = [cos(t /4), sin(t /2)]T ,
+
+For a system satisfying (104) it can be shown that Assumption 4
+is satisfied for any β ≥ 1 by a new clf V constructed as
+V =
+
+1.1
+−1.1
+
+[
+=
+
+note that the system is unstable with poles 1.05 ± 1.15i. In order
+to track the trajectory
+
+and |x|=ϵ
+
+∫ W
+
+(107)
+
+and |x|=ϵ
+
+(103)
+
+Lf W (x)
+
+< β < ∞.
+
+The relationships between stabilizability, Assumption 4, the existence of a clf, and the scp and sscp properties are summarized in
+Fig. 14.
+As a simple example, we consider the 2D open-loop unstable
+system with unknown and quickly time-varying control direction
+vector b(t) = (cos(20t), sin(20t)),
+
+While Assumption 5 is trivially satisfied by any time-invariant
+system with continuous dynamics, Assumption 4 is more restrictive than mere stabilizability. For example, for the system
+ẋ = x3 + x2 u,
+
+Lf V (x)
+(Lg V (x))2
+
+7. Lie bracket averaging for ES
+
+√(
+
+Lf V
+
+)2
+
+(
+
+)2
+
+Lg V
+
+( )4
++ Lg V
+
+.
+
+For the study of high frequency feedback ES dynamics, an
+interesting connection between ES and Lie bracket averaging was
+
+(106)
+13
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+developed in Dürr, Stanković , Ebenbauer, and Johansson (2013)
+by building on averaging techniques (Gurvits, 1992; Gurvits &
+Li, 1992; Kurzweil & Jarník, 1988; Sussmann, 1992; Sussmann &
+Liu, 1991) and semiglobal practical stability theorems (Moreau &
+Aeyels, 2000).
+In Dürr, Stanković , Ebenbauer, and Johansson (2013) the
+authors considered stable T -periodic systems of the form
+ẋ =
+
+m
+∑
+
+√
+
+√
+
+bi (x, t) ωui (t , ωt), u0 ≡ 1/ ω,
+
+(111)
+
+i=0
+
+and showed that the trajectory x(t) of (111) can be related to the
+trajectory of the Lie bracket averaged system
+
+∑ [
+
+ż =
+
+bi (z , t), bj (z , t) βij ,
+
+]
+
+(112)
+Fig. 16. Trajectories of agents relative to the Lie bracket averages of their
+trajectories are shown.
+Source: Figure adapted from Dürr, Stanković , Ebenbauer, and Johansson (2013).
+
+i=0,j=i+1
+
+where
+
+βij =
+
+1
+
+∫ T
+
+T
+
+σ
+
+uj (t , σ )
+
+∫ σ
+
+ui (t , τ )dτ dσ ,
+
+(113)
+
+0
+
+The Lie bracket averaging-based approach to studying ES dynamics is a powerful method which has been applied to a large
+variety of systems including ES on submanifolds (Dürr, Stanković,
+Johansson, & Ebenbauer, 2014), with singular perturbations (Dürr,
+Krstić, Scheinker, & Ebenbauer, 2015, 2017), for gain tuning
+(Benosman, 2016), for formation control (Suttner & Sun, 2018),
+obstacle avoidance (Grushkovskaya, Zuyev, & Ebenbauer, 2018b),
+multi-agent ES (Poveda, Benosman, & Teel, 2017), for a unicycle model (Grushkovskaya, Michalowsky, Zuyev, May, & Ebenbauer, 2018), for nonlinear systems (Grushkovskaya & Ebenbauer,
+2021), for systems with a dead zone (Shao, Teel, Tan, Liu, &
+Wang, 2019), for iterative learning control (Khong, Nešić, & Krstić,
+2016), for maximizing map sensitivity (Mills & Krstić, 2018),
+a Newton-based second-order Lie bracket approach has been
+developed (Labar, Garone, Kinnaert, & Ebenbauer, 2019b), and for
+non-holonomic systems (Suttner, 2020). In Labar, Ebenbauer, and
+Marconi (2022) input-to-state like stability properties are proven
+for a class of Lie bracket-averaged ES systems, in Zhu and Fridman
+(2022) a time-delayed approach to averaging was developed for
+studying stabilizing ES dynamics, and in Michalowsky, Gharesifard, and Ebenbauer (2018) Lie bracket approximations are used
+to design an approach to distributed optimization.
+
+and the terms [bi , bj ] are Lie brackets defined as
+
+[bi , bj ] =
+
+dbi
+dx
+
+bj −
+
+dbj
+dx
+
+bi .
+
+(114)
+
+The relationship between z(t) and x(t) is that they can be made
+arbitrarily close for arbitrarily long times by a sufficiently large
+value of ω.
+Theorem 3. For any bounded set K for which all trajectories of (111)
+have solutions bounded by some A > 0, for any Tf > 0 and any
+δ > 0 there exists ω∗ such that for all ω > ω∗ if z(t0 ) = x(t0 ) the
+following holds:
+
+|x(t) − z(t)| < δ, ∀t ∈ [t0 , t0 + Tf ].
+
+(115)
+
+The approach in Dürr, Stanković , Ebenbauer, and Johansson
+(2013) was designed for a system of 2D agents for Nash equilibrium seeking with the coordinates of agent i ∈ 1, . . . , N given by
+(xi , yi ) and dynamics
+
+√
+
+ẋi = ci (ri − ei hi ) ωi sin(ai ωi t − ϕi )
+
+√
+
++ αi ωi cos(ai ωi t)
+√
+√
++ αi ωi sin(ai ωi t)
+
+ẏi = −ci (ri − ei hi ) ωi cos(ai ωi t − ϕi )
+ėi = −ei hi + ri ,
+

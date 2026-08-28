@@ -195,12 +195,12 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 |-----------|----------|--------------------|------|
 | **ABB OCTOPUS** | 船舶咨询系统（航速/纵倾/航线多模块） | 原文："case studies have shown that a combination of OCTOPUS modules can save **up to 9%** in propulsion energy costs"；Dynamic Trim 模块单项 "up to 5%"；回收期原文为 "just over a couple of **months**"（几个月，初版"约一年"已修正）。"连接 1000+ 船"出自 [ABB 2022 资本市场日材料](https://global.abb/content/dam/abb/global/group/investors/documents/ir-events/2022/pa-cmd/ABB-PA-CMD-Digital.pdf)（">1,000 vessels connected"），非产品 PDF | [ABB 官方 PDF](https://library.e.abb.com/public/b92c10c2533647b08601322d2f9ffef4/Detailed%20Description_ABB%20Ability%20Marine%20Advisory%20Suite%20-%20OCTOPUS.pdf) |
 | **Wärtsilä / Eniram** | 纵倾优化 + 性能监测 | 2016 年收购价 **4,300 万欧元**（企业价值），其时已装 **270+ 船**；纵倾优化实测 1–5%（Navigator 杂志引 Eniram 原话 ✅）；VLCC 案例（320,000+ DWT、450 天数据）：年燃油成本省 **2.6%**（约 48.2 万美元 / 730 吨燃油） | [Wärtsilä, 2016](https://www.wartsila.com/media/news/30-06-2016-wartsila-enhances-its-digital-offering-by-acquiring-eniram)；[Navigator, 2017](https://navigatormagazine.fi/news/eniram-optimising-through-data/)；[SAFETY4SEA](https://safety4sea.com/study-on-vlcc-impact-of-real-fuel-savings-from-trim-optimization-and-hull-fouli/) |
-| **Yara Marine FuelOpt** | 推进功率闭环优化（直接干预主机/桨） | Teekay 4 艘油轮 2022 实测 **3–5%**（Zenith Spirit 2021 首装），随后追加 25 艘订单；厂商宣称典型 5–15%；**NAPA 独立分析确认 10–18%**（Sten Bothnia 12 个月 17.9%、Ekfjord 24 个月 10.3%——初版"独立测试最高 10%"已修正） | [Ship Technology, 2023](https://www.ship-technology.com/news/teekay-tankers-to-install-yara-marines-fuelopt-technology-on-25-vessels/)；[Riviera, 2023](https://www.rivieramm.com/news-content-hub/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433) |
+| **Yara Marine FuelOpt** | 推进功率闭环优化（直接干预主机/桨） | Teekay 4 艘油轮 2022 实测 **3–5%**（Zenith Spirit 2021 首装），随后追加 25 艘订单；厂商宣称典型 5–15%；**NAPA 独立分析确认 10–18%**（Sten Bothnia 12 个月 17.9%、Ekfjord 24 个月 10.3%——初版"独立测试最高 10%"已修正） | [Ship Technology, 2023](https://www.ship-technology.com/news/teekay-tankers-to-install-yara-marines-fuelopt-technology-on-25-vessels/)；[Riviera, 2023](https://www.rivieramm.com/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433) |
 | **Kongsberg EcoAdvisor** | 非线性优化求解器（主机/推进器停机建议） | 源自 DOF Subsea/SINTEF 联合项目；发布稿仅有定性描述（DOF 试点 Skandi Vega/Skandi Africa），**"DP 工况节油 8–10%"无法证实**（发布稿无数字，MTS DP 2023 会议 PDF 多次抓取失败），已删除该数字 | [MarineLink, 2022](https://www.marinelink.com/news/kongsberg-maritime-launches-ecoadvisor-499099) |
 | **NAPA Voyage Optimization** | 航程优化（航线+航速+纵倾） | Marubeni 试航"up to **7.1%** fuel savings"（结果最早见于 2023 年发布，案例页标注 2026-02）；与 Norsepower 联合研究：转筒帆+航程优化六条航线平均 CO₂ 减排 **19%**（纽约–阿姆斯特丹线 28%，其中 NAPA 贡献 10–12 个百分点） | [NAPA 案例](https://www.napa.fi/case/marubeni-sails-with-napa-fleet-intelligence-voyage-optimization/)；[NAPA×Norsepower](https://www.napa.fi/news/napa-norsepower-sumitomo-study/) |
 | **DeepSea + Nabtesco** | AI 性能模型（Cassandra）+ 自动航速控制（Telegraph Agent） | 汽车运输船 Malaysia Grace 结构化测试（10 天、每 3 小时交替开关、平均航速 17.0 kn）实测 **3.4%**；Eastern Pacific 全船队约 **300 艘**部署（2024-11 报道）；6 个月后船队**周油耗预报误差降至 0.8%**（1% 以内） | [Hellenic Shipping News, 2025](https://www.hellenicshippingnews.com/nabtesco-combines-telegraph-agent-and-cassandra-to-deliver-unmatched-fuel-optimisation-for-eastern-car-liner-co/)；[vesselperformance.info, 2024-11](https://vesselperformance.info/2024/11/15/eastern-pacific-uses-deepsea-to-improve-fuel-consumption-forecasts-to-within-1-per-cent/) |
 | **Anschütz NautoPilot 5000 NX** | 节能自动舵（ECO 自适应+航迹控制+双舵 Toe Angle） | 2023-03 首装（系列成员 NautoPilot **5400** NX）于双舵 RoRo 船 MV Corona Sea；"自动舵功能与设置单独或组合可减少油耗 **2.5%**"出自经销商 [Syberg 产品页](https://www.syberg.no/products/nautopilot-5000)（注意初版所挂 Anschütz 官网新闻不含 2.5%，且旧 URL 已 404，均已修正） | [Anschütz, 2023](https://www.anschuetz.com/news/article/nautopilot-5000-nx-reduces-fuel-consumption-and-emissions)；[Syberg](https://www.syberg.no/products/nautopilot-5000) |
-| **Orca AI**（补充） | AI 态势感知 + 航行决策辅助（减少避碰机动与无谓变速） | 2024 年船队数据：告警使近距遭遇事件减少 **54%**，平均每船年省燃油 **约 10 万美元**、全年合计减排约 **19.5 万吨 CO₂**；Seaspan 已部署 **267+ 船**（单船年省约 $100k / 减 500 t CO₂）。注意：节油路径是"减少机动损失"而非直接优化推进，口径与上表其他产品不同 | [Riviera, 2025-05](https://www.rivieramm.com/news-content-hub/news-content-hub/us725m-investment-drives-further-autonomous-navigation-development-84755)；[Riviera, 2025-08](https://www.rivieramm.com/news-content-hub/news-content-hub/seaspan-cuts-fuel-navigation-incidents-using-ai-85840) |
+| **Orca AI**（补充） | AI 态势感知 + 航行决策辅助（减少避碰机动与无谓变速） | 2024 年船队数据：告警使近距遭遇事件减少 **54%**，平均每船年省燃油 **约 10 万美元**、全年合计减排约 **19.5 万吨 CO₂**；Seaspan 已部署 **267+ 船**（单船年省约 $100k / 减 500 t CO₂）。注意：节油路径是"减少机动损失"而非直接优化推进，口径与上表其他产品不同 | [Riviera, 2025-05](https://www.rivieramm.com/news-content-hub/us725m-investment-drives-further-autonomous-navigation-development-84755)；[Riviera, 2025-08](https://www.rivieramm.com/news-content-hub/seaspan-cuts-fuel-navigation-incidents-using-ai-85840) |
 
 **部署格局观察**：
 - 工业界节能产品的主战场在**决策/操作层**（航线、航速、纵倾、推进功率），第三方实测节油集中在 **3–10%**；厂商宣传值普遍高于第三方实测，引用时应以船级社/试航数据为准。
@@ -229,15 +229,17 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 
 ## 六、参考文献
 
+> **链接有效性核查（2026-08-12）**：全部 57 条链接逐一探测，无失效链接。MDPI、ScienceDirect、ResearchGate、academia.edu、ship-technology 等站点对脚本访问返回 403（反爬机制，浏览器访问正常）；为此对期刊论文条目补充了 DOI 永久链接（doi.org 解析已逐条验证与原文 PII/页面一一对应）。en.wikipedia.org 从本机网络不可达（连接超时，站点本身正常）；morgan.edu 结题报告 PDF 服务器响应慢（约 1.1 MB，需耐心等待）但链接有效。
+
 **MPC vs PID 控制对比**
 1. [Jannaty et al., 2023, Kadikma 14(3)](https://www.researchgate.net/publication/377637467)（[PDF](https://pdfs.semanticscholar.org/d822/3e9163b9d78bbae541b1e9820cbe36d81daf.pdf)）— MPC 与 PID 护卫舰航向控制对比
 2. [Zhang et al., 2025, Ocean Engineering 334:121592](https://repository.tudelft.nl/file/File_4dca60ee-8635-4954-bee2-d55ab94a6f2c?preview=1) — 内河船 NMPC 路径跟踪 vs PID
-3. [MDPI Applied Sciences, 2026, 16(9):4477](https://www.mdpi.com/2076-3417/16/9/4477) — 桥区受限水域 FFRLS-MPC 航向控制
-4. [He et al., 2023, Ocean Engineering](https://www.sciencedirect.com/science/article/abs/pii/S0029801823023557) — 实船模验证的 MPC 路径跟踪（模型辨识障碍）
+3. [MDPI Applied Sciences, 2026, 16(9):4477](https://www.mdpi.com/2076-3417/16/9/4477)（DOI：[10.3390/app16094477](https://doi.org/10.3390/app16094477)）— 桥区受限水域 FFRLS-MPC 航向控制
+4. [He et al., 2023, Ocean Engineering](https://www.sciencedirect.com/science/article/abs/pii/S0029801823023557)（DOI：[10.1016/j.oceaneng.2023.115971](https://doi.org/10.1016/j.oceaneng.2023.115971)）— 实船模验证的 MPC 路径跟踪（模型辨识障碍）
 5. [Fernández & Hollinger, 2017, IEEE RA-L 2(1)](https://research.engr.oregonstate.edu/rdml/sites/research.engr.oregonstate.edu.rdml/files/mpc_icra.pdf) — 波浪场 MPC vs PD（仿真，74%）
 6. [《基于DMPC的船舶航向控制算法研究》，《舰船科学技术》2024(7)](https://html.rhhz.net/jckxjsgw/html/74000.htm)
-7. [Källström, 2000, Control Engineering Practice 8(2)](https://www.sciencedirect.com/science/article/abs/pii/S0967066199001677) — Stena HSS 高速船自动舵实船应用
-8. [Zheng et al., 2025, JMSE 13(5):851](https://www.mdpi.com/2077-1312/13/5/851) — 船舶自动舵技术综述
+7. [Källström, 2000, Control Engineering Practice 8(2)](https://www.sciencedirect.com/science/article/abs/pii/S0967066199001677)（DOI：[10.1016/s0967-0661(99)00167-7](https://doi.org/10.1016/s0967-0661(99)00167-7)）— Stena HSS 高速船自动舵实船应用
+8. [Zheng et al., 2025, JMSE 13(5):851](https://www.mdpi.com/2077-1312/13/5/851)（DOI：[10.3390/jmse13050851](https://doi.org/10.3390/jmse13050851)）— 船舶自动舵技术综述
 
 **整定与实时性**
 9. [Koetje, 2011, UCT 硕士论文](https://open.uct.ac.za/bitstreams/a690377e-3b85-455b-bb5e-60635f854e79/download) — MPC 多参数整定
@@ -246,29 +248,29 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 12. [Tomera, 2017, TransNav](https://www.researchgate.net/publication/318658447) — 模糊自整定 PID 船舶自动舵（Nomoto+极点配置）
 13. [Unar, 1999, 格拉斯哥大学博士论文](https://theses.gla.ac.uk/4493/) — Nomoto 极点配置整定公式推导（§3.6.1）
 14. [Świder et al., 2023, Polish Maritime Research 30(1)](http://www.bg.pg.gda.pl/pmr/pdf/PMRes_2023_1.pdf) — 自动舵 PID 一致性设计
-15. [Hu et al., 2024, JMSE 12(1):94](https://www.mdpi.com/2077-1312/12/1/94) — acados 嵌入式 MPC 实测 7 ms @ 20 Hz
+15. [Hu et al., 2024, JMSE 12(1):94](https://www.mdpi.com/2077-1312/12/1/94)（DOI：[10.3390/jmse12010094](https://doi.org/10.3390/jmse12010094)）— acados 嵌入式 MPC 实测 7 ms @ 20 Hz
 16. [arXiv:2510.21773, 2025](https://arxiv.org/abs/2510.21773) — 嵌入式实时 QP 求解器基准
 17. [You et al., 2024, UCL](https://discovery.ucl.ac.uk/id/eprint/10197595/1/03_Time_efficient_model_predictive_control_for_autonomous_tugs_with_adaptive_input_constraints.pdf) — 自主拖船 MPC（Ts=0.2 s）
 
 **稳定性**
-18. [Mayne et al., 2000, Automatica 36(6)](https://www.sciencedirect.com/science/article/abs/pii/S0005109899002149) — 约束 MPC 稳定性奠基文献
-19. [Gong et al., 2021, Ocean Engineering](https://www.sciencedirect.com/science/article/abs/pii/S0029801821004455) — Lyapunov-based MPC（AUV）
-20. [Zhang et al., 2023, JMSE 11(2):281](https://www.mdpi.com/2077-1312/11/2/281) — DP 船抗扰 Lyapunov-based MPC
+18. [Mayne et al., 2000, Automatica 36(6)](https://www.sciencedirect.com/science/article/abs/pii/S0005109899002149)（DOI：[10.1016/s0005-1098(99)00214-9](https://doi.org/10.1016/s0005-1098(99)00214-9)）— 约束 MPC 稳定性奠基文献
+19. [Gong et al., 2021, Ocean Engineering](https://www.sciencedirect.com/science/article/abs/pii/S0029801821004455)（DOI：[10.1016/j.oceaneng.2021.109010](https://doi.org/10.1016/j.oceaneng.2021.109010)）— Lyapunov-based MPC（AUV）
+20. [Zhang et al., 2023, JMSE 11(2):281](https://www.mdpi.com/2077-1312/11/2/281)（DOI：[10.3390/jmse11020281](https://doi.org/10.3390/jmse11020281)）— DP 船抗扰 Lyapunov-based MPC
 
 **节能算法**
-21. [Pelić et al., 2023, JMSE 11(3):675](https://www.mdpi.com/2077-1312/11/3/675) — 减速航行对集装箱船油耗与排放的影响
-22. [Du et al., 2019, TR-B 121:88–114](https://www.sciencedirect.com/science/article/abs/pii/S0191261517305738) — 航速-纵倾两阶段优化
+21. [Pelić et al., 2023, JMSE 11(3):675](https://www.mdpi.com/2077-1312/11/3/675)（DOI：[10.3390/jmse11030675](https://doi.org/10.3390/jmse11030675)）— 减速航行对集装箱船油耗与排放的影响
+22. [Du et al., 2019, TR-B 121:88–114](https://www.sciencedirect.com/science/article/abs/pii/S0191261517305738)（DOI：[10.1016/j.trb.2019.02.004](https://doi.org/10.1016/j.trb.2019.02.004)）— 航速-纵倾两阶段优化
 23. [IMO GreenVoyage2050 — Speed management](https://greenvoyage2050.imo.org/technology/speed-management/) / [Autopilot adjustment](https://greenvoyage2050.imo.org/technology/autopilot-adjustment-and-use/)
 24. [ClassNK-NAPA GREEN 全尺度试航, 2014](https://www.classnk.or.jp/hp/en/hp_pressrelease.aspx?id=834&layout=3)
 25. [Zaccone et al., 2018, Ocean Engineering](https://www.academia.edu/109716159/Optimal_ship_routing) — 动态规划气象航线优化
 26. [Wang, Mao & Eriksson, 2017, Chalmers](https://research.chalmers.se/en/publication/516144) — 气象航线五算法基准（原 core.ac.uk 链接 404 已更换为官方页面）
 27. [Aredah & Rakha, 2024, ShipNetSim 结题报告](https://www.morgan.edu/Documents/ACADEMIA/CENTERS/ntc/SMARTER/Year%201%20Core%20Projects/SM07_Final_Door_to_Door.pdf) — 转引 Li et al. 2022 气象航线节油 2.1–5.2%
 28. [StormGeo — 气象航线 IMO 口径转引](https://stormgeo.com/insights/how-the-evolution-of-weather-routing-is-reducing-greenhouse-gas-emissions)
-29. [Zhang et al., 2022, J. Energy Storage](https://www.sciencedirect.com/science/article/abs/pii/S2352152X22007733) — 混合动力船双层 MPC 能量管理
+29. [Zhang et al., 2022, J. Energy Storage](https://www.sciencedirect.com/science/article/abs/pii/S2352152X22007733)（DOI：[10.1016/j.est.2022.104763](https://doi.org/10.1016/j.est.2022.104763)）— 混合动力船双层 MPC 能量管理
 30. [周妍、陈俐, 2024,《中国舰船研究》19(Supp1)](https://www.sciopen.com/article/10.19693/j.issn.1673-3185.03104) — 客滚船 MPC-EMS
-31. [Yan et al., 2025, JMSE 13(2):269](https://www.mdpi.com/2077-1312/13/2/269) — 工况识别 NMPC 能量管理
+31. [Yan et al., 2025, JMSE 13(2):269](https://www.mdpi.com/2077-1312/13/2/269)（DOI：[10.3390/jmse13020269](https://doi.org/10.3390/jmse13020269)）— 工况识别 NMPC 能量管理
 32. [高现娇等, 2017,《舰船科学技术》](https://html.rhhz.net/jckxjsgw/html/53629.htm) — 油船纵倾优化 CFD+船模
-33. [Vasilev et al., 2024, JMSE 12(8):1265](https://www.mdpi.com/2077-1312/12/8/1265) — CFD+ANN 纵倾优化工具
+33. [Vasilev et al., 2024, JMSE 12(8):1265](https://www.mdpi.com/2077-1312/12/8/1265)（DOI：[10.3390/jmse12081265](https://doi.org/10.3390/jmse12081265)）— CFD+ANN 纵倾优化工具
 34. [ABS Advisory on Ship Energy Efficiency Measures](https://ww2.eagle.org/content/dam/eagle/advisories-and-debriefs/ABS_Energy_Efficiency_Advisory.pdf)
 35. [Anschütz — 双舵 Toe Angle 节油](https://www.anschuetz.com/news/article/anschuetz-autopilots-save-up-to-5-fuel-on-twin-rudder-vessels)；[舵动作减少 25%](https://www.anschuetz.com/news/article/want-to-know-how-efficiently-your-ship-steers)
 36. [van Amerongen — MRAS 自适应自动舵实船试验](https://www.dynamicalsystems.nl/intelligentcontrol/Intelligent_Control_MRAS.pdf)
@@ -276,12 +278,12 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 **部署案例**
 37. [ABB OCTOPUS 官方资料](https://library.e.abb.com/public/b92c10c2533647b08601322d2f9ffef4/Detailed%20Description_ABB%20Ability%20Marine%20Advisory%20Suite%20-%20OCTOPUS.pdf)；[ABB 2022 资本市场日](https://global.abb/content/dam/abb/global/group/investors/documents/ir-events/2022/pa-cmd/ABB-PA-CMD-Digital.pdf)
 38. [Wärtsilä 收购 Eniram, 2016](https://www.wartsila.com/media/news/30-06-2016-wartsila-enhances-its-digital-offering-by-acquiring-eniram)；[Navigator, 2017](https://navigatormagazine.fi/news/eniram-optimising-through-data/)；[VLCC 案例](https://safety4sea.com/study-on-vlcc-impact-of-real-fuel-savings-from-trim-optimization-and-hull-fouli/)
-39. [Yara FuelOpt / Teekay, 2023](https://www.ship-technology.com/news/teekay-tankers-to-install-yara-marines-fuelopt-technology-on-25-vessels/)；[Riviera 独立测试报道](https://www.rivieramm.com/news-content-hub/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433)
+39. [Yara FuelOpt / Teekay, 2023](https://www.ship-technology.com/news/teekay-tankers-to-install-yara-marines-fuelopt-technology-on-25-vessels/)；[Riviera 独立测试报道](https://www.rivieramm.com/news-content-hub/yara-marines-fuelopt-demonstrates-significant-fuel-savings-75433)
 40. [Kongsberg EcoAdvisor 发布, 2022](https://www.marinelink.com/news/kongsberg-maritime-launches-ecoadvisor-499099)
 41. [NAPA × Marubeni 案例](https://www.napa.fi/case/marubeni-sails-with-napa-fleet-intelligence-voyage-optimization/)；[NAPA × Norsepower](https://www.napa.fi/news/napa-norsepower-sumitomo-study/)
 42. [DeepSea × Nabtesco 汽车船实测](https://www.hellenicshippingnews.com/nabtesco-combines-telegraph-agent-and-cassandra-to-deliver-unmatched-fuel-optimisation-for-eastern-car-liner-co/)；[EPS 船队油耗预报误差 0.8%](https://vesselperformance.info/2024/11/15/eastern-pacific-uses-deepsea-to-improve-fuel-consumption-forecasts-to-within-1-per-cent/)
 43. [Anschütz NP5000 NX, 2023](https://www.anschuetz.com/news/article/nautopilot-5000-nx-reduces-fuel-consumption-and-emissions)；[Syberg 产品页（2.5% 出处）](https://www.syberg.no/products/nautopilot-5000)
-44. [Orca AI / Seaspan 部署](https://www.rivieramm.com/news-content-hub/news-content-hub/seaspan-cuts-fuel-navigation-incidents-using-ai-85840)；[Orca AI 融资与数据](https://www.rivieramm.com/news-content-hub/news-content-hub/us725m-investment-drives-further-autonomous-navigation-development-84755)
+44. [Orca AI / Seaspan 部署](https://www.rivieramm.com/news-content-hub/seaspan-cuts-fuel-navigation-incidents-using-ai-85840)；[Orca AI 融资与数据](https://www.rivieramm.com/news-content-hub/us725m-investment-drives-further-autonomous-navigation-development-84755)
 
 （注：第三轮修订删除了原第 45 条 IMO EEXI/CII 法规类参考文献，全文转为纯技术视角。）
 

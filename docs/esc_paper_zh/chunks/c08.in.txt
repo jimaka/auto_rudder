@@ -1,0 +1,503 @@
+=== CHUNK 08 — 本节图片映射（图号 -> 相对路径）===
+Fig.30 -> images/fig30_p23.png | Fig.31 -> images/fig31_p23.png | Fig.32 -> images/fig32_p24.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+12. ES for PDEs
+
+[Q (θ (t))],
+
+sin(ωn t)
+
+.
+
+(219)
+
+(220)
+
+(221)
+(222)
+(223)
+(224)
+
+where αi : [0, Di ]× R+ → R and each domain length Di is known.
+System (221)–(224) can be solved as
+
+In order to develop ES methods for systems with delays, the ES
+analysis was extended to systems governed by partial differential
+equations (PDE), in which the delay is modeled as a PDE (Oliveira,
+Krstić, & Tsubakino, 2016).
+In Oliveira et al. (2016) the authors consider static maps with
+a tuned vector of parameters θ = (θ1 , . . . , θn ), whose influence
+on the output measurement y = Q (θ ) has distinct delays in each
+channel i given by (D1 , . . . , Dn ) > 0. The delayed relationship can
+be summarized as
+y(t) = Q (θ (t − D)) = e
+
+an
+
+Θ (t) = αi (0, t), ∀i ∈ {1, 2, . . . , n}
+∂t αi (x, t) = ∂xx αi (x, t), x ∈ (0, Di )
+∂t αi (0, t) = 0
+αi (Di , t) = θi (t)
+
+The simulation results are shown in Fig. 29 for 5 random initial
+conditions.
+
+−Ds
+
+sin(ω1 t), . . . ,
+
+]T
+
+The ES PDE method described above was then extended for
+multivariate ES of static maps with actuator dynamics governed
+by diffusion PDEs (Oliveira, Feiling, Koga, & Krstić, 2020). For each
+control vector θi the authors assumed a distinct heat equation so
+that the propagated actuator vector Θ (t) ∈ Rn has dynamics
+
+]
+
+0
+.
+6
+
+a1
+
+(218)
+2
+
+N(t) = [a1 sin(ω1 (t + D1 )), . . . , an sin(ωn (t + Dn ))]T .
+
+(207)
+
+[
+
+2
+
+The setup is shown in Fig. 30, where
+
+][ ]
+
+0
+, Γ (t) = Γ0 et /10 ,
+9.375
+
+(217)
+
+which gives an estimate of the inverse of the cost function’s
+Hessian matrix. The matrix G(t) is related to the dithering signals
+applied to the measured output
+
+where u(t) is given as (196) and
+R=
+
+(216)
+
+Γ̇ = ωr Γ − ωr Γ Ĥ Γ
+
+(206)
+
+x1
+u(t),
+x2
+
+(215)
+
+0
+
+where Γ (t) is the solution to a Riccati differential equation, as
+described above for Newton-based ES,
+
+This intuitive result shows that the square root of the minimal
+dithering frequency is inversely proportional to the maximum
+separation of trajectories ∆ and is directly proportional to the
+terms that influence the amplitude of the perturbation injected
+into the system (α , k, |B|) as well as the scale of instability A(t) of
+the system.
+The FTS ES result is demonstrated with several simulations,
+including stabilization of the time-varying unstable system
+
+[ ]
+
+s + ci
+
+[
+{
+]}
+∫ Di
+−ki zi (t) +
+ui (σ , t)dσ
+,
+
+z(t) = Γ (t)G(t),
+
+where
+t
+
+ci
+
+where ci , ki > 0, and
+
+(205)
+
+ ∫t
+
+ |A(τ )−kαBBT Γ (τ )|dτ 
+η = max e t0
+.
+
+(214)
+
+αi (x, t) = L−1
+
+[
+
+√ ]
+∗ θi (t),
+√
+
+cosh(x s)
+cosh(Di
+
+s)
+
+(225)
+
+where L−1 (·) denotes the inverse Laplace transformation and ∗ is
+the convolution operator.
+This relationship is used to define the diffusion operator D =
+diag{D1 , . . . , Dn } with
+Di [ϕ (t)] = L−1
+
+(209)
+21
+
+[
+
+1
+cosh(Di
+
+]
+√
+
+s)
+
+∗ ϕ (t), s.t. Θ (t) = D[θ (t)]. (226)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+where the Hessian matrix H = H T < 0 is unknown. A Newton
+ES method is then developed for optimization of this system, in
+an approach similar to the one described above for systems with
+delays. The overall closed-loop system dynamics are given as
+
+θ̇i = ui (0, t)
+∂t ui (x, t) = ∂xx ui (x, t), x ∈ (0, Di )
+∂x ui (0, t) = 0
+ui (Di , t) = −
+
+−
+
+ki ci
+s + ci
+
+(229)
+(230)
+(231)
+
+zi (t)
+
+ki ci
+
+∫ Di
+
+s + ci
+
+0
+
+(Di − σ )ui (σ , t)dσ ,
+
+(232)
+
+and the overall setup shown in Fig. 31.
+PDE ES methods have also been developed for wave PDE
+compensation (Oliveira & Krstić, 2021), ES for systems with delays (Oliveira et al., 2016; Rušiti, Oliveira, Krstić, & Gerdts, 2021),
+Newton-based ES for systems with time-varying delays (Rušiti
+et al., 2021), and static maps with actuation dynamics governed
+by diffusion PDEs (Feiling, Koga, Krstić, & Oliveira, 2018).
+13. Hybrid ES with dynamic inclusions
+For some systems, introducing the added flexibility of hybrid
+controllers which switch between various feedback laws can be
+advantageous and for others it is required due to the structure
+of the system dynamics. Robust hybrid controllers have been
+developed for autonomous vehicles operating under unknown
+or adversarial environments, simultaneously avoiding obstacles
+and source seeking (Poveda, Benosman, Teel, & Sanfelice, 2021),
+hybrid ES controllers have been developed for optimization with
+acceleration and resets (Poveda & Li, 2021), and a hybrid ES
+approach has been developed for global practical optimization on
+smooth compact manifolds (Strizic, Poveda, & Teel, 2017).
+A general framework has been developed to extend the application of ES to hybrid systems with combined continuous
+and discrete-time dynamics (Poveda et al., 2018; Poveda & Teel,
+2017a). In Poveda and Teel (2017a) controllers were developed
+for set-valued hybrid dynamical systems (HDS) of the form
+
+Fig. 30. Top: Newton ES setup for systems with delay. Bottom: Simulation
+convergence example.
+Source: Figures adapted from Oliveira et al. (2016).
+
+The authors then define the relationship between the scalar measurements y of the unknown static map Q (θ ), with propagated
+input (221) as
+y(t) = Q (D[θ (t)]) = Q (Θ (t)), Θ (t) = [Θ1 (t), . . . , Θn (t)]T . (227)
+The unknown static map is assumed to be locally quadratic in the
+neighborhood of the extremum point y∗ , i.e.,
+1
+2
+
+(Θ (t) − Θ ∗ )T H(Θ (t) − Θ ∗ ),
+
+x ∈ C,
+
+(233)
+
+x ∈ D,
+
+(234)
+
+where ẋ = dx/dt, x+ corresponds to values of x after an instantaneous jump, and F (x) and G(x) are the flow map and jump
+map, respectively. In the approach the dynamic systems involved
+are not limited to those governed by Lipschitz differential equations, they are extended to systems described by differential
+inclusions, which are commonly used to analyze discontinuous
+and switched systems. Because such systems are not guaranteed
+to have unique solutions the authors find optimal operating set
+points relative to all of the dynamics that emerge from compact sets of initial conditions. Such a study can be especially
+useful for real-world applications in which noise, disturbances,
+and uncertainty require a study of entire sets of possible initial
+conditions and trajectories rather than single equilibrium point.
+Such systems emerge frequently in real-world applications in optimization and control systems in the form of switched systems,
+logic and event-based controllers, continuous-time systems with
+weakly jumping parameters, supervisory-based control systems,
+and multi-agent systems with switching communication topologies. The HDS system (233), (234) is represented by the notation
+H := {C , F , D, G}.
+Before the main results are presented, a few definitions are
+required. A set-valued mapping M is outer semi-continuous (OSC)
+at x ∈ Rm if for all sequences xi → x and yi ∈ M(xi ) such that
+
+Fig. 31. Newton ES for multivariable PDEs setup.
+Source: Figure adapted from Oliveira et al. (2020).
+
+y(t) = Q (Θ (t)) = y∗ +
+
+ẋ ∈ F (x),
+x+ ∈ G(x),
+
+(228)
+22
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+where µ = [µT1 , . . . , µTn ]T ∈ Sn , µi = [µi,1 , µi,2 ]T ∈ S1 , for all
+i ∈ {1, . . . , n}, ξ evolves in a compact set Λξ = λξ B ⊂ Rn , where
+λξ > 0 is selected sufficiently large to encompass all of the complete solutions of interest, matrix D = [e1 , 0, e2 , 0, . . . , ei , . . . ,
+0, en , 0] is a block matrix where 0 ∈ Rn is a column vector of
+zeros, and ei ∈ Rn is the unit basis vector in dimension i. The
+ω-parameterized block matrix Φ : R2n → R2n is given by
+
+⎡
+Ω (ω1 )
+⎢ 0
+Φ (ω) = ⎢
+⎣ ..
+.
+
+Ω (ωi ) =
+
+J = ϕ (θ, u),
+
+...
+
+0
+
+0
+0
+
+⎤
+
+⎥
+.. ⎥
+⎦,
+.
+Ω (ωn )
+
+(239)
+
+0
+
+ωi
+
+−ωi
+
+0
+
+[
+
+]
+
+,
+
+∀i ∈ {1, . . . , n},
+
+(240)
+
+where ω = [ω1 , . . . , ωn ]T , ωi = ϵ · κi , ωL = ϵ · ω̄, (ϵ, ω̄) ∈ R2>0 ,
+κi is a rational number such that κi ̸= κj and (i, j) ∈ {1, . . . , n}.
+u = û + aDµ where a ∈ (0, 1) is a small tunable parameter,
+and û ∈ Rn is an auxiliary state. The continuous-time dynamics
+associated to the linear oscillator µ̇ = Φ (ω) · µ generates a
+vector of periodic signals with odd components given by µi,1 (t) =
+cos(ωi t)µ2i−1 (0) + sin(ωi t)µ2i (0), for each i ∈ {1, . . . , n}. These
+signals are injected into the closed-loop system to extract the
+gradient information of J.
+14. Finite time Newton ES
+
+(235)
+In Poveda and Krstić (2021) the methods developed above
+for hybrid ES-based optimization were utilized to develop ES
+methods which could optimize (in a semi-global practical sense)
+the analytically unknown output function of a static map in a
+prescribed finite time. Because the systems considered are nonLipschitz continuous, the authors consider systems of the form
+
+The authors consider a dynamical system with state θ ∈ Rm ,
+with input u ∈ Rn , and output y ∈ R, modeled by a constrained
+differential inclusion
+(θ , u) ∈ Λθ × U,
+
+...
+...
+..
+.
+
+where the block components Ω (ωi ) are given by
+
+yi → y, we have that y ∈ M(x). A set-valued mapping M is
+locally bounded (LB) at x ∈ Rm if there exists a neighborhood
+Ux of x such that M(Ux ) ⊂ Rn is bounded. Given a set X ⊂ Rm
+the mapping M is said to be OSC and LB relative to X if the setvalued mapping from Rm to Rn defined by M(x) for x ∈ X and ∅
+for x ∈
+/ X is OSC and LB at each x ∈ X . Given a hybrid system
+H as described above, and A ⊂ Rn a compact set. The set A is
+said to be uniformly globally asymptotically stable (UGAS) for H
+if there exists a KL function β such that any maximal solution x
+of H satisfies
+
+θ̇ ∈ P(θ , u),
+
+..
+.
+
+0
+
+Fig. 32. Hybrid ES setup.
+Source: Figure adapted
+from Poveda and Teel
+(2017a).
+
+|x(t , j)|A ≤ β (|x(0, 0)|A , t + j), ∀(t , j) ∈ dom(x).
+
+0
+Ω (ω2 )
+
+(236)
+
+where P is a set-valued mapping, ϕ is an output function, and u
+evolves in the closed set U = Û + B, where Û ⊂ Rn . The following
+regularity assumptions are made.
+
+x ∈ C,
+
+ẋ = F (x),
+
+(241)
+
+n
+
+where x ∈ R is the state, C ⊂ dom(F ) is a closed flow set,
+and F is a set-valued mapping that is OSC, LB, and convex-valued
+with respect to C. A solution to (241) is an absolutely continuous
+function x : dom(x) → Rn that satisfies: x(0) ∈ C ; x(t) ∈ C for
+all t ∈ dom(x); and ẋ(t) ∈ F (x(t)) for almost all t ∈ dom(x). The
+authors develop their results for dynamic systems of the form
+
+Assumption 6. The set Û is closed. The set-valued mapping P(·, ·)
+is OSC and LB relative to Rm × U, Rm × U ⊂ dom(P), and P(θ, u)
+is convex for every (θ, u) ∈ Rm × U. The mapping ϕ (·, ·) is
+continuous with respect to both arguments.
+Assumption 7. There exists a set-valued mapping H that is OSC
+and LB relative to U, such that for each ρ > 0 the compact set
+Mρ := {(θ , u) : θ ∈ H(u), u ∈ U ∩ ρ B} is UGAS for the restricted
+HDS Hpρ := {Λθ × (U ∩ ρ B), P × 0, ∅, ∅} with state [θ T , uT ]T .
+
+ẋ = f (x, u),
+
+Assumption 8. The response map J : Rn → R is analytic, and
+there exists an optimal nonempty compact set O ⊂ Û, such that
+J(u∗ ) > J(u) for all u∗ ∈ O and all u ∈ Û \ O.
+
+Assumption 9. There exists a continuous function lx : Rn →
+Rp , such that for each compact set Ku ⊂ Rn the constrained
+dynamical system (x, u) ∈ S × Ku , ẋ = f (x, u), u̇ = 0 renders
+UGAS the compact set MKu = {(x, u) ∈ S × Ku : x = lx (u)}.
+
+2
+
+(242)
+
+where f is locally Lipschitz, h is continuously differentiable, and
+the operational space S of the states of the plant is closed and
+bounded. The following assumptions are required.
+
+A class of time-invariant gradient-based hybrid extremum
+seeking controllers is considered which are comprised of dynamic
+gradient estimators with states (ξ , µ) ∈ Rn × R2n , and a hybrid
+learning mechanism with overall state xu,z := (û, ẑ) ∈ Rn × Rr
+which regulate the input of the plant to the optimal set O by extracting the gradient information of J online based only on output
+measurements. The hybrid ES setup is shown in Fig. 32, where the
+gradient estimator for the response map J has dynamics
+
+(
+
+y = h(x, u),
+
+Assumption 10. Considering the response map defined as φ (u) =
+h(lx (u), u), the function u → φ (u) is twice continuously differentiable, and the set
+Aφ = argmin φ (u),
+u∈Rn
+
+is nonempty and compact.
+
+)
+
+ξ̇ = −ωL ξ − y · Dµ ,
+
+(237)
+
+µ̇ = Φ (ω) · µ,
+
+(238)
+
+a
+
+(ξ , µ) ∈ Λξ × Sn ,
+
+As described in the previous section, the approach is then to
+regulate the input u towards the set Aφ by using only output
+measurements y without analytic knowledge of f , h, or φ .
+23
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+

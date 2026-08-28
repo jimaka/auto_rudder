@@ -1,0 +1,606 @@
+=== CHUNK 07 — 本节图片映射（图号 -> 相对路径）===
+Fig.22 -> images/fig22_p19.png | Fig.23 -> images/fig23_p19.png | Fig.24 -> images/fig24_p19.png | Fig.25 -> images/fig25_p19.png | Fig.26 -> images/fig26_p20.png | Fig.27 -> images/fig27_p20.png | Fig.28 -> images/fig28_p21.png | Fig.29 -> images/fig29_p22.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+9. A general family of ES controllers
+
+uk =
+
+In Scheinker and Krstić (2014b) Lie bracket averaging theory
+was extended to non-differentiable systems and applied to a
+
+(
+)
+ωk
+1
+sin
+ω
+Ω
++
+,
+k
+(z − y)2
+z−y
+
+ż = −(z − y),
+17
+
+Ω̇ =
+
+1
+(z − y)5
+
+,
+
+(164)
+(165)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 24. PI ES as an optimizer and stabilizing feedback.
+
+Fig. 22. Based on the choice of controller parameters, a controller can be
+designed whose effort vanishes allowing the trajectory to settle at the origin.
+Source: Figure adapted from Grushkovskaya et al. (2018a).
+
+Fig. 25. PI-ES convergence relative to ES.
+Source: Figure adapted from Guay (2016).
+
+In Guay (2016), the derivative ẏ with respect to time of the
+unknown cost function being minimized is assumed to be available for measurement and the system dynamics and controller
+are given by
+ẋ = f (x) + g(x)u, y = h(x)
+1
+û˙ = −
+ẏ sin(ωt)
+
+(170)
+(171)
+
+ατI
+
+k
+
+u = û −
+
+α
+
+= û +
+
+τI
+
+ẏ sin(ωt) + a sin(ωt)
+
+k˙
+û + a sin(ωt).
+
+(172)
+
+In the above, the term −k/α ẏ sin(ωt) + a sin(ωt) takes on the
+role of a fast proportional feedback, while û takes the role of
+a proportional feedback, which can be seen more directly by
+integrating by parts and re-rewriting û as (with û(0) = 0)
+
+Fig. 23. Simulation example of ES asymptotically converging as the dithering
+frequency grows.
+Source: Figure adapted from Suttner (2019).
+
+û(t) = −
+which, under certain assumptions, guaranteed asymptotic convergence to the optimal value y(t) → y∗ as t → ∞.
+The method is demonstrated by simulating system (163) with
+
+1
+
+ατI
+
+y(t) sin(ωt) +
+
+ω
+ατI
+
+∫ t
+
+y(τ ) cos(ωτ )dτ .
+
+(173)
+
+0
+
+(166)
+
+We can then express the closed loop PI-ES system (170)–(172) as
+shown in Fig. 24.
+One example that clearly shows the benefit of the PI-ES result
+is for the system
+
+g1 (x1 , x2 ) = (cos(x1 + x2 ), sin(x1 + x2 )) ,
+
+(167)
+
+g2 (x1 , x2 ) = (− sin(x1 + x2 ), cos(x1 + x2 )) ,
+
+ẋ = −x + u,
+
+(168)
+
+ψ (x1 , x2 ) = (x1 − 1)2 + (x2 − 1)2 + 2018,
+
+(169)
+
+where the ES feedback has to fight the origin-stabilizing −x term
+in order to bring x(t) to its optimal value of 1.2. Simulation results
+comparing the PI scheme to a standard ES approach are shown
+in Fig. 25 where we clearly see faster settling with much less
+overshoot.
+In Guay and Dochain (2017) the authors extended their PIES results to an approach which does not require direct access
+to the derivative of the cost function ẏ, it is instead dynamically
+approximated. For a dynamic system of the form
+
+g0 (t) = (sin(2t), cos(t))
+
+and the simulation results are shown in Fig. 23.
+10. Proportional integral ES
+Two forms of proportional integral approaches to stabilizing ES have also been developed (Guay, 2016; Guay & Dochain,
+2017). In these approaches, the standard ES controller which
+achieves optimization is treated as an integral term in a PI-like
+control, with the addition of a proportional terms whose purpose
+is faster convergence and stabilization. Overall the two time-scale
+approach can result in improved convergence properties.
+
+y = 1 + 4(x − 1.2)2 ,
+
+ẋ = f (x) + g(x)u,
+
+(174)
+
+y = h(x),
+
+the ẏ dynamics are
+ẏ = Lf h + Lg hu,
+18
+
+(175)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 26. PI-ES convergence relative to ES.
+Source: Figure adapted from Guay and
+Dochain (2017).
+
+Fig. 27. A group of agents interact with a network, with each agent xi having
+its own controller ui and access only to its own local cost function hi (x) as well
+as those of its neighbors, with the goal of minimizing the unknown global cost
+function J(x).
+Source: Figure adapted from Guay et al. (2018).
+
+and the derivative ẏ can be parameterized as
+ẏ = θ0 + θ1 (u − û) = φ T u,
+
+(176)
+
+where φ = [1, (u − û)T ]T and θ = [θ0 , θ1T ]T . Considering the error
+signals e = y − ŷ and θ̃ = θ − θ̂ the following predictor is set up
+to estimate ẏ as ŷ˙
+
+˙
+ŷ˙ = φ T θ̂ + Ke + c T θ̂ ,
+
+(177)
+
+ċ = −Kc T + φ T ,
+
+(178)
+
+˙
+ė = u̇ θ̃ − Ke − c θ̂ ,
+T
+
+T
+
+where the ES algorithm only requires notifications of changes
+registered at sensors, rather than a continuous full sensor information stream of data (Premaratne, Halgamuge, Tan, & Mareels,
+2019).
+
+(179)
+
+11. Finite time stabilizing ES
+
+where e(0) = y(0)−ŷ(0). The full details of the full predictor setup
+are described in Guay and Dochain (2017), the resulting controller
+is given by
+u = −kg θ̂1 + û + d(t),
+1
+û˙ = − θ̂1 ,
+
+The non-C 2 ES controller described above, in (156), which has
+the advantageous property that the control effort disappears as
+the stabilized equilibrium is reached has the additional property
+of finite time stabilization which can be prescribed over compact
+sets.
+For example, considering the open-loop unstable system
+
+(180)
+(181)
+
+τI
+
+where the dither d(t) satisfies the persistency of excitation condition that there exist α2 , T > 0 such that
+
+ẋ = x + u,
+
+∫ t +T
+
+√
+ω cos(ωt) − k ω sin(ωt)x2 ,
+√
+√
+1
+3
+ur = 1 = α ω cos(ωt)|x| 2 − 2k ω sin(ωt)|x| 2 ,
+
+d(τ )dT (τ )dτ > α2 I ,
+
+∀t .
+
+and two choices of controllers ur as in (156)
+ur =0 = α
+
+(182)
+
+t
+
+Convergence of this estimated derivative approach for the same
+system as above is shown in Fig. 26.
+The PI-ES method has been studied for application to systems
+that are distributed over networks (Guay et al., 2018), where p
+agents are considered, each with dynamics
+ẋi = fi (x, η) + gi (x, η)ui
+
+(183)
+
+yi = hi (x),
+
+(184)
+
+hi (x)
+
+(187)
+(188)
+
+give identical average dynamics
+x̄˙ = (1 − kα )x̄ H⇒ x̄(t) = e(1−kα )t x̄(0).
+
+(189)
+
+The advantage of the choice r = 0.5 is that we now have
+a feedback controller with vanishing oscillations, allowing the
+system to settle at equilibrium in a finite time once x(t) reaches
+0. We can estimate this finite settling time ts as it should occur
+when the amplitude of oscillation is approximately of the same
+magnitude as x(t) so that the trajectory of x(t) will swing through
+0 and stop. To do so, we consider one cycle of ES oscillation,
+t ∈ [ts , ts + ∆t ] where ∆t = 2ωπ , during which x(t) ≈ x̄(ts ). During
+this time let us consider only the dominant first term of (188)
+which can be integrated to get the oscillation
+
+where η ∈ R is a vector of unknown parameters. The overall
+goal is to minimize the total cost
+p
+∑
+
+√
+
+2
+
+q
+
+J =
+
+(186)
+
+(185)
+
+i=1
+
+while each agent only has access to its local cost hi (x) and the
+costs of its immediate neighbors hi−1 (x) and hi+1 (x), as shown in
+Fig. 27. An example of the convergence of 5 networked ES agents
+is shown in Fig. 5. The problem is solved by utilizing a dynamic
+average approach to estimate the average of the total cost, for
+which the PI-ES method is then applied (Guay, 2016; Guay &
+Dochain, 2017). Network-based control systems with multiple
+independent agents must be robust to variations in information
+transmission rates and availability. Therefore, there has also been
+development of ES for network systems with sporadic packet loss,
+
+t ∈ [ts , ts + ∆t ],
+
+√
+α
+cos(ωt) |x̄(ts )|.
+ω
+
+x(t) ≈ x̄(ts ) + √
+
+(190)
+
+This term can only reach zero if the oscillation is of the same
+magnitude as x̄, such that
+
+√
+
+α
+α
+H⇒ |x(0)|e(1−kα)ts /2 ≈ √
+ω
+ω
+(
+)
+
+|x̄(ts )| ≈ √
+
+ln
+
+H⇒ ts ≈
+19
+
+√ 2α
+ω|x(0)|
+
+1 − kα
+
+.
+
+(191)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+is said to be FTS with respect to (t0 , T , Γ (·), R) if there exist
+L(t), Q (t) such that
+Q̇ (t) ≻ Q (t)AT (t) + A(t)Q (t) + LT (t)BT (t) + B(t)L(t)
+Q (t) ≺ Γ −1 (t),
+Q (t0 ) ≻ R
+
+−1
+
+t ∈ [t0 , t0 + T ]
+
+.
+
+When a system is FTS for Q (t), L(t) then the FT stabilizing controller gain is given by
+K (t) = L(t)Q −1 (t).
+
+(194)
+
+The authors consider open-loop unstable time-varying systems
+and stabilizing feedback controllers of the form
+ẋ = A(t)x + B(t)u,
+
+√
+√
+u = α ω cos(ωt) − k ω sin(ωt)xT Π (t)x,
+
+(195)
+(196)
+
+with Lie bracket-averaged dynamics (for large ω)
+x̄˙ = A(t)x̄ − kα B(t)BT (t)Π (t)x̄.
+
+(197)
+
+System (197) is in the form of system (193) and the idea is then to
+design Π (t) so that the feedback control gain −kα B(t)BT (t)Π (t)
+renders the system FTS. Once this is accomplished a large enough
+ω must be found such that the trajectories of (195), (196) and
+(197) are sufficiently close together such that the original highly
+oscillatory system satisfies the FTS conditions.
+Towards this goal, the authors first prove the following Lemma
+which allows them to relate the FTS condition of one system to
+the other based on the distance between the original (x(t)) and
+averaged trajectories (x̄(t)).
+Lemma 1. For x(t), x̄(t) ∈ Rn , for a given ∆ > 0, assume
+
+|x(t) − x̄(t)| < ∆.
+Fig. 28. This figure shows the evolution of the trajectories and the control effort
+of system (186) using controllers developed in Scheinker and Krstić (2014b). The
+bottom plots zoom in on the first 0.25 s of evolution and the plot inserts zoom
+in vertically to show the finite time settling.
+
+Consider two symmetric, positive-definite matrix valued functions of
+time Γ (t) and Γ̄ (t) such that ∀t ∈ [t0 , t0 + T ]
+
+Γ̄ (t) =
+
+∆
+,
+mini γi (t)
+
+(200)
+
+Theorem 5. For any ∆ > 0, choose ω sufficiently large such that
+the trajectories of (195)–(197) satisfy the bounds |x(t) − x̄(t)| < ∆
+for t ∈ [t0 , t0 + T ]. If there exists some Q (t), k, α , and Π (t) such
+that
+Q̇ (t) ≻ Q (t)A(t) + AT (t)Q (t) − kα Q (t)Π (t)B(t)BT (t)
+
+− kα B(t)BT (t)Π (t)Q (t), ∀t ∈ [t0 , t0 + T ],
+Q (t) ≻ Γ̄ −1 (t), ∀t ∈ [t0 , t0 + T ],
+Q (t0 ) ≺ R−1 ,
+
+t ∈ [t0 , t0 + T ].
+
+(201)
+(202)
+(203)
+
+where Γ̄ (t) is the matrix-valued function of time defined in Lemma 1
+with
+
+The FTS condition can be extended to a closed-loop system by the
+following definition
+
+r(t) ≤ 1 −
+
+Definition 4.
+u(t) = K (t)x(t),
+
+∀r(t) ≤ 1 −
+
+The main result of the paper is then given as
+
+is said to be finite time stabilizable (FTS) with respect to (t0 , T ,
+Γ (·), R) iff
+
+ẋ = A(t)x(t) + B(t)u(t),
+
+(199)
+
+where {1/γi2 (t)} are the eigenvalues of Γ (t) at time t.
+
+(192)
+
+xT0 Rx0 ≤ 1 H⇒ xT (t)Γ (t)x(t) < 1,
+
+Γ (t).
+
+xT (t)Γ (t)x(t) < 1,
+
+Definition 3. The system
+x(t0 ) = x0 ,
+
+1
+r 2 (t)
+
+If x̄T (t)Γ̄ (t)x̄(t) < 1 for the time interval t ∈ [t0 , t0 + T , then on the
+same time interval
+
+We consider 100 random starting conditions uniformly spread
+between x(0) ∈ [−1, 1] with ω = 300, α = 0.5, and k = 5.
+From (191) these trajectories should have a settling time of ts ≤
+4.7 seconds and Fig. 28 confirms that all trajectories have settled
+by ≈4.5 seconds.
+Another finite time ES method based on a stabilizing ES
+feedback was recently developed in Mele, Tommasi, and Pironti
+(2021), in which the authors develop a finite time ES method
+for open-loop unstable dynamic systems. The authors consider
+the following definition of finite time stabilizability (Amato et al.,
+2014):
+
+ẋ = A(t)x(t),
+
+(198)
+
+∆
+,
+mini γi (t)
+
+(204)
+
+then system (195), (196) is FTS with respect to (t0 , T , R, Γ (t)) for
+the same values of k, α , and Π (t).
+
+(193)
+20
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+where D = diag {D1 , . . . , Dn }. Considering the vector of dynamics
+of the delayed tuned parameters which are delayed functions of
+inputs Ui , given by
+U1 (t − D1 )
+⎢U2 (t − D2 )⎥
+
+⎡
+
+⎤
+
+θ̇ (t − D) = ⎢
+⎣
+
+⎥,
+..
+⎦
+.
+Un (t − Dn )
+
+(210)
+
+the delays can be represented as continuous time dynamics by
+the transport equation PDE according to
+
+θ̇i (t − Di ) = ui (0, t),
+∂t ui (x, t) = ∂x ui (x, t), x ∈ [0, Di ],
+ui (Di , t) = Ui (t), i = 1, 2, . . . , n,
+
+(211)
+(212)
+(213)
+
+with solution
+ui (x, t) = Ui (t + x − Di ).
+
+The system is then analyzed by utilizing averaging theory,
+Lyapunov–Krasovskii functional analysis, and backstepping transformations in order to derive the controllers
+
+Fig. 29. Simulation results for FTS ES for five different initial conditions.
+Source: Figure adapted from Mele et al. (2021).
+
+ui (Di , t) =
+Furthermore, following an interesting analysis the authors
+give an estimate on the required magnitude of ω in order to
+guarantee the bound |x(t) − x̄(t)| < ∆, for a system with constant
+B(t) = B. The bound is given as
+
+[
+
+ω≥
+
+2(α + k)|B|η
+
+]2
+
+∆
+
+,
+
+ẋ1
+ẋ2
+
+(
+)[
+t
+0.5
+= 1+
+0
+
+10
+
+−0.1
+−0.15
+
+6.25
+0
+
+[
+
+G(t) = M(t)y(t),
+
+[
+M(t) =
+
+]
+
+Γ0 =
+
+4
+0
+
+(208)
+

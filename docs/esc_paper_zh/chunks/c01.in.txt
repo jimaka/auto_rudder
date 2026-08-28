@@ -1,0 +1,297 @@
+=== CHUNK 01 — 本节图片映射（图号 -> 相对路径）===
+Fig.1 -> images/fig01_p03.png | Fig.2 -> images/fig02_p04.png | Fig.3 -> images/fig03_p05.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+LA-UR-22-32122
+Accepted Manuscript
+
+100 years of extremum seeking: A survey
+Scheinker, Alexander
+
+Provided by the author(s) and the Los Alamos National Laboratory (2024-06-19).
+To be published in: Automatica
+DOI to publisher's version: 10.1016/j.automatica.2023.111481
+Permalink to record:
+https://permalink.lanl.gov/object/view?what=info:lanl-repo/lareport/LA-UR-22-32122
+
+Los Alamos National Laboratory, an affirmative action/equal opportunity employer, is operated by Triad National Security, LLC for the National Nuclear Security
+Administration of U.S. Department of Energy under contract 89233218CNA000001. By approving this article, the publisher recognizes that the U.S. Government
+retains nonexclusive, royalty-free license to publish or reproduce the published form of this contribution, or to allow others to do so, for U.S. Government purposes.
+Los Alamos National Laboratory requests that the publisher identify this article as work performed under the auspices of the U.S. Department of Energy. Los Alamos
+National Laboratory strongly supports academic freedom and a researcher's right to publish; as an institution, however, the Laboratory does not endorse the
+viewpoint of a publication or guarantee its technical correctness.
+
+Automatica 161 (2024) 111481
+
+Contents lists available at ScienceDirect
+
+Automatica
+journal homepage: www.elsevier.com/locate/automatica
+
+Survey paper
+
+100 years of extremum seeking: A survey✩
+Alexander Scheinker
+Applied Electrodynamics Group, Los Alamos National Laboratory, Los Alamos NM 87544, USA
+
+article
+
+info
+
+Article history:
+Received 2 April 2021
+Received in revised form 19 July 2023
+Accepted 29 November 2023
+Available online xxxx
+Keywords:
+Extremum seeking
+
+a b s t r a c t
+Extremum seeking (ES) is a powerful approach to the optimization and stabilization of unknown
+dynamic systems and is an active field of research in control theory. This paper surveys recent ES
+algorithm developments. ES has evolved from its origins as a simple but brilliant engineering invention
+in the 1922 paper of Leblanc to the breakthrough work of Krstić and Wang in 2000 in which the first
+general stability analysis was given, to the most recent and numerous analytical results which prove
+convergence for a wide range of general dynamic systems. This survey provides a thorough overview
+of the dynamic systems for which ES stabilization and optimization results have been provided, the
+various analytical methods for proving convergence, and an overview of many real world applications
+for which ES has been utilized in industry and at scientific laboratories.
+Published by Elsevier Ltd. This is an open access article under the CC BY license
+(http://creativecommons.org/licenses/by/4.0/).
+
+1. Introduction
+Many real world control problems require optimizing the performance of time-varying and uncertain dynamic systems based
+on measurable but analytically unknown output functions. Examples of such systems include maximal power tracking for solar
+panels and wind farms operating in unpredictable weather conditions, anti-lock brakes which must compensate for unpredictable
+and changing road surfaces, power management in large computer server farms with time-varying demand, autonomous formation control and collision avoidance in changing environments,
+and the control and optimization of charged particle beams in
+particle accelerators.
+The problem of optimizing the performance of a dynamic system by tracking the extremum of its output function is known as
+extremum seeking (ES). ES is a general problem and many methods have been developed over the years including well known
+and established methods such as nonlinear programming (Teel
+& Popovic, 2001). Various adaptive ES methods have also been
+developed which utilize the knowledge of a system model with
+unknown parameters and optimize system performance by using state rather than objective function measurements (Adetola
+& Guay, 2006, 2007; DeHaan & Guay, 2005; Favache, Dochain,
+Perrier, & Guay, 2008; Guay, Dochain, Perrier, & Hudon, 2007;
+Guay & Zhang, 2003).
+✩ This work was supported by the Los Alamos National Laboratory Laboratory
+Directed Research and Development (LDRD) Program Directed Research (DR)
+project ‘‘Charged Particle Beam Control and Diagnostics using Adaptive Machine
+Learning,’’ project number 20220074DR. The material in this paper was not
+presented at any conference. This paper was recommended for publication in
+revised form by Editor Sonia Martinez.
+E-mail address: ascheink@lanl.gov.
+
+In this survey we focus on a perturbation driven method of
+extremum seeking for optimization and control. This approach is
+now ∼100 years old, as it was first proposed in the 1922 paper
+of Leblanc (1922). In his paper, Leblanc reported on a new method
+for maintaining maximum power transfer from a transmission
+line to a tram car. Leblanc’s paper was a description of an ingenious engineering design, but there was no mathematical analysis
+of the scheme’s dynamics. Eventually, Leblanc’s simple method
+became a popular tool for maximizing or minimizing unknown
+output functions of dynamic systems.
+Various ES approaches utilize a broad range of advanced mathematical and control theory methods including singular perturbation theory, stochastic calculus, differential geometry, nonlinear
+perturbation and averaging theory, weak convergence in Hilbert
+spaces, and partial differential equations. Before surveying the
+many recent cutting edge advances in ES, we start with a brief
+description which provides an intuition which is the foundation
+for all ES methods.
+Consider an analytically unknown function h(x) whose maximum we are interested in finding. We assume that h(x) converges
+to its Taylor series about a point x⋆
+h(x) =
+
+∞
+∑
+h(n) (x⋆ )
+n=0
+
+n!
+
+(x − x⋆ )n .
+
+(1)
+
+Assume there is a local maximum at x = x⋆ such that h′ (x⋆ ) = 0
+and h′′ (x⋆ ) < 0. We consider a small neighborhood of x⋆ in which
+the Taylor series can be accurately approximated as the quadratic
+function
+h(x) ≈ h(x⋆ ) +
+
+h′′ (x⋆ )
+2
+
+(x − x⋆ )2 .
+
+https://doi.org/10.1016/j.automatica.2023.111481
+0005-1098/Published by Elsevier Ltd. This is an open access article under the CC BY license (http://creativecommons.org/licenses/by/4.0/).
+
+(2)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+(6) is a highly challenging problem which required approximately
+80 years to solve.
+Leblanc’s simple and effective optimization scheme gained
+attention in Russia starting in the 1940s (Kazakevich, 1943, 1944)
+and in the U.S. the scheme was introduced in the 1950s (Blackman, 1962; Draper & Li, 1951; Tsien, 1954) for optimization of the
+performance of an internal combustion engine. In the 1950s and
+1960s the algorithm was modified and its performance for specific problems was analyzed (Meerkov, 1967; Morosanov, 1957;
+Obabkov, 1967; Ostrovsky, 1957), but rigorous performance and
+design analysis had not taken place. In 1971 a Lyapunov based
+stability analysis of a particular system was performed (Luxat &
+Lees, 1971), but general stability proofs would not arrive until
+30 years later.
+In 2000 the first general stability analysis of the extremum
+seeking method was performed by Krstić and Wang (2000), by
+utilizing an elegant combination of averaging and singular perturbation techniques. The work of Krstić and Wang sparked renewed interest in the field. Since 2000 the extremum seeking
+method, as a real-time non-model-based optimization approach,
+has seen significant theoretical advances (Ariyur & Krstić, 2003;
+Choi, Krstić, Ariyur, & Lee, 2002; Rotea, 2000), with extension to
+semi-global convergence (Tan, Nešić, & Mareels, 2006). In 2012 a
+method of utilizing ES directly as a feedback controller was introduced for the stabilization of open-loop unstable time-varying
+dynamic systems with unknown control direction and for optimizing their performance based on analytically unknown noisy
+output functions (Scheinker, 2012; Scheinker & Krstić, 2012a).
+Over the past 20 years a large body of work has been published
+on various ES methods for systems of increasing generality. Although a few reviews of ES have been written in the past (Åström
+& Wittenmark, 1995a, 1995b; Scheinker & Krstić, 2017; Tan,
+Moase, Manzie, Nešić, & Mareels, 2010; Zhang & Ordóñez, 2011),
+this survey attempts to cover the most recent developments in
+this quickly growing field including both theory and applications.
+
+Fig. 1. An intuitive sketch of the mechanism in searching for the maximum of
+h(x) near an extremum at which h(x) ≈ −x2 is also shown (A). Depending on
+whether x(t) > x⋆ or x(t) < x⋆ the value of the perturbed function h(x(t)) will
+be in or out of phase with the perturbing signal. The ES setup from Krstić and
+Wang (2000) is shown for optimization of general nonlinear dynamic systems
+(B).
+
+To illustrate the ES mechanism we start at a point x0 = x⋆ + δ ,
+δ > 0 and dither our signal with a small perturbation size α . Our
+dithered signal dynamics are
+x(t) = x0 + α sin(ωt) = x⋆ + δ + α sin(ωt),
+
+(3)
+
+1.1. Organization
+
+which we plug into (2) to approximate h(x) as
+h(x⋆ ) +
+
+h′′ (x⋆ ) ( 2
+
+)
+δ + 2δα sin(ωt) + α 2 sin2 (ωt) .
+
+Fig. 2 shows an incomplete high level view of the ES approaches that are surveyed here and how they are related. The
+survey is broken down into a set of sections which emphasize areas of ES research and somewhat follow along the timeline shown
+in Fig. 2. We start with classical ES methods and survey various
+extensions and modifications in Sections 2–5. In Sections 6–11
+forms of stabilizing ES and their generalizations are surveyed.
+Starting with Section 12 the survey jumps back to the classic
+form of ES, after which areas of overlap between classical and
+stabilizing ES are shown. The arrangement is described in more
+detail below.
+Section 2 gives an overview of various ES developments in
+most of which the original form of the ES approach is only
+slightly modified, the standard system assumptions are made,
+and the classical approaches to ES proofs of stability are applied via a combination of averaging and singular perturbation
+theory. Also discussed are extensions, such as passing through
+local minima, multi unit systems, and systems distributed over
+networks. Section 3 focuses on ES for games including Nash equilibrium seeking in noncooperative games, cooperative games for
+groups of agents, multi-population games for multi-constrained
+optimization problems, and multi-objective ES for finding Pareto
+sets of optimal solutions. Section 4 is focused on a Newton-based
+ES, a generalization to higher order derivatives, and multivariable
+Newton ES, methods which add complexity to the ES scheme, but
+can also result in faster convergence. Section 5 is focused on a
+stochastic approach to ES.
+In Section 6 a new approach of using high frequency ES as a
+stabilizing feedback for unknown open-loop unstable systems for
+
+(4)
+
+2
+If (4) is filtered to remove the non-oscillating terms (for example,
+this can be done by averaging and then subtracting its average value) and then multiplied by the same dithering frequency
+sin(ωt) the resulting signal is (neglecting phase shifts)
+
+δα h′′ (x⋆ ) sin2 (ωt) + h′′ (x⋆ )α 2 sin3 (ωt)/2.
+The signal is next low pass filtered, or simply integrated, so that
+sin2 (ωt) averages to 1/2 while sin3 (ωt) averages to 0. Finally this
+signal is multiplied by a gain factor k which is used to control the
+convergence speed of the ES algorithm, resulting in
+
+αδ ′′
+
+h (x⋆ ) < 0,
+(5)
+2
+which acts as a proportional feedback pushing x(t) > x⋆ in the
+negative direction back towards x⋆ . The same argument holds for
+a starting point x(t) < x⋆ . An intuitive sketch of the procedure is
+shown in Fig. 1A. For dynamic systems of the form
+k
+
+ẋ = f (x, u),
+
+u = α (x, θ ),
+
+y = h(x),
+
+(6)
+
+the method can be used for finding the optimal steady state
+value of an unknown output function h(x) by adjusting a control
+parameter θ which parameterizes an existing stabilizing controller, as shown in Fig. 1B. Although the intuition behind finding
+the optimal of an unknown function h(x) as described above is
+clear, the analysis of this method and an analytical proof of its
+convergence for output functions of nonlinear systems such as
+2
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 2. The inset in the top right corner shows a very high level overview of the evolution of ES as it has split into two major categories, which in recent years have
+started to merge and exchange ideas and methods. The rest of the figure shows a more detailed view with the major developments and bifurcations in ES research
+which are discussed in more detail in this survey.
+3
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+both control and optimization is introduced. Section 7 is focused
+on Lie bracket averaging, a powerful technique for studying the
+dynamics of systems in which ES is used directly as a feedback
+controller. In Section 8, a new bounded form of ES is introduced as
+well as a weak limit averaging approach which is a generalization
+of the Lie bracket averaging techniques to non-periodic, discontinuous, and non-differentiable dithers. In Section 9, a general
+family of ES controllers is introduced which includes as special
+cases many of the controllers from Sections 6–8. Section 10
+describes a proportional integral form of feedback ES that has
+improved convergence properties. In Section 11, the finite-time
+stabilization properties of stabilizing ES are surveyed.
+In Section 12, ES is extended to the study of PDEs. In Section 13 hybrid ES schemes are described and in Section 14 these
+techniques are extended to finite time Newton ES. In Section 15,
+ES with safety guarantees such as collision avoidance and safety
+barrier functions is surveyed, including both classical and stabilizing ES techniques. Section 16 discusses ES methods for adaptively
+tuning the low dimensional latent space of generative deep neural
+networks to enable their application for time-varying systems.
+Section 17 is a summary of theoretical ES techniques, Section 18
+discusses patents, and Section 19 gives a broad overview of
+applications.
+
+Fig. 3. The consequences of Assumptions 1–3 are described by this image for a
+2 dimensional system. The light gray flow lines in the (x1 , x2 ) plane represent
+the exponential stability of the equilibria points parameterized by l(θ ), for which
+there is a maximum at θ ∗ . For any given value of θ singular perturbation theory
+assumes that the system quickly converges to the curve l(θ ) and ES then slowly
+finds its way along l(θ ) to the maximum.
+
+ξ̇ = −ωl ξ + ωl (y − η)a sin ωt ,
+η̇ = −ωh η + ωh y,
+

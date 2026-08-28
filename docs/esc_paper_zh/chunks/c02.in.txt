@@ -1,0 +1,361 @@
+=== CHUNK 02 — 本节图片映射（图号 -> 相对路径）===
+Fig.4 -> images/fig04_p06.png | Fig.5 -> images/fig05_p07.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+2. Classic ES developments
+
+y = h(x),
+
+θ̃ = θ̂ − θ ∗ ,
+η̃ = η − h(l(θ ∗ )),
+
+(7)
+
+(8)
+
+dx
+
+The following assumptions were required.
+
+dτ
+
+Assumption 1. There exists a smooth function l : R → Rn such
+that
+f (x, α (x, θ )) = 0
+
+if and only if x = l(θ ).
+
+(
+
+x, α x, θ̂ + a sin ωt
+
+θ̂˙ = kξ ,
+
+))
+
+,
+
+
+
+
+
+fast
+
+slow
+
+Theorem 1. Consider the system (11)–(14) under Assumptions 1–3.
+There exists a ball of initial conditions around the point (x, θ̂ , ξ , η) =
+(l(θ ∗ ), θ ∗ , 0, h ◦ l(θ ∗ )) and constants ω̄, δ̄ , and ā such that for all ω ∈
+(0, ω̄), δ ∈ (0, δ̄ ), and a ∈ (0, ā), the solution (x(t), θ̂ (t), ξ (t), η(t))
+exponentially converges to an O(ω + δ + a)-neighborhood of that
+point. Furthermore, y(t) converges to an O(ω + δ + a)-neighborhood
+of h ◦ l(θ ∗ ).
+
+(10)
+
+A visual description of the consequences of Assumptions 1–3 is
+shown in Fig. 3 for a 2 dimensional (x1 , x2 ) dynamic system which
+has a stable equilibrium l(θ ) and an output function y = h(x1 , x2 )
+with a maximum at θ ∗ .
+A proof of convergence follows by considering the closed loop
+dynamics
+
+(
+
+(
+))
+1 (
+f x, α x, θ ∗ + θ̃ + a sin τ ,
+
+ω
+
+The slow and fast dynamics are then analyzed using a combination of averaging and singular perturbation techniques. As
+ω → 0, the fast system is frozen at its equilibrium x = l(θ ∗ +
+θ̃ + a sin τ ) which is substituted into the slow system for which
+averaging analysis proves the existence of an exponentially stable
+equilibrium (Krstić & Wang, 2000). The final result is summarized
+by the following theorem.
+
+Assumption 3. There exists θ ∗ ∈ R such that
+
+ẋ = f
+
+=
+
+⎤
+⎡
+K ′ξ
+dτ
+⎢ dξ ⎥
+⎣ dτ ⎦ = δ ⎣ −ωL′ ξ + ωL′ (h(x) − h(l(θ ∗ )) − η̃) a sin τ ⎦ .
+dη̃
+−ωH′ η̃ + ωH′ (h(x) − h(l(θ ∗ )))
+dτ
+
+
+
+
+(9)
+
+These two assumptions guarantee that the systems is closed
+loop stable and that given any choice of control parameter θ
+there is an exponentially stable equilibrium point. One more
+assumption is made about the existence of a maximum of the
+output function h(x).
+
+(h ◦ l)′′ (θ ∗ ) < 0.
+
+(16)
+
+⎡ dθ̃ ⎤
+
+Assumption 2. For each θ ∈ R, the equilibrium x = l(θ ) of
+the system (7), (8) is locally exponentially stable with decay and
+overshoot constants uniform in θ .
+
+(h ◦ l)′ (θ ∗ ) = 0,
+
+(15)
+
+the dynamic ES system is rewritten as two parts with the evolution of one arbitrarily slow relative to the other. Separation of
+the system into fast and slow parts depends on the choice of
+|δ|, |ω| ≪ 1. This can be seen by considering the dynamics with
+time scale τ = ωt:
+
+where x ∈ Rn , u ∈ R, f : Rn × R → Rn , y : Rn → R, and the
+controller u is parameterized by a scalar θ :
+u = α (x, θ ).
+
+(14)
+
+in which the dithering frequency ω is arbitrarily small and the
+gain of the integrator is chosen as k = ωδ K where δ is also small
+and K > 0. Defining coordinates
+
+The original stability analysis for extremum seeking was performed in Krstić and Wang (2000) for the setup shown in Fig. 1.
+The goal was to maximize the stable steady state output of
+an analytically unknown output function h(x) of the unknown
+dynamic system
+ẋ = f (x, u),
+
+(13)
+
+Theorem 1 and the associated Assumptions 1–3 have been
+utilized in a wide body of work with slight modifications. The
+approach described above has been studied for source seeking
+with a nonholonomic unicycle (Zhang, Arnold, Ghods, Siranosian,
+
+(11)
+(12)
+4
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+& Krstić, 2007), in which the velocity v of a spinning vehicle is
+tuned based on the ES scheme with equations of motion
+ẋ = v cos(ω0 t),
+
+ẏ = v sin(ω0 t),
+
+(17)
+
+for maximizing quadratic functions for which the location of the
+maximum is unknown. These results were then studied for a
+force actuated point mass and it was shown that ES could find
+maxima and track slowly varying trajectories even for moderately
+unstable systems (Zhang, Siranosian, & Krstić, 2007). Various
+dither choices for the ES scheme have also been compared in
+terms of speed of convergence, domain of convergence, and accuracy for sinusoidal, square wave, and triangle wave dithers (Tan,
+Nešić, & Mareels, 2008). It has been shown that the method
+described above can handle stochastic additive measurement
+noise (Stanković & Stipanović, 2010) and an approach to decentralized ES for multi-agent systems has been developed which
+uses numerical gradient estimation methods rather than sinusoidal perturbations (Kvaternik & Pavel, 2011, 2012a, 2012b). The
+method has also been applied using high frequency dithers for
+Weiner–Hammerstein plants (Moase & Manzie, 2012) and for
+Hammerstein plants (Moase & Manzie, 2011), a sliding mode approach has been developed for systems in normal form (Oliveira,
+Peixoto, & Hsu, 2012), as well as event-triggered ES (Poveda &
+Teel, 2017b).
+The ability of the ES scheme to pass through local minima has
+also been studied and it was shown that for a special class of
+systems if the dithering amplitude α is sufficiently large ES will
+pass over local minima and eventually settle at a global minimum
+once α (t) is reduced towards zero based on the dynamics update
+α̇ = −ωδϵ g(α ), where ω, δ , ϵ , and g(α ) must be designed properly (Tan, Nešić, Mareels, & Astolfi, 2009). As a simple example of
+non-local ES, consider the following dynamic system with an ESbased optimizer whose dithering amplitude a(t) starts at a(0) =
+3.0 and then exponentially decays:
+ẋ1 = x1 + x2 ,
+
+Fig. 4. The top plot shows the function y which has a local and a global
+maximum. The middle plot shows the evolution of the cost function with and
+without an adaptive dither size. The bottom plot shows convergence of the
+parameter θ to its local or global maximizing value.
+
+ẋ2 = x2 + u,
+
+u = −x1 + 4x2 + θ + a sin(ωt),
+θ̇ = ωδ y(x1 , x2 ) sin(ωt),
+ȧ = −ωδϵ a,
+
+(18)
+
+developed without steady state oscillations (Wang, Chen, & Ma,
+2016), and for constrained network optimization (Ye & Hu, 2016).
+
+where the output function being maximized is
+5
+8
+(x1 + 3x2 )3 + (x1 + 3x2 )2 + 10.
+15
+6
+A simulation of the above system is compared to the same system
+with a fixed dithering signal of a = 1. The output function y has a
+local maximum at which the small fixed dither size ES gets stuck,
+whereas the ES with decaying dither amplitude passes through
+the local maximum and finds the global maximum, as shown in
+Fig. 4. One limitation of such an approach is for time-varying systems. Once the dither amplitude has decayed, if the optimal point
+changes, the ES will not respond. An alternative non-gradient
+approach to ES over compact sets which may contain local minima was developed for systems with known Lipschitz constants
+by combining ES with a local Schubert search algorithm (Nešić,
+Nguyen, Tan, & Manzie, 2013).
+ES approaches have also been developed for multi unit systems with sampled data (Khong, Nešić, Tan, & Manzie, 2013)
+and time-varying ES approaches have also been studied in which
+using adaptive modification of the ES controller during convergence minimizes the impact of the choice of dither signal (Guay,
+2014; Guay & Dochain, 2015b), with attenuated steady-state oscillations (Bhattacharjee & Subbarao, 2021). Constrained systems
+have been handled by adding barrier functions to the cost function (Guay, Moshksar, & Dochain, 2015). A version of ES for
+nonlinear systems has been developed using fractional-order sliding modes (Yin, Chen, & Zhong, 2014), and a form of ES has been
+
+y = −(x1 + 3x2 )4 +
+
+Recently, data-enabled ES has been studied in which the incorporation of memory to store recorded data enables the use of
+information-rich datasets during the optimization process, which
+removes the need for a persistently exciting time-varying excitation dither signal needed by standard ES algorithms (Poveda,
+Benosman, & Vamvoudakis, 2021). Data-enabled ES is studied for
+systems of the form
+ẋ = f (x, u),
+
+y = h(x, u),
+
+φ (u) = h(l(u), u),
+
+(19)
+
+where φ (u) is to be minimized. The analytically unknown function φ (u) is parameterized as a linear combination of basis functions:
+p
+
+φ (u) =
+
+∑
+
+bi (u)wi + ϵ (u),
+
+(20)
+
+i=1
+
+where ϵ (u) is the approximation error. The approach is to fit this
+representation to φ over a compact set in order to locate the
+minimum.
+ES for the optimization of periodic time-varying outputs was
+presented in Haring, van de Wouw, and Nešić (2013) for systems
+of the form
+ẋ = f (x, α (x, θ ), θ, w (t)),
+5
+
+y = h(x, w (t)),
+
+(21)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Another approach to the optimization of time-varying steady
+state responses of nonlinear systems was taken in Hazeleger,
+Haring, and van de Wouw (2020) for systems of the form
+ẋ = f (x, u, w (t)),
+
+y = g(x, u, w (t)),
+
+(25)
+
+where y is a measured output function and w represents a disturbance that must be bounded, but is not assumed to be periodic.
+There are also approaches that incorporate system knowledge
+into optimization, which are useful for stable systems with existing controllers and known structure, but unknown parameters,
+systems of the form
+ẋ = f (x, θ, u),
+
+y = Q (θ, x),
+
+(26)
+
+where the function f is known, but the parameters θ and the
+output function y are unknown (Nesic, Mohammadi, & Manzie,
+2012). A multi-parametric ES approach for online estimation of
+parametric uncertainties of a model has also been developed for
+systems of the form
+ẋ = f (x) + ∆f (x, t) + g(x)u,
+
+y = h(x),
+
+(27)
+
+where
+∆f (x, t) is an additive model uncertainty
+(Benosman, Farahmand, & Xia, 2019).
+The classical ES algorithm has also been studied for open
+loop LQR control of discrete repeatable systems with fixed initial
+conditions of the form
+xk+1 = Ak xk + Bk uk ,
+Fig. 5. Convergence of networked ES agents.
+Source: Figure adapted from Guay, Vandermeulen, Dougherty, and McLellan (2018).
+
+y k = C k xk ,
+
+(28)
+
+over a finite time horizon N with the goal of finding a sequence of
+open-loop control steps {uk }Nk=−01 that minimize the cost function
+N −1
+
+J =
+
+where w (t) is periodic with known period Tw . Here the standard ES Assumption 1 above is generalized to the existence of
+a twice differentiable map M(θ, w (t)) such that for any fixed
+θ there exists a trajectory x̄θ ,w (t) = M(θ, w(t)) to which the
+system’s trajectory naturally converges. For such systems semiglobal practically asymptotic stability is proven. In this approach,
+a performance functional of the form
+
+(
+Lp (yd (t)) =
+
+1
+Tw
+
+∫ t
+
+|y(τ )| dτ
+p
+
+w
+aπ
+
+∫ t
+t − 2wπ
+
+(29)
+
+k=0
+
+where Ak , Bk and the analytic form of J are unknown (Frihauf,
+Krstić, & Başar, 2013). In this approach the system is re-initialized
+repeatedly from a fixed initial condition and multi-variable ES
+tunes a sequence of control steps to minimize J.
+An innovative ES-based method has also been developed for
+3D environmental source seeking with the navigation of a nonholonomic mobile robot (Matveev, Hoy, & Savkin, 2014).
+
+) 1p
+(22)
+
+t −Tw
+

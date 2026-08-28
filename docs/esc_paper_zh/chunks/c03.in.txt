@@ -1,0 +1,482 @@
+=== CHUNK 03 — 本节图片映射（图号 -> 相对路径）===
+Fig.6 -> images/fig06_p08.png | Fig.7 -> images/fig07_p08.png | Fig.8 -> images/fig08_p10.png | Fig.9 -> images/fig09_p10.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+3. ES for games
+
+is used. The term (22) is multiplied by the perturbing signal
+sin(ω[t − φ]) and passed through a moving average filter over
+one period of the ES dither:
+e(t) =
+
+1 T
+1∑ T
+yN QN yn +
+yk Qk yk + Rk u2k ,
+2
+2
+
+Lp (yd (τ )) sin(ω[τ − φ])dτ .
+
+For the ES methods described above, extending an approach
+to multi-parameter systems is easily handled by dithering each
+parameter with a unique frequency, resulting in a gradient descent in a high dimensional space, with minimal changes in the
+resulting analysis. Beyond such a high dimensional ES approach,
+a large body of work has focused on developing multi-parameter
+ES in which the relationships between various tuned parameters
+are studied in more complex arrangements such as cooperative
+games or for Nash equilibrium seeking in noncooperative games
+with limited game information.
+The first such approach was studied in Stanković, Johansson,
+and Stipanović (2010) for distributed Nash equilibrium seeking in
+mobile sensor networks in which agents generate actions based
+only on measurements of noise corrupted local cost functions. In
+this setup the actions and structural parameters of an agent’s and
+of other players’ costs are unknown. Each player utilizes their
+own local ES loop with a dithering frequency ωi that is distinct
+from that used by all of the other agents. This discrete ES setup is
+shown for a system of 2D players each with coordinates (xi , yi ) ∈
+R2 in Fig. 7, where u−i denotes the actions of all other players
+within a neighboring set Ni . In this setup all neighboring agents in
+
+(23)
+
+The result is a better estimate of the unknown function’s gradient and faster optimization compared to classical ES because
+harmonics of the dithering signal are removed. This approach is
+effective for systems with steady state oscillations such as simple
+harmonic oscillators:
+ẍ = −ω02 x − b(θ )ẋ + w (t),
+
+(24)
+⋆
+
+where the goal is to find the optimal θ which minimizes the
+unknown damping term b(θ ), w (t) is a periodic external disturbance, and the optimal output is a sinusoidal signal with the
+maximal amplitude. The benefit of this moving-average approach
+compared to the standard low pass filter ES approach described
+above can be seen with example system (24). Addition of the
+high frequency terms x2 = ẋ1 = ẋ in the cost function prevents
+the low pass filter version of ES from converging, but is handled
+by the moving average filtered approach, as shown in Fig. 6.
+6
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 6. Left column: Convergence to the optimal value of θ is shown for the classical low pass filtered version of ES θ̂LP compared to the performance of the moving
+average estimate θ̂MA . Both converge to the optimal, and the slightly better performance of the moving average approach can be explained by the more accurate
+estimate of the derivative. Right column: Once a small high frequency term 0.1x22 = 0.1ẋ1 is added to the cost function the low pass filtered ES can only get to
+within a neighborhood of the optimal whereas the moving average approach filters out the high frequency disturbances much more efficiently.
+
+for maximizing wind farm power capture (Menon & Baras, 2014).
+In this approach each agent indexed by i of a group of n agents has
+access to its own private utility function fi (u) which can depend
+on the collective actions taken by all agents u = (u1 , . . . , un ).
+The utility functions are assumed to be analytically unknown
+and each agent only has access to its own utility function. The
+objective of the multi-agent system is to optimize a welfare
+function which is the sum of all of the individual utility functions:
+
+W (u) =
+
+n
+∑
+
+fi (u).
+
+(34)
+
+i=1
+
+The agents run a dynamic average consensus algorithm so that
+the consensus output tracks W (u). Information is exchanged
+between agents over an undirected, connected communication
+graph and each agent runs part of an ES loop so that the action
+of agent i is on-average given by
+
+Fig. 7. Nash equilibrium seeking discrete time ES scheme.
+
+Ni have different dithering frequencies ωj ̸ = ωi , the Gi (z) are lowpass filters, the Hi (z) are high-pass filters, and n is measurement
+noise. The overall setup dynamics are given by
+
+wi (k) = Hi (z) [Gi (z) [Ji (ui (k), u−i (k))] + ni (k)] ,
+[
+]
+1
+i
+ui (k) = u0 (k) + Fi (z)
+[ξi (k)] ,
+1−z
+ξi (k) = ϵi (k)Ci (k)wi (k),
+
+u̇i ≈ −
+
+(30)
+
+(35)
+
+resulting in convergence to within an arbitrarily small neighborhood of a local minimizer of W (u).
+A class of extremum seeking controllers has also been developed for multi-population games, for solving multi-constrained
+optimization problems on multi-agent dynamical systems
+(Poveda & Quijano, 2013). In this setup, clusters of agents interact via different cost functions which depend on the states
+of all other agents. The agents of any single cluster attempt
+to simultaneously maximize their common cost function, which
+is analytically unknown and only accessible via measurements.
+A numerical example of such a problem is presented as two
+connected microgrids, with each one attempting to satisfy its own
+power demand by utilizing local generators.
+The work considers sets of populations P = {1, . . . , M } and
+of social strategies H = {1, . . . , N }, where the set of strategies
+used by population j ∈ P is the set Hj ⊂ H. At any given time
+
+(31)
+(32)
+
+and the system almost surely converges to the Nash equilibrium
+at u∗ where
+
+∇1 J1 (u∗ )T , . . . , ∇N JN (u∗ )T = 0.
+
+∂ W (u)
+,
+∂ ui
+
+(33)
+
+A similar approach was later studied for continuous systems
+in Frihauf, Krstić, and Basar (2011). A fixed-time Nash equilibrium seeking approach has also been studied (Poveda, Krstić, &
+Başar, 2022), as well as Nash equilibrium seeking in N-cluster
+noncooperative games (Ye, Hu, & Xu, 2020).
+ES methods have also been developed for cooperative games
+for groups of agents, such as distributed control of wind turbines
+7
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Given a vector of weights, λ, the authors show that computing
+elements of the Pareto curve can be achieved by solving the
+minimization problem
+
+t, pij (t) ≥ 0 denotes the number of individuals playing the ith
+strategy in the jth population. The amount
+∑ of entities associated
+to the jth population is then given by
+i∈Hj pij (t) = Pj (t) and
+the
+number
+of
+entities
+associated
+to
+the
+ith
+strategy is given by
+∑
+p
+(t)
+=
+S
+(t).
+The
+total
+amount
+of
+entities
+in the entire
+ij
+i
+j∈Pi
+∑ ∑
+society is then
+j∈P
+i∈Hj pij = T . The authors consider two
+types of society states: (1) normalized with respect to Pj , for
+every population j ∈ P ; and (2) normalized with respect to Si ,
+for each strategy i ∈ H.
+pij (t)
+Yj ,
+For the first case, the states are defined as yij (t) = P
+j
+which defines the proportion of entities playing the ith strategy in
+the jth population, where Yj ∈ R>0 and where Pj is assumed to be
+constant for every j ∈ P . With this setup the society state for the
+jth population is defined yj (t) and the overall society state is given
+by [y1 (t)T , . . . , yM (t)T ]T . The authors consider state dynamics of
+the form
+
+⎛
+
+
+
+ẏij = βj yij ⎝fij (y) −
+
+Yj
+
+yij fij (y)⎠ ,
+
+subject to the constraints
+
+λi ≥ 0, i = 1, . . . , m,
+
+∂ x̂ij
+Jj (x, θ )µij (τ ) ∑
+= 2ϵ x̂ij ⎝
+x̂kj + C · · ·
+∂τ
+Xj
+k∈Hj
+⎞
+[
+]
+1 ∑
+x̂kj Jj (θ )µkj (τ ) + C ⎠ ,
+··· −
+Xj
+
+dt
+
+= f (x, u),
+
+
+
+β
+
+(41)
+
+(42)
+
+∏m−1
+
+2
+where λm (β ) =
+i=1 cos(βi ) is a parameterization of the λi ,
+which can be solved by a gradient descent algorithm to yield
+a minimum squared norm element of λT ∇ u as a function of
+β , based on which the Pareto optimal solution can be found
+following a simple gradient update of the input u. These two
+gradient descent dynamics are then combined as the following
+controller:
+
+(36)
+
+∂λ(β )T
+∇u l(u)∇u l(u)T λ(β ),
+∂β
+u̇ = −ϵ2 k∇u l(u)T λ(β ), ϵ2 > 0.
+
+β̇ = −k
+
+(43)
+(44)
+
+In practice, it is often desirable to define a particular optimal
+solution associated with specific compromises between multiple
+objectives. Assuming such a solution is known and defined as y∗ ,
+the above controller is then modified as
+
+∂λ(β )T
+∇u l(u)∇u l(u)T λ(β ),
+∂β
+[
+]
+u̇ = −Mk∇u l(u)T λ(β ) − k∇u l(u)T l(u) − y∗ ,
+
+β̇ = −Mk
+
+(37)
+
+(45)
+(46)
+
+with M > 0.
+The ES part is now developed for an analytically unknown
+function l(u) for which time-varying estimates of the unknown
+gradients are developed. Considering the dynamics
+dy
+
+(38)
+
+∂ l T du
+,
+∂ u dt
+
+(47)
+dt
+for each output function yi , the unknown gradient is defined as
+θi (t) = ∂∂ lui so that
+
+k∈Hj
+
+y = h(x),
+
+2
+
+min λ(β )T ∇u l(u) ,
+
+where x̂ij = xij − aµij (t) with µij (t) the dither signals defined as
+sin(ω̄ωij ) with distinct ωij and k = 2ϵ ω̄ is the adaptation gain
+for all agents. The authors prove that by appropriately tuning the
+parameters ω̄, ϵ , a, and C , the system can be made semi-globally
+practically asymptotically stable.
+As a final example, we consider a real-time multi-objective ES
+controller for uncertain nonlinear systems which is guaranteed to
+converge to points of the Pareto set of optimal solutions (Guay &
+Dochain, 2015a). This form of ES is designed for engineering problems in which multiple competing objectives must be handled for
+various design goals. Nonlinear systems are studied of the form
+dx
+
+λi = 1,
+
+and that this problem is equivalent to the unconstrained optimization problem:
+
+i∈Hj
+
+∂θij
+= gij (x̂ + aµ(τ ), θ ),
+∂τ
+⎛
+
+m
+∑
+i=1
+
+where βj > 0 and the function fij represents the payoff perceived
+by the portion of entities of the jth population implementing
+the ith strategy in the society. By utilizing interesting differential
+geometric arguments, the authors show how the dynamics (36)
+can be related to a gradient system with respect to a potential
+function Jj for each population j ∈ P , and one of the ES problems
+they consider is for a system of Ω agents and the goal is to
+maximize Ji (x, θ ) where x represents agent states and each agent’s
+internal dynamics are given by θ̇ij = gij (x, θ ), θ ∈ RΩ . The authors
+propose ES dynamics for the ith agent of the jth cluster in the
+τ = ω̄t time scale given by
+
+ω̄
+
+(40)
+
+λ
+
+⎞
+1 ∑
+
+2
+
+min λT ∇u l(u) ,
+
+dy
+dt
+
+=
+
+= θi (t)T
+
+du
+dt
+
+,
+
+(48)
+
+and estimates ŷi of yi are then defined by the dynamics
+dŷi
+
+= u̇θ̂i + Kei + ciT θ̂˙i ,
+
+dt
+
+(49)
+
+where K > 0 is a design variable, ei = yi − ŷi is the estimation
+error, and the time-varying vector ci (t) has dynamics
+dci T
+
+= −KciT + u̇T .
+(50)
+dt
+A parameter estimation update approach is then developed which
+guarantees convergence of the parameter estimates.[
+]
+
+(39)
+
+where x ∈ Rn is a vector of state variables, the control input
+u takes values in a compact convex set U ⊂ Rp , and y =
+h(x) ∈ Rm is a vector valued unknown function to be minimized.
+The usual ES assumptions are made, such as f (x, u) and h(x)
+being smooth functions and there being an equilibrium (steadystate) map given by the n-dimensional vector π (u) such that
+f (π (u), u) = 0 and the equilibrium cost function is given by
+y = h(π (u)) = l(u) with the equilibrium manifold x = π (u) being
+locally exponentially stable uniformly in u, ∀u ∈ U .
+
+For a p × m matrix of parameter estimates Θ̂ = θ̂1 , . . . , θ̂m
+
+T
+
+and the vector of weightings of Pareto solutions λ = [λ1 , . . . ,
+
+λm ]T , the proposed ES controller is
+( m
+)
+∑[
+]
+du
+∗
+= −ϵ2 k
+λi + ϵ1 (yi − yi ) θ̂i + d(t)
+dt
+
+i=1
+
+(
+
+)
+[
+]
+= ϵ2 −kΘ̂ λ + ϵ1 (y − y∗ ) + d(t) ,
+8
+
+(51)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 8. Newton-based ES for multivariable systems, which requires an initial
+condition of Γ (0) < 0.
+
+)
+)( m
+( m
+∑
+∑ ∂λi (β )
+T
+= −k
+θ̂i
+λi θ̂i
+dt
+∂β
+
+dβ
+
+i=1
+
+i=1
+
+∂λT T
+= −k
+Θ̂ Θ̂ λ,
+∂β
+
+(52)
+
+Fig. 9. Example of convergence via the Newton-based ES method for a two
+dimensional system compared to the standard ES approach.
+Source: Figure adapted from the simulation results section of Ghaffari, Krstić,
+and Nešić (2012).
+
+where d(t) is a vector of bounded dither signals, k > 0 is a chosen
+gain, and ϵ1 > 0 is a time-scale separation parameter.

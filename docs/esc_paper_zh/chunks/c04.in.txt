@@ -1,0 +1,557 @@
+=== CHUNK 04 — 本节图片映射（图号 -> 相对路径）===
+Fig.10 -> images/fig10_p11.png | Fig.11 -> images/fig11_p12.png | Fig.12 -> images/fig12_p12.png
+=== 正文（pdftotext 原始提取，含断词/错位/页眉噪声）===
+4. Newton-based ES
+
+where h(θ0 , a, t) contains terms of third order and higher in a.
+This plant output is represented as a dynamic system in matrix
+form as
+
+Another major extension of ES was the development of a
+Newton-based approach. Averaging analysis shows that extremum
+seeking methods converge by continuously following the unknown gradients of the functions being maximized or minimized.
+This makes the algorithm convergence speed locally dependent
+on a function’s curvature. Convergence speed being proportional
+to curvature is clearly demonstrated by the following example
+from Moase, Manzie, and Brear (2009) in which an ES setup with
+a tuned parameter θ is being adjusted to minimize the output
+function y with averaged ES dynamics
+
+θ̄˙ = −kŷ′ ,
+
+y = Cx + h(θ0 , a, t),
+dx
+∂ x ∂θ0
+∂x ∂a
+= ωθ Ax +
++
+,
+dt
+∂θ0 ∂ t
+∂a ∂t
+y0 + 14 a2 y′′0
+0
+⎢0
+⎢ y′0 aS1 ⎥
+⎥
+⎢
+⎢
+x = ⎢ y′0 aC1 ⎥ , A = ⎢0
+⎣0
+⎣ y′′ a2 S ⎦
+2
+0
+0
+y′′0 a2 C2
+
+y′′ (θ − θ ∗ ) = y′′∗ + O(θ ),
+y′ (θ − θ ∗ )
+∼ (θ − θ ∗ ).
+y′′ (θ − θ ∗ )
+
+(55)
+
+1 ′′ 2
+y a sin(ωθ t) + h(θ0 , a, t),
+2 0
+
+⎡
+
+0
+0
+−1
+0
+0
+
+0
+1
+0
+0
+0
+
+0
+0
+0
+0
+−2
+
+⎤
+
+0
+0⎥
+⎥
+0⎥ ,
+2⎦
+0
+
+(60)
+
+Sn = sin(nωθ t) and Cn = cos(nωθ t). System (59) is then dynamically estimated by the state-space observer
+
+ŷ = C x̂,
+dx̂
+= ωθ Ax̂ + ωθ L(y − ŷ),
+dt
+
+(61)
+(62)
+
+with L ∈ R5 a gain vector and the estimates of y′0 and y′′0 are given
+by
+
+(56)
+
+Therefore by introducing a local ES convergence proportional to
+a Newton rate of y′ /y′′ removes the curvature dependence from
+the convergence rate. Such an approach to Newton-like ES was
+developed in Moase et al. (2009) and Moase, Manzie, and Brear
+(2010) and generalized to higher order derivatives in Nesić, Tan,
+Moase, and Manzie (2010).
+The price of using a Newton method to improve convergence
+rate is an increase in complexity. In order to apply a Newton-like
+ES scheme, in addition to the typically used estimates of y′ there
+is a requirement to estimate y′′ . The method introduced in Moase
+et al. (2009, 2010) is to consider a second order Taylor expansion
+of the plant output y with an ES dither signal θ = θ0 + a sin(ωθ t)
+y = y0 + y′0 a sin(ωθ t) +
+
+⎤
+
+⎡
+
+where ŷ′ is an estimate of dy/dθ near a local minimum at θ ∗
+where y′ (θ ∗ ) = y′∗ = 0. We can Taylor expand y′ and y′′ near
+θ ∗ as
+(54)
+
+(59)
+
+where C = (1 1 0 0 − 1/4),
+
+(53)
+
+y′ (θ − θ ∗ ) = (θ − θ ∗ )y′′∗ + O(θ 2 ),
+
+(58)
+
+ayˆ′0 = C ′ x̂,
+
+C ′ = (0 S1 C1 0 0),
+
+(63)
+
+ˆ = C x̂,
+
+C ′′ (0 0 0 S2 C2 ).
+
+(64)
+
+a2 y′′0
+
+′′
+
+See Fig. 9.
+The Newton-based approach was later extended to multi-inputsingle-output (MISO) nonlinear dynamic systems of the form
+ẋ = f (x, u),
+
+y = h(x),
+m
+
+(65)
+n
+
+where x ∈ R , u ∈ R , and y ∈ R (Ghaffari et al., 2012). The
+multivariable ES approach requires typical ES assumptions of a
+known smooth control law u = α (x, θ ) such that the closed loop
+system ẋ = f (x, α (x, θ )) has a set of equilibria parameterized by
+a smooth function l(θ ), that for each value of θ the equilibrium
+point x = l(θ ) is locally exponentially stable uniformly in θ , and
+
+(57)
+9
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+that there exists θ ∗ ∈ Rn such that h(l(θ ∗ )) = 0 and where the
+second derivative Hessian matrix H is negative definite.
+The multivariable Newton ES work utilizes the approach of Nesić et al. (2010) to find an estimate Ĥ of the Hessian matrix H
+and then use a Riccati equation to find its inverse. Considering
+the filter dynamics
+H = −ωr H + ωr Ĥ ,
+
+(66)
+
+whose state converges to Ĥ, if we denote Γ = H
+
+Γ̇ = −Γ HΓ dynamics can be written as
+Γ̇ = ωr Γ − ωr Γ Ĥ Γ ,
+
+−1
+
+, then the
+(67)
+
+with equilibria Γ ∗ = 0n×n and Γ ∗ = Ĥ −1 , whose 0 equilibrium is
+unstable for ωr > 0. This dynamic estimate of the Hessian inverse
+is robust even for Ĥ which are close to singular or whose inverse
+is indefinite. The approach is then to estimate Ĥ, and estimate
+its inverse Γ , which can be used to remove the influence of the
+Hessian from the ES dynamics whose rate of convergence can
+then be specified by a gain matrix K .
+The overall multivariable Newton ES setup is shown in Fig. 8
+with dynamics
+ẋ = f x, α x, θ ∗ + θ̃ + S(t)
+
+(
+
+(
+
+))
+
+(
+)
+θ̃˙ = −K Γ̃ + H −1 Ĝ
+(
+)
+˙
+Ĝ = −ωl Ĝ + ωl y − h ◦ l(θ ∗ ) − η̃ M(t)
+(
+(
+)
+(
+)
+(
+))
+Γ̃˙ − ω Γ̃ + H −1 I − H̃ + H Γ̃ + H −1
+r
+
+˙
+
+Fig. 10. Example of stochastic ES escaping from a local minimum.
+Source: Figure adapted from Liu and Krstić (2012).
+
+H̃ = −ωl H̃ − ωl H + ωl y − h ◦ l(θ ∗ ) − η̃ N(t)
+
+(
+
+)
+
+η̃˙ = −ωh η̃ + ωh (y − h ◦ l(θ ∗ )),
+
+(68)
+
+where θ̃ = θ̂ − θ , θ = θ̂ + S(t), η̃ = η − h ◦ l(θ ), Γ̃ = Γ − H −1 ,
+H̃ = Ĥ − H, and
+∗
+
+∗
+
+η̇ = −ωh η + ωh y.
+
+where Wt is a standard 1D Brownian motion. Using the fact
+that Brownian motion on the unit circle is exponentially ergodic
+distribution
+{with invariant
+} µ given by the uniform measure T =
+(x, y) ∈ R2 |x2 + y2 = 1 , such that µ(S) = l(S)/2π for any set
+S ⊂ T where l(S) is the Lebesgue measure of S, the authors
+show that utilizing dither (72) results in an averaged dynamics
+of system (70) of the form
+
+(69)
+
+5. Stochastic ES
+ES methods have also been developed for stochastic systems by first proving general stochastic averaging results, which
+are then applied to an ES approach which utilizes stochastic
+dithers (Liu & Krstić, 2010, 2012). One of the main motivations for
+a stochastic ES method is that there is a chance of escaping from
+local minima due to the possibility of a large random jump, which
+may then result in a trajectory that locates the global minimum
+(see Fig. 10).
+In Liu and Krstić (2010, 2012), the authors consider a system
+of the form
+(
+)
+dXtϵ
+= a Xtϵ , Yt /ϵ ,
+(70)
+dt
+ϵ
+where Xt is a continuous Markov process on probability space
+(Ω , F , P), a(x, y) is a continuous function of (x, y) which for any
+x ∈ Rn is a bounded function of y, and satisfies a Lipschitz
+condition in x ∈ Rn such that for any compact set D ⊂ Rn there
+exists a constant kD such that for all y and any x1 , x2 ∈ D,
+
+|a(x1 , y) − a(x2 , y)| < kD |x1 − x2 |.
+
+dX̄t
+dt
+
+= ā(Xtϵ ) + R(X ϵt , Yt /ϵ ), X0ϵ = x,
+(75)
+(
+)
+where R(X ϵt , Yt /ϵ ) = a Xtϵ , Yt /ϵ − ā(Xtϵ ), such that (75) can be
+viewed as a random perturbation of the averaged system (74),
+with assumption that ā(0) = 0, X̄t ≡ 0 is a stable solution of
+(74). The authors then develop an approximation theorem which
+provides a closeness of trajectories condition for their system,
+ensuring that the perturbed and averaged system trajectories
+will remain within any δ > 0 for arbitrarily long time for
+arbitrarily small ϵ almost surely and in probability as stated in
+their Theorem 1:
+For any δ > 0
+lim inf t ≥ 0 : |Xtϵ − X̄t | > δ = +∞, a.s
+
+{
+
+0
+
+]
+
+,
+
+}
+
+ϵ→0
+
+(76)
+
+and there exists a function T (ϵ ) : (0, ϵ0 ) → N such that for any
+
+δ>0
+
+(72)
+
+−1
+
+(74)
+
+dt
+
+{
+lim P
+
+ϵ→0
+
+which is the solution to the following system of stochastic differential equations
+0
+dYt = − Yt dt + BYt dWt , B =
+1
+2
+
+a(x, y)µ(dy).
+SY
+
+dXtϵ
+
+(71)
+
+Yt = ejWt = [cos(Wt ), sin(Wt )]T ,
+
+[
+
+∫
+ā(x) =
+
+In order to study stability, the authors rewrite system (70) as
+
+For such systems, one of the stochastic ES excitation signals
+proposed by the authors is the Brownian motion on the unit circle
+(Yt , t ≥ 0)
+
+1
+
+= ā(X̄t ),
+
+ϵ
+
+sup |Xt − X̄t | > δ
+
+0≤t ≤T (ϵ )
+
+}
+
+= 0,
+
+(77)
+
+where
+lim T (ϵ ) = +∞.
+
+(73)
+
+ϵ→0
+
+10
+
+(78)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 12. ES as an optimizer or as a stabilizing feedback setup with the system
+dynamics being utilized as the natural integrator of the ES input as developed
+in Scheinker (2012).
+Fig. 11. Stochastic ES setup using white noise for a dynamic system.
+
+This approach to developing ES-based stabilizing feedbacks was
+married to the theories of stabilization and control Lyapunov
+functions (clf) (Freeman & Kokotovic, 1996; Krstić & Deng, 1998;
+Krstić, Kokotovic, & Kanellakopoulos, 1995; Sepulchre, Jankovic,
+& Kokotovic, 2012; Sontag, 1989). The marriage of clf techniques
+with high frequency ES studies has allowed for the stabilization of unknown systems (Scheinker, 2012; Scheinker & Krstić,
+2012a, 2012b), such as systems with unknown control directions (Mudgett & Morse, 1985; Nussbaum, 1983), which unlike
+other approaches (Ge, Yang, & Lee, 2008), allows the unknown
+control gain matrix B(t) to repeatedly pass through zero. The
+original idea of using ES as a stabilizing feedback was developed
+for an open-loop unstable system
+
+See Fig. 11.
+Utilizing this stochastic closeness of trajectories property the
+authors are able to relate various forms of stability of the averaged system (74) with the original system (70), the strongest
+of which is an exponential stability result which states that if
+the equilibrium X̄t ≡ 0 of (74) is exponentially stable, then
+it is weakly exponentially stable under random perturbations
+R(·, Yt /ϵ ), implying there exist constants r > 0, c > 0, and γ > 0
+such that for any initial condition with norm bounded by r, and
+for any δ > 0, the solution of (70) satisfies
+lim inf t ≥ 0 : |Xtϵ | > c |x|e−γ t + δ = +∞, a.s.
+
+{
+
+}
+
+ϵ→0
+
+(79)
+
+ẋ = ax + bu,
+
+as well as the boundedness result
+lim P |Xtϵ | ≤ c |x|e−γ t + δ, ∀t ∈ [0, T (ϵ )] = 1.
+
+{
+
+}
+
+ϵ→0
+
+y = h(x),
+
+u = αω cos(ωt) − k sin(ωt)V (x),
+
+where y = V (x) is a Lyapunov function for (87). For y = x , the
+closed loop dynamics are
+
+(81)
+
+ẋ = ax + bαω cos(ωt) − bk sin(ωt)x2 ,
+
+where x ∈ R is the state, u ∈ R is the input, and y ∈ R is
+an analytically unknown output function. A smooth control law
+of the form u = α (x, θ ) is assumed, parameterized by a scalar
+parameter θ . The stochastic ES update law for finding the optimal
+value θ ∗ of θ is then designed as
+
+θ = a sin(η) + θ̂ ,
+dt
+dξ
+dt
+dζ
+
+(83)
+
+= −w1 ξ + w1 (y − ζ ) sin(η),
+
+(84)
+
+= −w2 ζ + w2 y,
+dt
+√
+ϵ dη = −ηdt + ϵ qdW ,
+
+(89)
+
+where α can be thought of as the persistent dithering amplitude,
+k the feedback gain, and ω must be sufficiently large to guarantee
+stability, which is a departure from the classical ES methods described above in which the ES dithering frequency was required
+to be small. It is clear from (89) that even if x(t) is near zero a
+persistent dithering term of the form bα sin(ωt) will remain. To
+study stability we change variables to
+
+(82)
+
+= kξ ,
+
+(88)
+2
+
+n
+
+dθ̂
+
+(87)
+
+where a > 0, b, and h are unknown, as shown in Fig. 12. In
+the case of stabilization, the proposed feedback controller was
+defined as
+
+(80)
+
+With these stochastic averaging results in hand the authors next
+go on to develop their stochastic ES controller for general nonlinear systems of the form
+ẋ = f (x, u),
+
+y = h(x, t),
+
+y(t) = x(t) − bα sin(ωt),
+
+(90)
+
+where we have subtracted off the persistent oscillating term. By
+considering the time scale τ = ωt, the system dynamics can be
+rewritten as
+1 (
+dy
+=
+ay + abα sin(τ ) − y2 bk sin(τ )
+dτ
+ω
+)
+− 2b2 kα y sin2 (τ ) − b3 kα 2 sin3 (τ ) ,
+(91)
+
+(85)
+(86)
+
+a stochastic analog of system (11)–(14), where k > 0, w1 > 0,
+w2 > 0, ϵ > 0, and q > 0 are design parameters and (W (t), t ≥ 0)
+
+which, for large ω, can be related to the averaged system
+
+is a 1D Brownian motion.
+Subsequently, stochastic ES methods have also been developed for discrete implementations (Liu & Krstić, 2015; Manzie
+& Krstić, 2009), Newton-based stochastic ES (Liu & Krstić, 2014),
+and stochastic ES for dynamic maps with delays (Rušiti, Evangelisti, Oliveira, Gerdts, & Krstić, 2018).
+
+dȳ
+
+(
+)
+= a − kα b2 ȳ.
+
+(92)
+dτ
+The strength of this ES-based feedback approach is immediately
+evident from (92) as the unknown control direction b is squared
+in the average dynamics. Therefore stabilization is achieved independently of the sign of b simply by ensuring that kα >
+a/b2 , which ensures that the origin of the average system (92)
+is exponentially stable no matter what the sign of b is. The trajectory x(t) then exponentially converges to an arbitrarily small
+neighborhood of the origin proportional to α and 1/ω, with a
+solution of the form
+

@@ -1,0 +1,5916 @@
+LA-UR-22-32122
+Accepted Manuscript
+
+100 years of extremum seeking: A survey
+Scheinker, Alexander
+
+Provided by the author(s) and the Los Alamos National Laboratory (2024-06-19).
+To be published in: Automatica
+DOI to publisher's version: 10.1016/j.automatica.2023.111481
+Permalink to record:
+https://permalink.lanl.gov/object/view?what=info:lanl-repo/lareport/LA-UR-22-32122
+
+Los Alamos National Laboratory, an affirmative action/equal opportunity employer, is operated by Triad National Security, LLC for the National Nuclear Security
+Administration of U.S. Department of Energy under contract 89233218CNA000001. By approving this article, the publisher recognizes that the U.S. Government
+retains nonexclusive, royalty-free license to publish or reproduce the published form of this contribution, or to allow others to do so, for U.S. Government purposes.
+Los Alamos National Laboratory requests that the publisher identify this article as work performed under the auspices of the U.S. Department of Energy. Los Alamos
+National Laboratory strongly supports academic freedom and a researcher's right to publish; as an institution, however, the Laboratory does not endorse the
+viewpoint of a publication or guarantee its technical correctness.
+
+Automatica 161 (2024) 111481
+
+Contents lists available at ScienceDirect
+
+Automatica
+journal homepage: www.elsevier.com/locate/automatica
+
+Survey paper
+
+100 years of extremum seeking: A survey✩
+Alexander Scheinker
+Applied Electrodynamics Group, Los Alamos National Laboratory, Los Alamos NM 87544, USA
+
+article
+
+info
+
+Article history:
+Received 2 April 2021
+Received in revised form 19 July 2023
+Accepted 29 November 2023
+Available online xxxx
+Keywords:
+Extremum seeking
+
+a b s t r a c t
+Extremum seeking (ES) is a powerful approach to the optimization and stabilization of unknown
+dynamic systems and is an active field of research in control theory. This paper surveys recent ES
+algorithm developments. ES has evolved from its origins as a simple but brilliant engineering invention
+in the 1922 paper of Leblanc to the breakthrough work of Krstić and Wang in 2000 in which the first
+general stability analysis was given, to the most recent and numerous analytical results which prove
+convergence for a wide range of general dynamic systems. This survey provides a thorough overview
+of the dynamic systems for which ES stabilization and optimization results have been provided, the
+various analytical methods for proving convergence, and an overview of many real world applications
+for which ES has been utilized in industry and at scientific laboratories.
+Published by Elsevier Ltd. This is an open access article under the CC BY license
+(http://creativecommons.org/licenses/by/4.0/).
+
+1. Introduction
+Many real world control problems require optimizing the performance of time-varying and uncertain dynamic systems based
+on measurable but analytically unknown output functions. Examples of such systems include maximal power tracking for solar
+panels and wind farms operating in unpredictable weather conditions, anti-lock brakes which must compensate for unpredictable
+and changing road surfaces, power management in large computer server farms with time-varying demand, autonomous formation control and collision avoidance in changing environments,
+and the control and optimization of charged particle beams in
+particle accelerators.
+The problem of optimizing the performance of a dynamic system by tracking the extremum of its output function is known as
+extremum seeking (ES). ES is a general problem and many methods have been developed over the years including well known
+and established methods such as nonlinear programming (Teel
+& Popovic, 2001). Various adaptive ES methods have also been
+developed which utilize the knowledge of a system model with
+unknown parameters and optimize system performance by using state rather than objective function measurements (Adetola
+& Guay, 2006, 2007; DeHaan & Guay, 2005; Favache, Dochain,
+Perrier, & Guay, 2008; Guay, Dochain, Perrier, & Hudon, 2007;
+Guay & Zhang, 2003).
+✩ This work was supported by the Los Alamos National Laboratory Laboratory
+Directed Research and Development (LDRD) Program Directed Research (DR)
+project ‘‘Charged Particle Beam Control and Diagnostics using Adaptive Machine
+Learning,’’ project number 20220074DR. The material in this paper was not
+presented at any conference. This paper was recommended for publication in
+revised form by Editor Sonia Martinez.
+E-mail address: ascheink@lanl.gov.
+
+In this survey we focus on a perturbation driven method of
+extremum seeking for optimization and control. This approach is
+now ∼100 years old, as it was first proposed in the 1922 paper
+of Leblanc (1922). In his paper, Leblanc reported on a new method
+for maintaining maximum power transfer from a transmission
+line to a tram car. Leblanc’s paper was a description of an ingenious engineering design, but there was no mathematical analysis
+of the scheme’s dynamics. Eventually, Leblanc’s simple method
+became a popular tool for maximizing or minimizing unknown
+output functions of dynamic systems.
+Various ES approaches utilize a broad range of advanced mathematical and control theory methods including singular perturbation theory, stochastic calculus, differential geometry, nonlinear
+perturbation and averaging theory, weak convergence in Hilbert
+spaces, and partial differential equations. Before surveying the
+many recent cutting edge advances in ES, we start with a brief
+description which provides an intuition which is the foundation
+for all ES methods.
+Consider an analytically unknown function h(x) whose maximum we are interested in finding. We assume that h(x) converges
+to its Taylor series about a point x⋆
+h(x) =
+
+∞
+∑
+h(n) (x⋆ )
+n=0
+
+n!
+
+(x − x⋆ )n .
+
+(1)
+
+Assume there is a local maximum at x = x⋆ such that h′ (x⋆ ) = 0
+and h′′ (x⋆ ) < 0. We consider a small neighborhood of x⋆ in which
+the Taylor series can be accurately approximated as the quadratic
+function
+h(x) ≈ h(x⋆ ) +
+
+h′′ (x⋆ )
+2
+
+(x − x⋆ )2 .
+
+https://doi.org/10.1016/j.automatica.2023.111481
+0005-1098/Published by Elsevier Ltd. This is an open access article under the CC BY license (http://creativecommons.org/licenses/by/4.0/).
+
+(2)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+(6) is a highly challenging problem which required approximately
+80 years to solve.
+Leblanc’s simple and effective optimization scheme gained
+attention in Russia starting in the 1940s (Kazakevich, 1943, 1944)
+and in the U.S. the scheme was introduced in the 1950s (Blackman, 1962; Draper & Li, 1951; Tsien, 1954) for optimization of the
+performance of an internal combustion engine. In the 1950s and
+1960s the algorithm was modified and its performance for specific problems was analyzed (Meerkov, 1967; Morosanov, 1957;
+Obabkov, 1967; Ostrovsky, 1957), but rigorous performance and
+design analysis had not taken place. In 1971 a Lyapunov based
+stability analysis of a particular system was performed (Luxat &
+Lees, 1971), but general stability proofs would not arrive until
+30 years later.
+In 2000 the first general stability analysis of the extremum
+seeking method was performed by Krstić and Wang (2000), by
+utilizing an elegant combination of averaging and singular perturbation techniques. The work of Krstić and Wang sparked renewed interest in the field. Since 2000 the extremum seeking
+method, as a real-time non-model-based optimization approach,
+has seen significant theoretical advances (Ariyur & Krstić, 2003;
+Choi, Krstić, Ariyur, & Lee, 2002; Rotea, 2000), with extension to
+semi-global convergence (Tan, Nešić, & Mareels, 2006). In 2012 a
+method of utilizing ES directly as a feedback controller was introduced for the stabilization of open-loop unstable time-varying
+dynamic systems with unknown control direction and for optimizing their performance based on analytically unknown noisy
+output functions (Scheinker, 2012; Scheinker & Krstić, 2012a).
+Over the past 20 years a large body of work has been published
+on various ES methods for systems of increasing generality. Although a few reviews of ES have been written in the past (Åström
+& Wittenmark, 1995a, 1995b; Scheinker & Krstić, 2017; Tan,
+Moase, Manzie, Nešić, & Mareels, 2010; Zhang & Ordóñez, 2011),
+this survey attempts to cover the most recent developments in
+this quickly growing field including both theory and applications.
+
+Fig. 1. An intuitive sketch of the mechanism in searching for the maximum of
+h(x) near an extremum at which h(x) ≈ −x2 is also shown (A). Depending on
+whether x(t) > x⋆ or x(t) < x⋆ the value of the perturbed function h(x(t)) will
+be in or out of phase with the perturbing signal. The ES setup from Krstić and
+Wang (2000) is shown for optimization of general nonlinear dynamic systems
+(B).
+
+To illustrate the ES mechanism we start at a point x0 = x⋆ + δ ,
+δ > 0 and dither our signal with a small perturbation size α . Our
+dithered signal dynamics are
+x(t) = x0 + α sin(ωt) = x⋆ + δ + α sin(ωt),
+
+(3)
+
+1.1. Organization
+
+which we plug into (2) to approximate h(x) as
+h(x⋆ ) +
+
+h′′ (x⋆ ) ( 2
+
+)
+δ + 2δα sin(ωt) + α 2 sin2 (ωt) .
+
+Fig. 2 shows an incomplete high level view of the ES approaches that are surveyed here and how they are related. The
+survey is broken down into a set of sections which emphasize areas of ES research and somewhat follow along the timeline shown
+in Fig. 2. We start with classical ES methods and survey various
+extensions and modifications in Sections 2–5. In Sections 6–11
+forms of stabilizing ES and their generalizations are surveyed.
+Starting with Section 12 the survey jumps back to the classic
+form of ES, after which areas of overlap between classical and
+stabilizing ES are shown. The arrangement is described in more
+detail below.
+Section 2 gives an overview of various ES developments in
+most of which the original form of the ES approach is only
+slightly modified, the standard system assumptions are made,
+and the classical approaches to ES proofs of stability are applied via a combination of averaging and singular perturbation
+theory. Also discussed are extensions, such as passing through
+local minima, multi unit systems, and systems distributed over
+networks. Section 3 focuses on ES for games including Nash equilibrium seeking in noncooperative games, cooperative games for
+groups of agents, multi-population games for multi-constrained
+optimization problems, and multi-objective ES for finding Pareto
+sets of optimal solutions. Section 4 is focused on a Newton-based
+ES, a generalization to higher order derivatives, and multivariable
+Newton ES, methods which add complexity to the ES scheme, but
+can also result in faster convergence. Section 5 is focused on a
+stochastic approach to ES.
+In Section 6 a new approach of using high frequency ES as a
+stabilizing feedback for unknown open-loop unstable systems for
+
+(4)
+
+2
+If (4) is filtered to remove the non-oscillating terms (for example,
+this can be done by averaging and then subtracting its average value) and then multiplied by the same dithering frequency
+sin(ωt) the resulting signal is (neglecting phase shifts)
+
+δα h′′ (x⋆ ) sin2 (ωt) + h′′ (x⋆ )α 2 sin3 (ωt)/2.
+The signal is next low pass filtered, or simply integrated, so that
+sin2 (ωt) averages to 1/2 while sin3 (ωt) averages to 0. Finally this
+signal is multiplied by a gain factor k which is used to control the
+convergence speed of the ES algorithm, resulting in
+
+αδ ′′
+
+h (x⋆ ) < 0,
+(5)
+2
+which acts as a proportional feedback pushing x(t) > x⋆ in the
+negative direction back towards x⋆ . The same argument holds for
+a starting point x(t) < x⋆ . An intuitive sketch of the procedure is
+shown in Fig. 1A. For dynamic systems of the form
+k
+
+ẋ = f (x, u),
+
+u = α (x, θ ),
+
+y = h(x),
+
+(6)
+
+the method can be used for finding the optimal steady state
+value of an unknown output function h(x) by adjusting a control
+parameter θ which parameterizes an existing stabilizing controller, as shown in Fig. 1B. Although the intuition behind finding
+the optimal of an unknown function h(x) as described above is
+clear, the analysis of this method and an analytical proof of its
+convergence for output functions of nonlinear systems such as
+2
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 2. The inset in the top right corner shows a very high level overview of the evolution of ES as it has split into two major categories, which in recent years have
+started to merge and exchange ideas and methods. The rest of the figure shows a more detailed view with the major developments and bifurcations in ES research
+which are discussed in more detail in this survey.
+3
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+both control and optimization is introduced. Section 7 is focused
+on Lie bracket averaging, a powerful technique for studying the
+dynamics of systems in which ES is used directly as a feedback
+controller. In Section 8, a new bounded form of ES is introduced as
+well as a weak limit averaging approach which is a generalization
+of the Lie bracket averaging techniques to non-periodic, discontinuous, and non-differentiable dithers. In Section 9, a general
+family of ES controllers is introduced which includes as special
+cases many of the controllers from Sections 6–8. Section 10
+describes a proportional integral form of feedback ES that has
+improved convergence properties. In Section 11, the finite-time
+stabilization properties of stabilizing ES are surveyed.
+In Section 12, ES is extended to the study of PDEs. In Section 13 hybrid ES schemes are described and in Section 14 these
+techniques are extended to finite time Newton ES. In Section 15,
+ES with safety guarantees such as collision avoidance and safety
+barrier functions is surveyed, including both classical and stabilizing ES techniques. Section 16 discusses ES methods for adaptively
+tuning the low dimensional latent space of generative deep neural
+networks to enable their application for time-varying systems.
+Section 17 is a summary of theoretical ES techniques, Section 18
+discusses patents, and Section 19 gives a broad overview of
+applications.
+
+Fig. 3. The consequences of Assumptions 1–3 are described by this image for a
+2 dimensional system. The light gray flow lines in the (x1 , x2 ) plane represent
+the exponential stability of the equilibria points parameterized by l(θ ), for which
+there is a maximum at θ ∗ . For any given value of θ singular perturbation theory
+assumes that the system quickly converges to the curve l(θ ) and ES then slowly
+finds its way along l(θ ) to the maximum.
+
+ξ̇ = −ωl ξ + ωl (y − η)a sin ωt ,
+η̇ = −ωh η + ωh y,
+
+2. Classic ES developments
+
+y = h(x),
+
+θ̃ = θ̂ − θ ∗ ,
+η̃ = η − h(l(θ ∗ )),
+
+(7)
+
+(8)
+
+dx
+
+The following assumptions were required.
+
+dτ
+
+Assumption 1. There exists a smooth function l : R → Rn such
+that
+f (x, α (x, θ )) = 0
+
+if and only if x = l(θ ).
+
+(
+
+x, α x, θ̂ + a sin ωt
+
+θ̂˙ = kξ ,
+
+))
+
+,
+
+
+
+
+
+fast
+
+slow
+
+Theorem 1. Consider the system (11)–(14) under Assumptions 1–3.
+There exists a ball of initial conditions around the point (x, θ̂ , ξ , η) =
+(l(θ ∗ ), θ ∗ , 0, h ◦ l(θ ∗ )) and constants ω̄, δ̄ , and ā such that for all ω ∈
+(0, ω̄), δ ∈ (0, δ̄ ), and a ∈ (0, ā), the solution (x(t), θ̂ (t), ξ (t), η(t))
+exponentially converges to an O(ω + δ + a)-neighborhood of that
+point. Furthermore, y(t) converges to an O(ω + δ + a)-neighborhood
+of h ◦ l(θ ∗ ).
+
+(10)
+
+A visual description of the consequences of Assumptions 1–3 is
+shown in Fig. 3 for a 2 dimensional (x1 , x2 ) dynamic system which
+has a stable equilibrium l(θ ) and an output function y = h(x1 , x2 )
+with a maximum at θ ∗ .
+A proof of convergence follows by considering the closed loop
+dynamics
+
+(
+
+(
+))
+1 (
+f x, α x, θ ∗ + θ̃ + a sin τ ,
+
+ω
+
+The slow and fast dynamics are then analyzed using a combination of averaging and singular perturbation techniques. As
+ω → 0, the fast system is frozen at its equilibrium x = l(θ ∗ +
+θ̃ + a sin τ ) which is substituted into the slow system for which
+averaging analysis proves the existence of an exponentially stable
+equilibrium (Krstić & Wang, 2000). The final result is summarized
+by the following theorem.
+
+Assumption 3. There exists θ ∗ ∈ R such that
+
+ẋ = f
+
+=
+
+⎤
+⎡
+K ′ξ
+dτ
+⎢ dξ ⎥
+⎣ dτ ⎦ = δ ⎣ −ωL′ ξ + ωL′ (h(x) − h(l(θ ∗ )) − η̃) a sin τ ⎦ .
+dη̃
+−ωH′ η̃ + ωH′ (h(x) − h(l(θ ∗ )))
+dτ
+
+
+
+
+(9)
+
+These two assumptions guarantee that the systems is closed
+loop stable and that given any choice of control parameter θ
+there is an exponentially stable equilibrium point. One more
+assumption is made about the existence of a maximum of the
+output function h(x).
+
+(h ◦ l)′′ (θ ∗ ) < 0.
+
+(16)
+
+⎡ dθ̃ ⎤
+
+Assumption 2. For each θ ∈ R, the equilibrium x = l(θ ) of
+the system (7), (8) is locally exponentially stable with decay and
+overshoot constants uniform in θ .
+
+(h ◦ l)′ (θ ∗ ) = 0,
+
+(15)
+
+the dynamic ES system is rewritten as two parts with the evolution of one arbitrarily slow relative to the other. Separation of
+the system into fast and slow parts depends on the choice of
+|δ|, |ω| ≪ 1. This can be seen by considering the dynamics with
+time scale τ = ωt:
+
+where x ∈ Rn , u ∈ R, f : Rn × R → Rn , y : Rn → R, and the
+controller u is parameterized by a scalar θ :
+u = α (x, θ ).
+
+(14)
+
+in which the dithering frequency ω is arbitrarily small and the
+gain of the integrator is chosen as k = ωδ K where δ is also small
+and K > 0. Defining coordinates
+
+The original stability analysis for extremum seeking was performed in Krstić and Wang (2000) for the setup shown in Fig. 1.
+The goal was to maximize the stable steady state output of
+an analytically unknown output function h(x) of the unknown
+dynamic system
+ẋ = f (x, u),
+
+(13)
+
+Theorem 1 and the associated Assumptions 1–3 have been
+utilized in a wide body of work with slight modifications. The
+approach described above has been studied for source seeking
+with a nonholonomic unicycle (Zhang, Arnold, Ghods, Siranosian,
+
+(11)
+(12)
+4
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+& Krstić, 2007), in which the velocity v of a spinning vehicle is
+tuned based on the ES scheme with equations of motion
+ẋ = v cos(ω0 t),
+
+ẏ = v sin(ω0 t),
+
+(17)
+
+for maximizing quadratic functions for which the location of the
+maximum is unknown. These results were then studied for a
+force actuated point mass and it was shown that ES could find
+maxima and track slowly varying trajectories even for moderately
+unstable systems (Zhang, Siranosian, & Krstić, 2007). Various
+dither choices for the ES scheme have also been compared in
+terms of speed of convergence, domain of convergence, and accuracy for sinusoidal, square wave, and triangle wave dithers (Tan,
+Nešić, & Mareels, 2008). It has been shown that the method
+described above can handle stochastic additive measurement
+noise (Stanković & Stipanović, 2010) and an approach to decentralized ES for multi-agent systems has been developed which
+uses numerical gradient estimation methods rather than sinusoidal perturbations (Kvaternik & Pavel, 2011, 2012a, 2012b). The
+method has also been applied using high frequency dithers for
+Weiner–Hammerstein plants (Moase & Manzie, 2012) and for
+Hammerstein plants (Moase & Manzie, 2011), a sliding mode approach has been developed for systems in normal form (Oliveira,
+Peixoto, & Hsu, 2012), as well as event-triggered ES (Poveda &
+Teel, 2017b).
+The ability of the ES scheme to pass through local minima has
+also been studied and it was shown that for a special class of
+systems if the dithering amplitude α is sufficiently large ES will
+pass over local minima and eventually settle at a global minimum
+once α (t) is reduced towards zero based on the dynamics update
+α̇ = −ωδϵ g(α ), where ω, δ , ϵ , and g(α ) must be designed properly (Tan, Nešić, Mareels, & Astolfi, 2009). As a simple example of
+non-local ES, consider the following dynamic system with an ESbased optimizer whose dithering amplitude a(t) starts at a(0) =
+3.0 and then exponentially decays:
+ẋ1 = x1 + x2 ,
+
+Fig. 4. The top plot shows the function y which has a local and a global
+maximum. The middle plot shows the evolution of the cost function with and
+without an adaptive dither size. The bottom plot shows convergence of the
+parameter θ to its local or global maximizing value.
+
+ẋ2 = x2 + u,
+
+u = −x1 + 4x2 + θ + a sin(ωt),
+θ̇ = ωδ y(x1 , x2 ) sin(ωt),
+ȧ = −ωδϵ a,
+
+(18)
+
+developed without steady state oscillations (Wang, Chen, & Ma,
+2016), and for constrained network optimization (Ye & Hu, 2016).
+
+where the output function being maximized is
+5
+8
+(x1 + 3x2 )3 + (x1 + 3x2 )2 + 10.
+15
+6
+A simulation of the above system is compared to the same system
+with a fixed dithering signal of a = 1. The output function y has a
+local maximum at which the small fixed dither size ES gets stuck,
+whereas the ES with decaying dither amplitude passes through
+the local maximum and finds the global maximum, as shown in
+Fig. 4. One limitation of such an approach is for time-varying systems. Once the dither amplitude has decayed, if the optimal point
+changes, the ES will not respond. An alternative non-gradient
+approach to ES over compact sets which may contain local minima was developed for systems with known Lipschitz constants
+by combining ES with a local Schubert search algorithm (Nešić,
+Nguyen, Tan, & Manzie, 2013).
+ES approaches have also been developed for multi unit systems with sampled data (Khong, Nešić, Tan, & Manzie, 2013)
+and time-varying ES approaches have also been studied in which
+using adaptive modification of the ES controller during convergence minimizes the impact of the choice of dither signal (Guay,
+2014; Guay & Dochain, 2015b), with attenuated steady-state oscillations (Bhattacharjee & Subbarao, 2021). Constrained systems
+have been handled by adding barrier functions to the cost function (Guay, Moshksar, & Dochain, 2015). A version of ES for
+nonlinear systems has been developed using fractional-order sliding modes (Yin, Chen, & Zhong, 2014), and a form of ES has been
+
+y = −(x1 + 3x2 )4 +
+
+Recently, data-enabled ES has been studied in which the incorporation of memory to store recorded data enables the use of
+information-rich datasets during the optimization process, which
+removes the need for a persistently exciting time-varying excitation dither signal needed by standard ES algorithms (Poveda,
+Benosman, & Vamvoudakis, 2021). Data-enabled ES is studied for
+systems of the form
+ẋ = f (x, u),
+
+y = h(x, u),
+
+φ (u) = h(l(u), u),
+
+(19)
+
+where φ (u) is to be minimized. The analytically unknown function φ (u) is parameterized as a linear combination of basis functions:
+p
+
+φ (u) =
+
+∑
+
+bi (u)wi + ϵ (u),
+
+(20)
+
+i=1
+
+where ϵ (u) is the approximation error. The approach is to fit this
+representation to φ over a compact set in order to locate the
+minimum.
+ES for the optimization of periodic time-varying outputs was
+presented in Haring, van de Wouw, and Nešić (2013) for systems
+of the form
+ẋ = f (x, α (x, θ ), θ, w (t)),
+5
+
+y = h(x, w (t)),
+
+(21)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Another approach to the optimization of time-varying steady
+state responses of nonlinear systems was taken in Hazeleger,
+Haring, and van de Wouw (2020) for systems of the form
+ẋ = f (x, u, w (t)),
+
+y = g(x, u, w (t)),
+
+(25)
+
+where y is a measured output function and w represents a disturbance that must be bounded, but is not assumed to be periodic.
+There are also approaches that incorporate system knowledge
+into optimization, which are useful for stable systems with existing controllers and known structure, but unknown parameters,
+systems of the form
+ẋ = f (x, θ, u),
+
+y = Q (θ, x),
+
+(26)
+
+where the function f is known, but the parameters θ and the
+output function y are unknown (Nesic, Mohammadi, & Manzie,
+2012). A multi-parametric ES approach for online estimation of
+parametric uncertainties of a model has also been developed for
+systems of the form
+ẋ = f (x) + ∆f (x, t) + g(x)u,
+
+y = h(x),
+
+(27)
+
+where
+∆f (x, t) is an additive model uncertainty
+(Benosman, Farahmand, & Xia, 2019).
+The classical ES algorithm has also been studied for open
+loop LQR control of discrete repeatable systems with fixed initial
+conditions of the form
+xk+1 = Ak xk + Bk uk ,
+Fig. 5. Convergence of networked ES agents.
+Source: Figure adapted from Guay, Vandermeulen, Dougherty, and McLellan (2018).
+
+y k = C k xk ,
+
+(28)
+
+over a finite time horizon N with the goal of finding a sequence of
+open-loop control steps {uk }Nk=−01 that minimize the cost function
+N −1
+
+J =
+
+where w (t) is periodic with known period Tw . Here the standard ES Assumption 1 above is generalized to the existence of
+a twice differentiable map M(θ, w (t)) such that for any fixed
+θ there exists a trajectory x̄θ ,w (t) = M(θ, w(t)) to which the
+system’s trajectory naturally converges. For such systems semiglobal practically asymptotic stability is proven. In this approach,
+a performance functional of the form
+
+(
+Lp (yd (t)) =
+
+1
+Tw
+
+∫ t
+
+|y(τ )| dτ
+p
+
+w
+aπ
+
+∫ t
+t − 2wπ
+
+(29)
+
+k=0
+
+where Ak , Bk and the analytic form of J are unknown (Frihauf,
+Krstić, & Başar, 2013). In this approach the system is re-initialized
+repeatedly from a fixed initial condition and multi-variable ES
+tunes a sequence of control steps to minimize J.
+An innovative ES-based method has also been developed for
+3D environmental source seeking with the navigation of a nonholonomic mobile robot (Matveev, Hoy, & Savkin, 2014).
+
+) 1p
+(22)
+
+t −Tw
+
+3. ES for games
+
+is used. The term (22) is multiplied by the perturbing signal
+sin(ω[t − φ]) and passed through a moving average filter over
+one period of the ES dither:
+e(t) =
+
+1 T
+1∑ T
+yN QN yn +
+yk Qk yk + Rk u2k ,
+2
+2
+
+Lp (yd (τ )) sin(ω[τ − φ])dτ .
+
+For the ES methods described above, extending an approach
+to multi-parameter systems is easily handled by dithering each
+parameter with a unique frequency, resulting in a gradient descent in a high dimensional space, with minimal changes in the
+resulting analysis. Beyond such a high dimensional ES approach,
+a large body of work has focused on developing multi-parameter
+ES in which the relationships between various tuned parameters
+are studied in more complex arrangements such as cooperative
+games or for Nash equilibrium seeking in noncooperative games
+with limited game information.
+The first such approach was studied in Stanković, Johansson,
+and Stipanović (2010) for distributed Nash equilibrium seeking in
+mobile sensor networks in which agents generate actions based
+only on measurements of noise corrupted local cost functions. In
+this setup the actions and structural parameters of an agent’s and
+of other players’ costs are unknown. Each player utilizes their
+own local ES loop with a dithering frequency ωi that is distinct
+from that used by all of the other agents. This discrete ES setup is
+shown for a system of 2D players each with coordinates (xi , yi ) ∈
+R2 in Fig. 7, where u−i denotes the actions of all other players
+within a neighboring set Ni . In this setup all neighboring agents in
+
+(23)
+
+The result is a better estimate of the unknown function’s gradient and faster optimization compared to classical ES because
+harmonics of the dithering signal are removed. This approach is
+effective for systems with steady state oscillations such as simple
+harmonic oscillators:
+ẍ = −ω02 x − b(θ )ẋ + w (t),
+
+(24)
+⋆
+
+where the goal is to find the optimal θ which minimizes the
+unknown damping term b(θ ), w (t) is a periodic external disturbance, and the optimal output is a sinusoidal signal with the
+maximal amplitude. The benefit of this moving-average approach
+compared to the standard low pass filter ES approach described
+above can be seen with example system (24). Addition of the
+high frequency terms x2 = ẋ1 = ẋ in the cost function prevents
+the low pass filter version of ES from converging, but is handled
+by the moving average filtered approach, as shown in Fig. 6.
+6
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 6. Left column: Convergence to the optimal value of θ is shown for the classical low pass filtered version of ES θ̂LP compared to the performance of the moving
+average estimate θ̂MA . Both converge to the optimal, and the slightly better performance of the moving average approach can be explained by the more accurate
+estimate of the derivative. Right column: Once a small high frequency term 0.1x22 = 0.1ẋ1 is added to the cost function the low pass filtered ES can only get to
+within a neighborhood of the optimal whereas the moving average approach filters out the high frequency disturbances much more efficiently.
+
+for maximizing wind farm power capture (Menon & Baras, 2014).
+In this approach each agent indexed by i of a group of n agents has
+access to its own private utility function fi (u) which can depend
+on the collective actions taken by all agents u = (u1 , . . . , un ).
+The utility functions are assumed to be analytically unknown
+and each agent only has access to its own utility function. The
+objective of the multi-agent system is to optimize a welfare
+function which is the sum of all of the individual utility functions:
+
+W (u) =
+
+n
+∑
+
+fi (u).
+
+(34)
+
+i=1
+
+The agents run a dynamic average consensus algorithm so that
+the consensus output tracks W (u). Information is exchanged
+between agents over an undirected, connected communication
+graph and each agent runs part of an ES loop so that the action
+of agent i is on-average given by
+
+Fig. 7. Nash equilibrium seeking discrete time ES scheme.
+
+Ni have different dithering frequencies ωj ̸ = ωi , the Gi (z) are lowpass filters, the Hi (z) are high-pass filters, and n is measurement
+noise. The overall setup dynamics are given by
+
+wi (k) = Hi (z) [Gi (z) [Ji (ui (k), u−i (k))] + ni (k)] ,
+[
+]
+1
+i
+ui (k) = u0 (k) + Fi (z)
+[ξi (k)] ,
+1−z
+ξi (k) = ϵi (k)Ci (k)wi (k),
+
+u̇i ≈ −
+
+(30)
+
+(35)
+
+resulting in convergence to within an arbitrarily small neighborhood of a local minimizer of W (u).
+A class of extremum seeking controllers has also been developed for multi-population games, for solving multi-constrained
+optimization problems on multi-agent dynamical systems
+(Poveda & Quijano, 2013). In this setup, clusters of agents interact via different cost functions which depend on the states
+of all other agents. The agents of any single cluster attempt
+to simultaneously maximize their common cost function, which
+is analytically unknown and only accessible via measurements.
+A numerical example of such a problem is presented as two
+connected microgrids, with each one attempting to satisfy its own
+power demand by utilizing local generators.
+The work considers sets of populations P = {1, . . . , M } and
+of social strategies H = {1, . . . , N }, where the set of strategies
+used by population j ∈ P is the set Hj ⊂ H. At any given time
+
+(31)
+(32)
+
+and the system almost surely converges to the Nash equilibrium
+at u∗ where
+
+∇1 J1 (u∗ )T , . . . , ∇N JN (u∗ )T = 0.
+
+∂ W (u)
+,
+∂ ui
+
+(33)
+
+A similar approach was later studied for continuous systems
+in Frihauf, Krstić, and Basar (2011). A fixed-time Nash equilibrium seeking approach has also been studied (Poveda, Krstić, &
+Başar, 2022), as well as Nash equilibrium seeking in N-cluster
+noncooperative games (Ye, Hu, & Xu, 2020).
+ES methods have also been developed for cooperative games
+for groups of agents, such as distributed control of wind turbines
+7
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Given a vector of weights, λ, the authors show that computing
+elements of the Pareto curve can be achieved by solving the
+minimization problem
+
+t, pij (t) ≥ 0 denotes the number of individuals playing the ith
+strategy in the jth population. The amount
+∑ of entities associated
+to the jth population is then given by
+i∈Hj pij (t) = Pj (t) and
+the
+number
+of
+entities
+associated
+to
+the
+ith
+strategy is given by
+∑
+p
+(t)
+=
+S
+(t).
+The
+total
+amount
+of
+entities
+in the entire
+ij
+i
+j∈Pi
+∑ ∑
+society is then
+j∈P
+i∈Hj pij = T . The authors consider two
+types of society states: (1) normalized with respect to Pj , for
+every population j ∈ P ; and (2) normalized with respect to Si ,
+for each strategy i ∈ H.
+pij (t)
+Yj ,
+For the first case, the states are defined as yij (t) = P
+j
+which defines the proportion of entities playing the ith strategy in
+the jth population, where Yj ∈ R>0 and where Pj is assumed to be
+constant for every j ∈ P . With this setup the society state for the
+jth population is defined yj (t) and the overall society state is given
+by [y1 (t)T , . . . , yM (t)T ]T . The authors consider state dynamics of
+the form
+
+⎛
+
+
+
+ẏij = βj yij ⎝fij (y) −
+
+Yj
+
+yij fij (y)⎠ ,
+
+subject to the constraints
+
+λi ≥ 0, i = 1, . . . , m,
+
+∂ x̂ij
+Jj (x, θ )µij (τ ) ∑
+= 2ϵ x̂ij ⎝
+x̂kj + C · · ·
+∂τ
+Xj
+k∈Hj
+⎞
+[
+]
+1 ∑
+x̂kj Jj (θ )µkj (τ ) + C ⎠ ,
+··· −
+Xj
+
+dt
+
+= f (x, u),
+
+
+
+β
+
+(41)
+
+(42)
+
+∏m−1
+
+2
+where λm (β ) =
+i=1 cos(βi ) is a parameterization of the λi ,
+which can be solved by a gradient descent algorithm to yield
+a minimum squared norm element of λT ∇ u as a function of
+β , based on which the Pareto optimal solution can be found
+following a simple gradient update of the input u. These two
+gradient descent dynamics are then combined as the following
+controller:
+
+(36)
+
+∂λ(β )T
+∇u l(u)∇u l(u)T λ(β ),
+∂β
+u̇ = −ϵ2 k∇u l(u)T λ(β ), ϵ2 > 0.
+
+β̇ = −k
+
+(43)
+(44)
+
+In practice, it is often desirable to define a particular optimal
+solution associated with specific compromises between multiple
+objectives. Assuming such a solution is known and defined as y∗ ,
+the above controller is then modified as
+
+∂λ(β )T
+∇u l(u)∇u l(u)T λ(β ),
+∂β
+[
+]
+u̇ = −Mk∇u l(u)T λ(β ) − k∇u l(u)T l(u) − y∗ ,
+
+β̇ = −Mk
+
+(37)
+
+(45)
+(46)
+
+with M > 0.
+The ES part is now developed for an analytically unknown
+function l(u) for which time-varying estimates of the unknown
+gradients are developed. Considering the dynamics
+dy
+
+(38)
+
+∂ l T du
+,
+∂ u dt
+
+(47)
+dt
+for each output function yi , the unknown gradient is defined as
+θi (t) = ∂∂ lui so that
+
+k∈Hj
+
+y = h(x),
+
+2
+
+min λ(β )T ∇u l(u) ,
+
+where x̂ij = xij − aµij (t) with µij (t) the dither signals defined as
+sin(ω̄ωij ) with distinct ωij and k = 2ϵ ω̄ is the adaptation gain
+for all agents. The authors prove that by appropriately tuning the
+parameters ω̄, ϵ , a, and C , the system can be made semi-globally
+practically asymptotically stable.
+As a final example, we consider a real-time multi-objective ES
+controller for uncertain nonlinear systems which is guaranteed to
+converge to points of the Pareto set of optimal solutions (Guay &
+Dochain, 2015a). This form of ES is designed for engineering problems in which multiple competing objectives must be handled for
+various design goals. Nonlinear systems are studied of the form
+dx
+
+λi = 1,
+
+and that this problem is equivalent to the unconstrained optimization problem:
+
+i∈Hj
+
+∂θij
+= gij (x̂ + aµ(τ ), θ ),
+∂τ
+⎛
+
+m
+∑
+i=1
+
+where βj > 0 and the function fij represents the payoff perceived
+by the portion of entities of the jth population implementing
+the ith strategy in the society. By utilizing interesting differential
+geometric arguments, the authors show how the dynamics (36)
+can be related to a gradient system with respect to a potential
+function Jj for each population j ∈ P , and one of the ES problems
+they consider is for a system of Ω agents and the goal is to
+maximize Ji (x, θ ) where x represents agent states and each agent’s
+internal dynamics are given by θ̇ij = gij (x, θ ), θ ∈ RΩ . The authors
+propose ES dynamics for the ith agent of the jth cluster in the
+τ = ω̄t time scale given by
+
+ω̄
+
+(40)
+
+λ
+
+⎞
+1 ∑
+
+2
+
+min λT ∇u l(u) ,
+
+dy
+dt
+
+=
+
+= θi (t)T
+
+du
+dt
+
+,
+
+(48)
+
+and estimates ŷi of yi are then defined by the dynamics
+dŷi
+
+= u̇θ̂i + Kei + ciT θ̂˙i ,
+
+dt
+
+(49)
+
+where K > 0 is a design variable, ei = yi − ŷi is the estimation
+error, and the time-varying vector ci (t) has dynamics
+dci T
+
+= −KciT + u̇T .
+(50)
+dt
+A parameter estimation update approach is then developed which
+guarantees convergence of the parameter estimates.[
+]
+
+(39)
+
+where x ∈ Rn is a vector of state variables, the control input
+u takes values in a compact convex set U ⊂ Rp , and y =
+h(x) ∈ Rm is a vector valued unknown function to be minimized.
+The usual ES assumptions are made, such as f (x, u) and h(x)
+being smooth functions and there being an equilibrium (steadystate) map given by the n-dimensional vector π (u) such that
+f (π (u), u) = 0 and the equilibrium cost function is given by
+y = h(π (u)) = l(u) with the equilibrium manifold x = π (u) being
+locally exponentially stable uniformly in u, ∀u ∈ U .
+
+For a p × m matrix of parameter estimates Θ̂ = θ̂1 , . . . , θ̂m
+
+T
+
+and the vector of weightings of Pareto solutions λ = [λ1 , . . . ,
+
+λm ]T , the proposed ES controller is
+( m
+)
+∑[
+]
+du
+∗
+= −ϵ2 k
+λi + ϵ1 (yi − yi ) θ̂i + d(t)
+dt
+
+i=1
+
+(
+
+)
+[
+]
+= ϵ2 −kΘ̂ λ + ϵ1 (y − y∗ ) + d(t) ,
+8
+
+(51)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 8. Newton-based ES for multivariable systems, which requires an initial
+condition of Γ (0) < 0.
+
+)
+)( m
+( m
+∑
+∑ ∂λi (β )
+T
+= −k
+θ̂i
+λi θ̂i
+dt
+∂β
+
+dβ
+
+i=1
+
+i=1
+
+∂λT T
+= −k
+Θ̂ Θ̂ λ,
+∂β
+
+(52)
+
+Fig. 9. Example of convergence via the Newton-based ES method for a two
+dimensional system compared to the standard ES approach.
+Source: Figure adapted from the simulation results section of Ghaffari, Krstić,
+and Nešić (2012).
+
+where d(t) is a vector of bounded dither signals, k > 0 is a chosen
+gain, and ϵ1 > 0 is a time-scale separation parameter.
+4. Newton-based ES
+
+where h(θ0 , a, t) contains terms of third order and higher in a.
+This plant output is represented as a dynamic system in matrix
+form as
+
+Another major extension of ES was the development of a
+Newton-based approach. Averaging analysis shows that extremum
+seeking methods converge by continuously following the unknown gradients of the functions being maximized or minimized.
+This makes the algorithm convergence speed locally dependent
+on a function’s curvature. Convergence speed being proportional
+to curvature is clearly demonstrated by the following example
+from Moase, Manzie, and Brear (2009) in which an ES setup with
+a tuned parameter θ is being adjusted to minimize the output
+function y with averaged ES dynamics
+
+θ̄˙ = −kŷ′ ,
+
+y = Cx + h(θ0 , a, t),
+dx
+∂ x ∂θ0
+∂x ∂a
+= ωθ Ax +
++
+,
+dt
+∂θ0 ∂ t
+∂a ∂t
+y0 + 14 a2 y′′0
+0
+⎢0
+⎢ y′0 aS1 ⎥
+⎥
+⎢
+⎢
+x = ⎢ y′0 aC1 ⎥ , A = ⎢0
+⎣0
+⎣ y′′ a2 S ⎦
+2
+0
+0
+y′′0 a2 C2
+
+y′′ (θ − θ ∗ ) = y′′∗ + O(θ ),
+y′ (θ − θ ∗ )
+∼ (θ − θ ∗ ).
+y′′ (θ − θ ∗ )
+
+(55)
+
+1 ′′ 2
+y a sin(ωθ t) + h(θ0 , a, t),
+2 0
+
+⎡
+
+0
+0
+−1
+0
+0
+
+0
+1
+0
+0
+0
+
+0
+0
+0
+0
+−2
+
+⎤
+
+0
+0⎥
+⎥
+0⎥ ,
+2⎦
+0
+
+(60)
+
+Sn = sin(nωθ t) and Cn = cos(nωθ t). System (59) is then dynamically estimated by the state-space observer
+
+ŷ = C x̂,
+dx̂
+= ωθ Ax̂ + ωθ L(y − ŷ),
+dt
+
+(61)
+(62)
+
+with L ∈ R5 a gain vector and the estimates of y′0 and y′′0 are given
+by
+
+(56)
+
+Therefore by introducing a local ES convergence proportional to
+a Newton rate of y′ /y′′ removes the curvature dependence from
+the convergence rate. Such an approach to Newton-like ES was
+developed in Moase et al. (2009) and Moase, Manzie, and Brear
+(2010) and generalized to higher order derivatives in Nesić, Tan,
+Moase, and Manzie (2010).
+The price of using a Newton method to improve convergence
+rate is an increase in complexity. In order to apply a Newton-like
+ES scheme, in addition to the typically used estimates of y′ there
+is a requirement to estimate y′′ . The method introduced in Moase
+et al. (2009, 2010) is to consider a second order Taylor expansion
+of the plant output y with an ES dither signal θ = θ0 + a sin(ωθ t)
+y = y0 + y′0 a sin(ωθ t) +
+
+⎤
+
+⎡
+
+where ŷ′ is an estimate of dy/dθ near a local minimum at θ ∗
+where y′ (θ ∗ ) = y′∗ = 0. We can Taylor expand y′ and y′′ near
+θ ∗ as
+(54)
+
+(59)
+
+where C = (1 1 0 0 − 1/4),
+
+(53)
+
+y′ (θ − θ ∗ ) = (θ − θ ∗ )y′′∗ + O(θ 2 ),
+
+(58)
+
+ayˆ′0 = C ′ x̂,
+
+C ′ = (0 S1 C1 0 0),
+
+(63)
+
+ˆ = C x̂,
+
+C ′′ (0 0 0 S2 C2 ).
+
+(64)
+
+a2 y′′0
+
+′′
+
+See Fig. 9.
+The Newton-based approach was later extended to multi-inputsingle-output (MISO) nonlinear dynamic systems of the form
+ẋ = f (x, u),
+
+y = h(x),
+m
+
+(65)
+n
+
+where x ∈ R , u ∈ R , and y ∈ R (Ghaffari et al., 2012). The
+multivariable ES approach requires typical ES assumptions of a
+known smooth control law u = α (x, θ ) such that the closed loop
+system ẋ = f (x, α (x, θ )) has a set of equilibria parameterized by
+a smooth function l(θ ), that for each value of θ the equilibrium
+point x = l(θ ) is locally exponentially stable uniformly in θ , and
+
+(57)
+9
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+that there exists θ ∗ ∈ Rn such that h(l(θ ∗ )) = 0 and where the
+second derivative Hessian matrix H is negative definite.
+The multivariable Newton ES work utilizes the approach of Nesić et al. (2010) to find an estimate Ĥ of the Hessian matrix H
+and then use a Riccati equation to find its inverse. Considering
+the filter dynamics
+H = −ωr H + ωr Ĥ ,
+
+(66)
+
+whose state converges to Ĥ, if we denote Γ = H
+
+Γ̇ = −Γ HΓ dynamics can be written as
+Γ̇ = ωr Γ − ωr Γ Ĥ Γ ,
+
+−1
+
+, then the
+(67)
+
+with equilibria Γ ∗ = 0n×n and Γ ∗ = Ĥ −1 , whose 0 equilibrium is
+unstable for ωr > 0. This dynamic estimate of the Hessian inverse
+is robust even for Ĥ which are close to singular or whose inverse
+is indefinite. The approach is then to estimate Ĥ, and estimate
+its inverse Γ , which can be used to remove the influence of the
+Hessian from the ES dynamics whose rate of convergence can
+then be specified by a gain matrix K .
+The overall multivariable Newton ES setup is shown in Fig. 8
+with dynamics
+ẋ = f x, α x, θ ∗ + θ̃ + S(t)
+
+(
+
+(
+
+))
+
+(
+)
+θ̃˙ = −K Γ̃ + H −1 Ĝ
+(
+)
+˙
+Ĝ = −ωl Ĝ + ωl y − h ◦ l(θ ∗ ) − η̃ M(t)
+(
+(
+)
+(
+)
+(
+))
+Γ̃˙ − ω Γ̃ + H −1 I − H̃ + H Γ̃ + H −1
+r
+
+˙
+
+Fig. 10. Example of stochastic ES escaping from a local minimum.
+Source: Figure adapted from Liu and Krstić (2012).
+
+H̃ = −ωl H̃ − ωl H + ωl y − h ◦ l(θ ∗ ) − η̃ N(t)
+
+(
+
+)
+
+η̃˙ = −ωh η̃ + ωh (y − h ◦ l(θ ∗ )),
+
+(68)
+
+where θ̃ = θ̂ − θ , θ = θ̂ + S(t), η̃ = η − h ◦ l(θ ), Γ̃ = Γ − H −1 ,
+H̃ = Ĥ − H, and
+∗
+
+∗
+
+η̇ = −ωh η + ωh y.
+
+where Wt is a standard 1D Brownian motion. Using the fact
+that Brownian motion on the unit circle is exponentially ergodic
+distribution
+{with invariant
+} µ given by the uniform measure T =
+(x, y) ∈ R2 |x2 + y2 = 1 , such that µ(S) = l(S)/2π for any set
+S ⊂ T where l(S) is the Lebesgue measure of S, the authors
+show that utilizing dither (72) results in an averaged dynamics
+of system (70) of the form
+
+(69)
+
+5. Stochastic ES
+ES methods have also been developed for stochastic systems by first proving general stochastic averaging results, which
+are then applied to an ES approach which utilizes stochastic
+dithers (Liu & Krstić, 2010, 2012). One of the main motivations for
+a stochastic ES method is that there is a chance of escaping from
+local minima due to the possibility of a large random jump, which
+may then result in a trajectory that locates the global minimum
+(see Fig. 10).
+In Liu and Krstić (2010, 2012), the authors consider a system
+of the form
+(
+)
+dXtϵ
+= a Xtϵ , Yt /ϵ ,
+(70)
+dt
+ϵ
+where Xt is a continuous Markov process on probability space
+(Ω , F , P), a(x, y) is a continuous function of (x, y) which for any
+x ∈ Rn is a bounded function of y, and satisfies a Lipschitz
+condition in x ∈ Rn such that for any compact set D ⊂ Rn there
+exists a constant kD such that for all y and any x1 , x2 ∈ D,
+
+|a(x1 , y) − a(x2 , y)| < kD |x1 − x2 |.
+
+dX̄t
+dt
+
+= ā(Xtϵ ) + R(X ϵt , Yt /ϵ ), X0ϵ = x,
+(75)
+(
+)
+where R(X ϵt , Yt /ϵ ) = a Xtϵ , Yt /ϵ − ā(Xtϵ ), such that (75) can be
+viewed as a random perturbation of the averaged system (74),
+with assumption that ā(0) = 0, X̄t ≡ 0 is a stable solution of
+(74). The authors then develop an approximation theorem which
+provides a closeness of trajectories condition for their system,
+ensuring that the perturbed and averaged system trajectories
+will remain within any δ > 0 for arbitrarily long time for
+arbitrarily small ϵ almost surely and in probability as stated in
+their Theorem 1:
+For any δ > 0
+lim inf t ≥ 0 : |Xtϵ − X̄t | > δ = +∞, a.s
+
+{
+
+0
+
+]
+
+,
+
+}
+
+ϵ→0
+
+(76)
+
+and there exists a function T (ϵ ) : (0, ϵ0 ) → N such that for any
+
+δ>0
+
+(72)
+
+−1
+
+(74)
+
+dt
+
+{
+lim P
+
+ϵ→0
+
+which is the solution to the following system of stochastic differential equations
+0
+dYt = − Yt dt + BYt dWt , B =
+1
+2
+
+a(x, y)µ(dy).
+SY
+
+dXtϵ
+
+(71)
+
+Yt = ejWt = [cos(Wt ), sin(Wt )]T ,
+
+[
+
+∫
+ā(x) =
+
+In order to study stability, the authors rewrite system (70) as
+
+For such systems, one of the stochastic ES excitation signals
+proposed by the authors is the Brownian motion on the unit circle
+(Yt , t ≥ 0)
+
+1
+
+= ā(X̄t ),
+
+ϵ
+
+sup |Xt − X̄t | > δ
+
+0≤t ≤T (ϵ )
+
+}
+
+= 0,
+
+(77)
+
+where
+lim T (ϵ ) = +∞.
+
+(73)
+
+ϵ→0
+
+10
+
+(78)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 12. ES as an optimizer or as a stabilizing feedback setup with the system
+dynamics being utilized as the natural integrator of the ES input as developed
+in Scheinker (2012).
+Fig. 11. Stochastic ES setup using white noise for a dynamic system.
+
+This approach to developing ES-based stabilizing feedbacks was
+married to the theories of stabilization and control Lyapunov
+functions (clf) (Freeman & Kokotovic, 1996; Krstić & Deng, 1998;
+Krstić, Kokotovic, & Kanellakopoulos, 1995; Sepulchre, Jankovic,
+& Kokotovic, 2012; Sontag, 1989). The marriage of clf techniques
+with high frequency ES studies has allowed for the stabilization of unknown systems (Scheinker, 2012; Scheinker & Krstić,
+2012a, 2012b), such as systems with unknown control directions (Mudgett & Morse, 1985; Nussbaum, 1983), which unlike
+other approaches (Ge, Yang, & Lee, 2008), allows the unknown
+control gain matrix B(t) to repeatedly pass through zero. The
+original idea of using ES as a stabilizing feedback was developed
+for an open-loop unstable system
+
+See Fig. 11.
+Utilizing this stochastic closeness of trajectories property the
+authors are able to relate various forms of stability of the averaged system (74) with the original system (70), the strongest
+of which is an exponential stability result which states that if
+the equilibrium X̄t ≡ 0 of (74) is exponentially stable, then
+it is weakly exponentially stable under random perturbations
+R(·, Yt /ϵ ), implying there exist constants r > 0, c > 0, and γ > 0
+such that for any initial condition with norm bounded by r, and
+for any δ > 0, the solution of (70) satisfies
+lim inf t ≥ 0 : |Xtϵ | > c |x|e−γ t + δ = +∞, a.s.
+
+{
+
+}
+
+ϵ→0
+
+(79)
+
+ẋ = ax + bu,
+
+as well as the boundedness result
+lim P |Xtϵ | ≤ c |x|e−γ t + δ, ∀t ∈ [0, T (ϵ )] = 1.
+
+{
+
+}
+
+ϵ→0
+
+y = h(x),
+
+u = αω cos(ωt) − k sin(ωt)V (x),
+
+where y = V (x) is a Lyapunov function for (87). For y = x , the
+closed loop dynamics are
+
+(81)
+
+ẋ = ax + bαω cos(ωt) − bk sin(ωt)x2 ,
+
+where x ∈ R is the state, u ∈ R is the input, and y ∈ R is
+an analytically unknown output function. A smooth control law
+of the form u = α (x, θ ) is assumed, parameterized by a scalar
+parameter θ . The stochastic ES update law for finding the optimal
+value θ ∗ of θ is then designed as
+
+θ = a sin(η) + θ̂ ,
+dt
+dξ
+dt
+dζ
+
+(83)
+
+= −w1 ξ + w1 (y − ζ ) sin(η),
+
+(84)
+
+= −w2 ζ + w2 y,
+dt
+√
+ϵ dη = −ηdt + ϵ qdW ,
+
+(89)
+
+where α can be thought of as the persistent dithering amplitude,
+k the feedback gain, and ω must be sufficiently large to guarantee
+stability, which is a departure from the classical ES methods described above in which the ES dithering frequency was required
+to be small. It is clear from (89) that even if x(t) is near zero a
+persistent dithering term of the form bα sin(ωt) will remain. To
+study stability we change variables to
+
+(82)
+
+= kξ ,
+
+(88)
+2
+
+n
+
+dθ̂
+
+(87)
+
+where a > 0, b, and h are unknown, as shown in Fig. 12. In
+the case of stabilization, the proposed feedback controller was
+defined as
+
+(80)
+
+With these stochastic averaging results in hand the authors next
+go on to develop their stochastic ES controller for general nonlinear systems of the form
+ẋ = f (x, u),
+
+y = h(x, t),
+
+y(t) = x(t) − bα sin(ωt),
+
+(90)
+
+where we have subtracted off the persistent oscillating term. By
+considering the time scale τ = ωt, the system dynamics can be
+rewritten as
+1 (
+dy
+=
+ay + abα sin(τ ) − y2 bk sin(τ )
+dτ
+ω
+)
+− 2b2 kα y sin2 (τ ) − b3 kα 2 sin3 (τ ) ,
+(91)
+
+(85)
+(86)
+
+a stochastic analog of system (11)–(14), where k > 0, w1 > 0,
+w2 > 0, ϵ > 0, and q > 0 are design parameters and (W (t), t ≥ 0)
+
+which, for large ω, can be related to the averaged system
+
+is a 1D Brownian motion.
+Subsequently, stochastic ES methods have also been developed for discrete implementations (Liu & Krstić, 2015; Manzie
+& Krstić, 2009), Newton-based stochastic ES (Liu & Krstić, 2014),
+and stochastic ES for dynamic maps with delays (Rušiti, Evangelisti, Oliveira, Gerdts, & Krstić, 2018).
+
+dȳ
+
+(
+)
+= a − kα b2 ȳ.
+
+(92)
+dτ
+The strength of this ES-based feedback approach is immediately
+evident from (92) as the unknown control direction b is squared
+in the average dynamics. Therefore stabilization is achieved independently of the sign of b simply by ensuring that kα >
+a/b2 , which ensures that the origin of the average system (92)
+is exponentially stable no matter what the sign of b is. The trajectory x(t) then exponentially converges to an arbitrarily small
+neighborhood of the origin proportional to α and 1/ω, with a
+solution of the form
+
+6. ES as stabilizing feedback for systems with unknown timevarying control directions
+In 2012 the idea was proposed to use extremum seeking as
+a stabilizing feedback directly for unknown, unstable, and timevarying systems and to minimize their analytically unknown
+output functions (Scheinker, 2012; Scheinker & Krstić, 2012b).
+
+x(t) → bα sin(ωt) + O (1/ω) .
+11
+
+(93)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 13. Convergence of x(t) to a small neighborhood of a tracked trajectory r(t) is shown for various initial conditions for an unstable system (96) with a(t) ≡ 1.
+The columns show results for various forms of r(t) and b(t) while the rows show results for various values of k, ω. The ability to overcome the instability while
+tracking a time-varying trajectory in the face of a quickly time-varying control direction b(t) improves as the dithering frequency ω and ES gain k are increased. The
+blue curve in the right column shows a scaled down version of b(t) to demonstrate its rate of time variation relative to the system dynamics. (For interpretation of
+the references to color in this figure legend, the reader is referred to the web version of this article.)
+
+r(t))2 where r(t) = exp(−10(t − 0.75)2 ). In Fig. 13 for each
+choice of b(t) and r(t) we show how increasing k and ω improves
+convergence.
+ES-based feedback controllers have been developed for stabilizing a wide range of time-varying vector-valued linear and
+nonlinear systems (Scheinker & Krstić, 2012a), and their convergence proofs utilized a Lie bracket averaging approach, which
+is summarized in the next section. The implications of using ES
+as a feedback controller to minimize Lyapunov-like functions,
+resulting in stabilization, are summarized in Fig. 14. For example,
+consider the possibly open loop unstable vector valued nonlinear
+system
+
+This result is summarized by the following theorem.
+Theorem 2. Consider system (87), (88) and a compact set K ⊂ R,
+if kα > a/b2 then there exists ω∗ > 0 such that for all ω > ω∗ and
+for all x(0) ∈ K
+(
+
+x(t) = e
+
+)
+
+a−kα b2 t
+
+x(0) + bα sin(ωt) + O (1/ω)
+
+∀t .
+
+(94)
+
+For the more general time-varying system
+ẋ = a(t)x + b(t)u,
+
+(95)
+
+u = αω cos(ωt) − k sin(ωt)V (x, t),
+
+(96)
+
+a similar analysis as the one performed above results in an
+averaged system of the form
+dȳ
+dτ
+
+= a(t)ȳ −
+
+kα
+2
+
+b2 (t)
+
+∂ V (ȳ, t)
+,
+∂ ȳ
+
+ẋ = f (x, t) + g(x, t)u,
+
+y = V (x, t),
+
+(98)
+
+where x ∈ Rn and V (x, t) is either a function chosen by the
+user to achieve stabilization (a Lyapunov-type function) or an
+analytically unknown measurable output function of the system
+to be minimized as in classical ES applications. In either case,
+applying the ES-based feedback controller
+
+(97)
+
+which simultaneously minimizes V (x, t) and stabilizes the location of its minimum. The function V (x, t) can either be a chosen
+Lyapunov-type function or an analytically unknown output function to be minimized. We simulate the dynamics (95), (96) for
+a(t) ≡ 1 and several choice of b(t) = 1 and b(t) = cos(w t) in
+order to minimize V (x, t) of several forms including the simple
+time-invariant V = x2 and also the time-varying V (x, t) = (x(t) −
+
+u=
+
+√
+ω [α cos(ωt) − k sin(ωt)V (x, t)] ,
+
+results in average closed-loop dynamics of the form
+x̄˙ = f (x̄, t) −
+12
+
+kα
+2
+
+g(x̄, t)g T (x̄, t)∇x̄ V (x̄, t)
+
+(99)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+kα
+
+= f (x̄, t) −
+
+2
+
+)T
+
+g(x̄, t) Lg V (x̄, t)
+
+(
+
+,
+
+(100)
+
+where Lg V = ∇x̄ Vg. Note that in the average dynamics the control
+direction matrix is now of the form g(x̄, t)g T (x̄, t) ≥ 0 and the
+system can be stabilized with unknown and time-varying control
+direction.
+The form of Eq. (100) motivates two assumptions about a system for which an ES-based stabilizing feedback is being designed.
+Fig. 14. The existence of a clf with sscp is equivalent to the system being
+strong Lg V -stabilizable, which implies that the system is stabilizable. Because
+stabilizability is equivalent to the existence of a clf with scp, as shown above
+the existence of a clf with sscp implies existence of a clf with scp.
+Source: Figure adapted from Scheinker and Krstić (2012a).
+
+Assumption 4 (Strong Lg V -Stabilizability). There exists a positive
+definite, radially unbounded, continuously differentiable function
+V : Rn → R+ and β > 0 such that
+Lf V − β Lg V
+
+(
+
+)2
+
+< 0, ∀x ̸= 0.
+
+(101)
+
+It is well known that a continuous time-invariant system of the
+form (98) is stabilizable by feedback continuous at the origin and
+smooth away from the origin if and only if there exists a control
+Lyapunov function (clf) with a suitable ‘‘small control property’’
+(scp) (Sontag, 1989), defined as:
+Definition 1. A positive definite radially unbounded function W
+has small control property (scp) relative to a system of the form
+(98) if
+Lg W = 0 H⇒ Lf W < 0,
+Lf W + Lg W αc < 0, ∀x ̸ = 0,
+for some continuous function αc .
+
+Fig. 15. After an initial transient, the simultaneous stabilization and tracking of
+a time-varying trajectory by utilizing ES as a stabilizing feedback controller is
+shown.
+
+In addition, if we also make the following boundedness assumption the above clf results are extended to time-varying
+systems of the form (98) (Albertini & Sontag, 1997).
+Assumption 5. For any compact set K and r1 , r2 > 0 there exists
+Mr1 ,r2 > 0 such that
+sup |f (x, t) + g(x, t)u| ≤ Mr1 ,r2 , ∀t ∈ R,
+
+Therefore a system is strongly Lg V -stabilizable if it has a clf with
+sscp and the converse is also true by noting that (101) implies
+that Lg V = 0 implies that Lf V < 0 whenever x ̸ = 0 and therefore
+
+(102)
+
+|x|K ≤r1
+d(u,0)≤r2
+
+lim max
+
+ϵ→0 Lf V (x)>0
+
+where |x|K denotes the distance of a point from a compact set K .
+
+[ ]
+
+which is stabilizable by a simple smooth feedback u = −2x, no
+function V exists that satisfies (101) for some β > 0, and yet
+W = x2 /2 is a clf with an scp.
+However, Assumption 4 is satisfied for any stabilizable system
+whose clf W satisfies not only the clf condition Lg W = 0 H⇒
+Lf W < 0 but also a strong small control property (sscp) that
+lim max
+
+ϵ→0 Lf W (x)>0 (Lg W (x))2
+
+< ∞.
+
+ẋ1
+ẋ2
+
+u=α
+
+(105)
+
+where
+
+ρ (r) = 1 + 2 sup
+x:V (x)≤r
+
+[
+
+]
+
+x1
+cos(20t)
++
+u,
+x2
+sin(20t)
+
+(108)
+
+(109)
+
+√
+
+√
+ω cos(ωt) − k ω sin(ωt)|e(t)|2 .
+
+(110)
+
+The trajectories of this system are shown in Fig. 15.
+This stabilizing ES approach is able to simultaneously stabilize open-loop unstable systems and optimize their analytically
+unknown output functions (Scheinker, 2013b).
+
+0
+
+Lf V +
+
+][ ]
+
+we define the error e(t) = x(t) − r(t) and utilize the stabilizing
+ES feedback controller
+
+(104)
+
+ρ (r)dr ,
+
+1.2
+1ẋ2
+
+r(t) = [cos(t /4), sin(t /2)]T ,
+
+For a system satisfying (104) it can be shown that Assumption 4
+is satisfied for any β ≥ 1 by a new clf V constructed as
+V =
+
+1.1
+−1.1
+
+[
+=
+
+note that the system is unstable with poles 1.05 ± 1.15i. In order
+to track the trajectory
+
+and |x|=ϵ
+
+∫ W
+
+(107)
+
+and |x|=ϵ
+
+(103)
+
+Lf W (x)
+
+< β < ∞.
+
+The relationships between stabilizability, Assumption 4, the existence of a clf, and the scp and sscp properties are summarized in
+Fig. 14.
+As a simple example, we consider the 2D open-loop unstable
+system with unknown and quickly time-varying control direction
+vector b(t) = (cos(20t), sin(20t)),
+
+While Assumption 5 is trivially satisfied by any time-invariant
+system with continuous dynamics, Assumption 4 is more restrictive than mere stabilizability. For example, for the system
+ẋ = x3 + x2 u,
+
+Lf V (x)
+(Lg V (x))2
+
+7. Lie bracket averaging for ES
+
+√(
+
+Lf V
+
+)2
+
+(
+
+)2
+
+Lg V
+
+( )4
++ Lg V
+
+.
+
+For the study of high frequency feedback ES dynamics, an
+interesting connection between ES and Lie bracket averaging was
+
+(106)
+13
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+developed in Dürr, Stanković , Ebenbauer, and Johansson (2013)
+by building on averaging techniques (Gurvits, 1992; Gurvits &
+Li, 1992; Kurzweil & Jarník, 1988; Sussmann, 1992; Sussmann &
+Liu, 1991) and semiglobal practical stability theorems (Moreau &
+Aeyels, 2000).
+In Dürr, Stanković , Ebenbauer, and Johansson (2013) the
+authors considered stable T -periodic systems of the form
+ẋ =
+
+m
+∑
+
+√
+
+√
+
+bi (x, t) ωui (t , ωt), u0 ≡ 1/ ω,
+
+(111)
+
+i=0
+
+and showed that the trajectory x(t) of (111) can be related to the
+trajectory of the Lie bracket averaged system
+
+∑ [
+
+ż =
+
+bi (z , t), bj (z , t) βij ,
+
+]
+
+(112)
+Fig. 16. Trajectories of agents relative to the Lie bracket averages of their
+trajectories are shown.
+Source: Figure adapted from Dürr, Stanković , Ebenbauer, and Johansson (2013).
+
+i=0,j=i+1
+
+where
+
+βij =
+
+1
+
+∫ T
+
+T
+
+σ
+
+uj (t , σ )
+
+∫ σ
+
+ui (t , τ )dτ dσ ,
+
+(113)
+
+0
+
+The Lie bracket averaging-based approach to studying ES dynamics is a powerful method which has been applied to a large
+variety of systems including ES on submanifolds (Dürr, Stanković,
+Johansson, & Ebenbauer, 2014), with singular perturbations (Dürr,
+Krstić, Scheinker, & Ebenbauer, 2015, 2017), for gain tuning
+(Benosman, 2016), for formation control (Suttner & Sun, 2018),
+obstacle avoidance (Grushkovskaya, Zuyev, & Ebenbauer, 2018b),
+multi-agent ES (Poveda, Benosman, & Teel, 2017), for a unicycle model (Grushkovskaya, Michalowsky, Zuyev, May, & Ebenbauer, 2018), for nonlinear systems (Grushkovskaya & Ebenbauer,
+2021), for systems with a dead zone (Shao, Teel, Tan, Liu, &
+Wang, 2019), for iterative learning control (Khong, Nešić, & Krstić,
+2016), for maximizing map sensitivity (Mills & Krstić, 2018),
+a Newton-based second-order Lie bracket approach has been
+developed (Labar, Garone, Kinnaert, & Ebenbauer, 2019b), and for
+non-holonomic systems (Suttner, 2020). In Labar, Ebenbauer, and
+Marconi (2022) input-to-state like stability properties are proven
+for a class of Lie bracket-averaged ES systems, in Zhu and Fridman
+(2022) a time-delayed approach to averaging was developed for
+studying stabilizing ES dynamics, and in Michalowsky, Gharesifard, and Ebenbauer (2018) Lie bracket approximations are used
+to design an approach to distributed optimization.
+
+and the terms [bi , bj ] are Lie brackets defined as
+
+[bi , bj ] =
+
+dbi
+dx
+
+bj −
+
+dbj
+dx
+
+bi .
+
+(114)
+
+The relationship between z(t) and x(t) is that they can be made
+arbitrarily close for arbitrarily long times by a sufficiently large
+value of ω.
+Theorem 3. For any bounded set K for which all trajectories of (111)
+have solutions bounded by some A > 0, for any Tf > 0 and any
+δ > 0 there exists ω∗ such that for all ω > ω∗ if z(t0 ) = x(t0 ) the
+following holds:
+
+|x(t) − z(t)| < δ, ∀t ∈ [t0 , t0 + Tf ].
+
+(115)
+
+The approach in Dürr, Stanković , Ebenbauer, and Johansson
+(2013) was designed for a system of 2D agents for Nash equilibrium seeking with the coordinates of agent i ∈ 1, . . . , N given by
+(xi , yi ) and dynamics
+
+√
+
+ẋi = ci (ri − ei hi ) ωi sin(ai ωi t − ϕi )
+
+√
+
++ αi ωi cos(ai ωi t)
+√
+√
++ αi ωi sin(ai ωi t)
+
+ẏi = −ci (ri − ei hi ) ωi cos(ai ωi t − ϕi )
+ėi = −ei hi + ri ,
+
+8. Bounded ES and weak limit averaging
+In Scheinker (2013a) a new bounded form of ES was developed
+in which the feedback control output has analytically guaranteed
+bounds despite acting on analytically unknown, noisy, and timevarying functions. This bounded form of ES was developed for
+systems of the form
+
+(116)
+
+where ci > 0, hi > 0 are design parameters including gains
+and filter coefficients which remove DC offsets, the ri are utility
+functions, and ei are filtered versions of the ri after passing
+through a high-pass filter represented in state space as s/(s +
+hi ), and the potential function to be maximized, Q (x, y), satisfies
+∇xi ,yi Q (x, y) = ∇xi ,yi ri (x, y).
+The Lie bracket averaged system (112) of (116) is given by
+x̄˙ i =
+
+ẋ = f (x, t) + g(x, t)u,
+
+(118)
+
+where f (x, t) and g(x, t) are unknown, the system may be openloop unstable, and y is a noise-corrupted measurement of an
+analytically unknown function h(x, t). The ES feedback controller
+in this case is given by
+
+1(
+ci αi ∇x̄i ri (x̄, ȳ) cos(ϕi ) + ci αi ∇ȳi ri (x̄, ȳ) sin(ϕi )
+2
+)
+− ci2 ∇ȳi ri (x̄, ȳ) cos(ϕi )(ri (x̄, ȳ) − ēi hi ) ,
+
+1(
+ȳ˙ i =
+ci αi ∇ȳi ri (x̄, ȳ) cos(ϕi ) − ci αi ∇x̄i ri (x̄, ȳ) sin(ϕi )
+2
+)
++ ci2 ∇x̄i ri (x̄, ȳ) cos(ϕi )(ri (x̄, ȳ) − ēi hi ) ,
+ē˙ i = −ēi hi + ri ,
+
+y = h(x, t) + n(t),
+
+√
+u=
+
+αω cos(ωt + ky),
+
+(119)
+
+and the closed-loop average dynamics are
+x̄˙ = f (x̄, t) −
+
+kα
+
+g(x̄, t)g T (x̄, t)∇x̄ h(x̄, t).
+(120)
+2
+In the case of optimization, h(x, t) is an analytically unknown cost
+function which is minimized. In the case of stabilization, where
+h(x, t) may be chosen, by picking a Lyapunov-type function (such
+as h = xT x) stabilization is achieved. This simple bounded ES
+setup is shown in Fig. 17. Although there are no bounds assumed
+
+(117)
+
+which can be shown to converge to the maximum of Q by a
+Lyapunov analysis with V (x̄, ȳ) = Q (x∗ , y∗ ) − Q (x̄, ȳ). Simulation
+results showing the proximity of agent dynamics to their Lie
+bracket averages for ω = 100 are shown in Fig. 16.
+14
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+bi (x, t) = g(x, t)ki (ψ (x, t), t ) ,
+
+(130)
+
+where the functions defined as
+
+∫ t
+Hi,ω (t) =
+
+hi,ω (τ )dτ
+
+(131)
+
+t0
+
+satisfy the uniform limits and weak limits
+Fig. 17. Bounded ES as an optimizer or as a stabilizing feedback.
+
+lim Hi,ω (t) = 0,
+
+ω→∞
+
+x̄˙ = f (x̄, t) −
+
+(121)
+
+m
+∑
+
+λi,j (t)
+
+i̸ =j=1
+
+which makes the algorithm especially well suited for in-hardware
+applications for sensitive systems in which tight control is required over parameter settings while optimizing an analytically
+unknown and time-varying cost function. Recently a group of
+researchers confirmed that this exact bonded ES mechanism is
+utilized by sea urchin sperm when finding the egg (Abdelgalil,
+Aboelkassem, & Taha, 2022).
+In Scheinker and Scheinker (2016) the authors extended
+bounded ES to a much more general class systems for ES-based
+stabilization of vector-valued nonlinear time-varying systems
+which are not periodic and whose ES controllers are not periodic,
+not differentiable, and not even required to be continuous by
+utilizing the general weak limit averaging approach from the
+field of functional analysis (Conway, 1990). We start with a brief
+reminder and some definitions. Riemann–Lebesgue Lemma: If f ∈
+L1 (K ), then
+
+∫
+
+f (x)e−iωx dx = 0.
+
+lim
+
+ω→∞
+
+lim
+
+fk (τ )g(τ )dτ =
+
+0
+
+f (τ )g(τ )dτ ,
+
+Definition 2. Considering ϵ = ω1 and denoting a trajectory of
+(127), (128) with x(t0 ) = x0 as φ ϵ (t , t0 , x0 ), an equilibrium point
+of (127), (128) is said to be ϵ -SPUAS if it satisfies the following
+three conditions:
+
+• Uniform Stability: For every c2 ∈ (0, ∞) there exists c1 ∈ (0, ∞)
+and ϵ̂ ∈ (0, ∞) such that for all t0 ∈ R and for all x0 ∈ Rn with
+∥x0 ∥ < c1 and for all ϵ ∈ (0, ϵ̂ ),
+∥φ ϵ (t , t0 , x0 )∥ < c2 ∀t ∈ [t0 , ∞).
+
+∀g ∈ L [0, 1].
+
+0
+
+∥φ ϵ (t , t0 , x0 )∥ < c2 ∀t ∈ [t0 , ∞).
+
+For example, by application of the Riemann–Lebesgue Lemma,
+(123)
+
+sin (ω1 t ) sin (ω2 t ) ⇀ 0,
+
+(126)
+
+∥φ ϵ (t , t0 , x0 )∥ < c2 ∀t ∈ [t0 + T̄ , ∞).
+
+(125)
+
+y = ψ (x, t),
+
+n
+
+n
+
+(127)
+n
+
+n
+
+where x ∈ R , and the functions f : R × R → R , g : R × R →
+Rn×n , ψ : Rn × R → R are unknown.
+It is assumed that f and g are twice continuously differentiable
+with respect to x and assume that the value y of ψ (x, t) is
+available for measurement. The controller u is given by
+u(y, t) =
+
+m
+∑
+
+ki (y, t)hi,ω (t),
+
+ki : R × R → Rn ,
+
+(128)
+
+i=1
+
+where the functions ki (y, t) are continuously differentiable and
+the functions hi,ω (t) are piece-wise continuous. System (127),
+(128) has the following equivalent closed-loop form
+ẋ(t) = f (x, t) +
+
+m
+∑
+
+bi (x, t)hi,ω (t),
+
+(136)
+
+The weak limit-based ES approach has been studied for discontinuous dithers (Scheinker & Scheinker, 2016), bounded ES
+(Scheinker & Krstić, 2014a), inverted pendulum stabilization
+(Michalowsky & Ebenbauer, 2013), for systems not affine in
+control (Scheinker & Scheinker, 2018), and for generating optimal feedback controllers for unknown systems (Scheinker &
+Scheinker, 2021).
+As a simple example of the generality of the weak limit averaging approach, we consider a 2D setting in which we are seeking
+the minimum of an analytically unknown output function y =
+h(x, t) for the open-loop unstable system
+
+In Scheinker and Scheinker (2016) the authors consider a general
+class of vector-valued, time-varying, nonlinear systems
+ẋ = f (x, t) + g(x, t)u(y, t),
+
+(135)
+
+• Global Uniform Attractivity: For all c1 , c2 ∈ (0, ∞) there exists
+T̄ ∈ (0, ∞) and ϵ̂ ∈ (0, ∞) such that for all t0 ∈ R and for all
+x0 ∈ Rn with ∥x0 ∥ < c1 and for all ϵ ∈ (0, ϵ̂ ),
+
+(124)
+
+∀ ω1 ̸= ω2 .
+
+(134)
+
+• Uniform Boundedness: For every c1 ∈ (0, ∞) there exists c2 ∈
+(0, ∞) and ϵ̂ ∈ (0, ∞) such that for all t0 ∈ R and for all
+x0 ∈ Rn with ∥x0 ∥ < c1 and for all ϵ ∈ (0, ϵ̂ ),
+
+2
+
+cos (ωt ) sin (ωt ) ⇀ 0,
+1
+1
+cos2 (ωt ) ⇀ , sin2 (ωt ) ⇀ ,
+2
+2
+cos (ω1 t ) cos (ω2 t ) ⇀ 0, ∀ ω1 ̸ = ω2 ,
+
+(133)
+
+The statement of the theorem utilizes the following definitions
+of stability.
+
+A sequence of functions {fk } ⊂ L2 [0, 1] is said to converge weakly
+to f in L2 [0, 1], denoted fk ⇀ f , if
+
+k→∞
+
+x̄(0) = x(0).
+
+Theorem 4. For any compact set K ⊂ Rn , any t0 , T ∈ R≥0 ,
+and any δ > 0, there exists ω⋆ such that for each ω > ω⋆ , the
+trajectories of (129) and (133), satisfy ∥x(t) − x̄(t)∥ < δ for all
+t ∈ [t0 , t0 + T ]. Therefore, by Moreau and Aeyels (2000), uniform
+asymptotic stability of (133) over K implies that (129) is ω1 -SPUAS.
+
+(122)
+
+∫ 1
+
+∂ bi (x̄, t)
+bj (x̄, t),
+∂ x̄
+
+The stability result is given by the following theorem.
+
+K
+
+∫ 1
+
+(132)
+
+The dynamics (129) can be approximated arbitrarily accurately
+with weak limit average dynamics
+
+on the optimized function h(x, t), the control effort of bounded
+ES has analytically guaranteed bounds
+
+⏐√
+⏐ √
+|u| = ⏐ αω cos(ωt + ky)⏐ ≤ αω,
+
+hi,ω (t)Hj,ω (t) ⇀ λi,j (t).
+
+ẋ1 = x1 + 0.75x2 + u1
+
+(137)
+
+ẋ2 = 0.5x1 + 2x2 + u2 ,
+
+(138)
+
+whose open-loop eigenvalues are λ = {2.29, 0.71} > 0. Instead
+of utilizing two distinct frequencies, we can utilize sin() and cos()
+functions with a single frequency, or phase-shifted square waves,
+or triangle waves, or square waves with dead time, as these all
+satisfy the above requirements of being orthogonal in L2 [0, T ].
+If the dithering amplitudes are chosen so that all of the signals
+
+(129)
+
+i=1
+
+15
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 19. Bounded ES for 2D unicycle control setup.
+
+which is the dot product of the vehicle’s velocity with the gradient of the unknown function J. Therefore, when the vehicle
+is heading towards the minimum, along a negative gradient of
+J the rotation slows down and the vehicle spends more time
+approaching the minimum. If instead the vehicle is moving away
+from the minimum, the gradient is positive, and the rotation
+speeds up, and the vehicle spends less time moving away. This
+sort of behavior is clearly seen in Fig. 18. In Ghadiri-Modarres,
+Mojiri, and Zangeneh (2016a), this scheme was modified in order to adjust the forward velocity, while rotating the vehicle
+at a constant angular velocity. In Grushkovskaya and Ebenbauer
+(2016), this bounded ES controller was applied for multi-agent
+coordination with Lagrangian measurements.
+This simple 2D vehicle control ES setup has since been extended for 3D vehicle control in several papers. In GhadiriModarres, Mojiri, and Zangeneh (2016b) the authors considered
+a 3D unicycle and proposed the following generalization of the
+2D controller described above
+
+Fig. 18. A family of various dithering signals with identical weak limit average
+dynamics is shown.
+Source: Figure adapted from Scheinker and Scheinker (2016).
+
+have equal average power, then the average dynamics for all
+of the dithering types are identical, as shown in Fig. 18. This
+is a useful result because some analog systems can more easily
+implement continuous signals such as trigonometric functions or
+triangle waves, while digital systems are usually switching in a
+discontinuous way with dead time in between.
+To get an intuitive understanding for the simple control law
+(119), we consider a system without outside influence, where
+we only worry about control according to ẋ1 = u1 , ẋ2 = u2 , as
+is typically considered for ES applied for optimization of some
+unknown function y = J(x, t). In this case if we apply sin() and
+cos() controllers, the system dynamics are
+
+√
+αω cos(ωt + kJ) = v cos(θ ),
+√
+ẋ2 = αω sin(ωt + kJ) = v sin(θ ),
+
+ẋ1 =
+
+ẋ3 = V0 sin(φ ),
+
+(144)
+
+φ̇ = ωφ − khη,
+
+(145)
+
+θ̇ = ωθ − khη,
+[
+]
+s
+η=
+J(x1 , x2 , x3 , t),
+s+h
+
+(146)
+
+ẋ =
+
+(140)
+
+(147)
+
+ωf1 (x, t ,
+
+√
+
+ωt , ωt) + f2 (x, t ,
+
+√
+
+ωt , ωt),
+
+(148)
+
+of which a 3D unicycle is a special case with dynamics
+
+√
+√
+ẋ2 = (R 2ωe1 )2 ,
+√
+ẋ3 = (R 2ωe1 )3 ,
+Ṙ = RΩ , Ω = ϕ e1 + θ e3 ,
+µż = J(x) − z ,
+θ = ω − ż ,
+√
+ϕ = 2α 2ω sin(ωt − z + π/4),
+ẋ1 = (R 2ωe1 )1 ,
+
+dJ
+
+= ω + kv [cos(θ ), sin(θ )] · ∇x J ,
+
+
+
+
+(143)
+
+√
+
+(139)
+
+∂J
+∂J
+=ω+k
+ẋ1 + k
+ẋ2
+dt
+dt
+∂ x1
+∂ x2
+[
+]
+√
+∂J
+∂J
+= ω + k αω cos(θ )
++ sin(θ )
+∂ x1
+∂ x2
+= ω+k
+
+(142)
+
+ẋ2 = V0 cos(φ ) sin(θ ),
+
+where φ and θ are the pitch and yaw angles of the vehicle,
+respectively. The setup and a simulation result are shown in
+Fig. 20.
+In Abdelgalil and Taha (2022) the authors considered a 3D
+unicycle and proposed another generalization of the 2D controller described above in which they utilized differential geometry techniques and recursive second order averaging for an ES
+setup with two time scales for a general class of systems of the
+form
+
+which is simply a unicycle
+in a 2D environment traveling at
+√
+constant velocity v =
+αω with ES being used to control the
+heading angle θ (t) = ωt + kJ, as shown in Fig. 19.
+An intuition behind the convergence comes from considering
+the rate of change of this heading angle θ (t) which is given by
+dθ
+
+ẋ1 = V0 cos(φ ) cos(θ ),
+
+(149)
+(150)
+(151)
+(152)
+(153)
+(154)
+(155)
+
+where ei are the standard unit basis vectors, ϕ and θ are the roll
+and yaw angles of the rigid body, R ∈ SO(3) is a rotation matrix,
+
+(141)
+
+angular v elocity modulation
+
+16
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+general class of ES controllers of the form
+ur = α
+
+√
+
+ω cos(ωt)|x|r −
+
+k
+
+√
+
+1−r
+
+ω sin(ωt)|x|2−r ,
+
+(156)
+
+for x ∈ Rn . The analysis of these non-differentiable controllers
+required the extension of Lie bracket averaging and practical
+stability results to functions not differentiable over entire sets.
+The main advantage of these non-C 2 controllers is that for
+r ̸ = 0, 2 the entire high frequency oscillating control feedback
+disappears as equilibrium is reached. The average dynamics of a
+system of the form
+ẋ = f (x, t) + g(x, t)u,
+
+(157)
+
+with u as in (156) are given by
+x̄˙ = f (x̄, t) − kα g(x̄, t)g(x̄, t)T x̄,
+
+(158)
+
+which, remarkably, are independent of the choice of r.
+The studies in Scheinker (2013a) and Scheinker and Krstić
+(2014a, 2014b) led to a search for a larger class of generating
+vector fields for stabilizing ES controllers. Another form of dithering functions was introduced in Suttner and Dashkovskiy (2017)
+with guaranteed exponential stability for systems whose output
+functions have known minimum values. In Grushkovskaya, Zuyev,
+and Ebenbauer (2018a) for systems of the form
+
+√
+
+√
+
+ẋ = F1 (J(x)) ωu1 (ωt) + F2 (J(x)) ωu2 (ωt),
+
+(159)
+
+it was shown that the results of Suttner and Dashkovskiy (2017)
+and Scheinker and Krstić (2014b) could be described by a general
+family of ES controllers defined as
+
+∫
+F2 (x) = −F1 (x)
+
+F0 (x)
+F12 (x)
+
+dx,
+
+(160)
+
+for which the Lie bracket average dynamics of (159) are given by
+x̄˙ = −β2,1 ∇ J(x̄)F0 (J(x̄)),
+
+Fig. 20. Bounded ES for 3D unicycle control setup and simulation example.
+Source: Figures adapted from Ghadiri-Modarres et al. (2016a).
+
+where the constant β2,1 is defined according to the T -periodic
+dither signals u1 , u2 as
+
+β2,1 =
+
+∫ T∫ σ
+0
+
+u1 (σ )u2 (θ )dθ dσ .
+
+(162)
+
+0
+
+This general family of ES controllers can be used to generate
+feedback with nice properties such as minimal overshoot and
+with vanishing control efforts that allow the system to settle at
+equilibrium, as shown in Fig. 22.
+While the standard ES methods rely on the existence of some
+small enough ω∗ such that the averaging and singular perturbation results hold for all ω ∈ (0, ω∗ ), the Lie bracket averaging
+approach relies on the existence of a large enough ω∗ such that
+for all ω > ω∗ the averaging results hold, with the actual required
+value of ω∗ depending on the specific system being considered.
+In Suttner (2019) a form of ES was introduced in which the dither
+signal’s frequency continuously increases thereby guaranteeing
+a large enough ω relative to any system dynamics. The authors
+considered systems of the form
+
+Fig. 21. Bounded ES for 3D unicycle control simulation example.
+Source: Figure adapted from Abdelgalil and Taha (2022).
+
+√
+
+(161)
+
+√
+
+m
+
+and (R 2ωe1 )i denotes the i component of the vector R 2ωe1 . A
+simulation result for static source localization as well as trajectory
+tracking is shown in Fig. 21.
+
+ẋ = g0 (t , x) +
+
+∑
+
+uk gk (t , x),
+
+y = ψ (x),
+
+(163)
+
+k=1
+
+and utilize controllers
+
+√
+
+9. A general family of ES controllers
+
+uk =
+
+In Scheinker and Krstić (2014b) Lie bracket averaging theory
+was extended to non-differentiable systems and applied to a
+
+(
+)
+ωk
+1
+sin
+ω
+Ω
++
+,
+k
+(z − y)2
+z−y
+
+ż = −(z − y),
+17
+
+Ω̇ =
+
+1
+(z − y)5
+
+,
+
+(164)
+(165)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 24. PI ES as an optimizer and stabilizing feedback.
+
+Fig. 22. Based on the choice of controller parameters, a controller can be
+designed whose effort vanishes allowing the trajectory to settle at the origin.
+Source: Figure adapted from Grushkovskaya et al. (2018a).
+
+Fig. 25. PI-ES convergence relative to ES.
+Source: Figure adapted from Guay (2016).
+
+In Guay (2016), the derivative ẏ with respect to time of the
+unknown cost function being minimized is assumed to be available for measurement and the system dynamics and controller
+are given by
+ẋ = f (x) + g(x)u, y = h(x)
+1
+û˙ = −
+ẏ sin(ωt)
+
+(170)
+(171)
+
+ατI
+
+k
+
+u = û −
+
+α
+
+= û +
+
+τI
+
+ẏ sin(ωt) + a sin(ωt)
+
+k˙
+û + a sin(ωt).
+
+(172)
+
+In the above, the term −k/α ẏ sin(ωt) + a sin(ωt) takes on the
+role of a fast proportional feedback, while û takes the role of
+a proportional feedback, which can be seen more directly by
+integrating by parts and re-rewriting û as (with û(0) = 0)
+
+Fig. 23. Simulation example of ES asymptotically converging as the dithering
+frequency grows.
+Source: Figure adapted from Suttner (2019).
+
+û(t) = −
+which, under certain assumptions, guaranteed asymptotic convergence to the optimal value y(t) → y∗ as t → ∞.
+The method is demonstrated by simulating system (163) with
+
+1
+
+ατI
+
+y(t) sin(ωt) +
+
+ω
+ατI
+
+∫ t
+
+y(τ ) cos(ωτ )dτ .
+
+(173)
+
+0
+
+(166)
+
+We can then express the closed loop PI-ES system (170)–(172) as
+shown in Fig. 24.
+One example that clearly shows the benefit of the PI-ES result
+is for the system
+
+g1 (x1 , x2 ) = (cos(x1 + x2 ), sin(x1 + x2 )) ,
+
+(167)
+
+g2 (x1 , x2 ) = (− sin(x1 + x2 ), cos(x1 + x2 )) ,
+
+ẋ = −x + u,
+
+(168)
+
+ψ (x1 , x2 ) = (x1 − 1)2 + (x2 − 1)2 + 2018,
+
+(169)
+
+where the ES feedback has to fight the origin-stabilizing −x term
+in order to bring x(t) to its optimal value of 1.2. Simulation results
+comparing the PI scheme to a standard ES approach are shown
+in Fig. 25 where we clearly see faster settling with much less
+overshoot.
+In Guay and Dochain (2017) the authors extended their PIES results to an approach which does not require direct access
+to the derivative of the cost function ẏ, it is instead dynamically
+approximated. For a dynamic system of the form
+
+g0 (t) = (sin(2t), cos(t))
+
+and the simulation results are shown in Fig. 23.
+10. Proportional integral ES
+Two forms of proportional integral approaches to stabilizing ES have also been developed (Guay, 2016; Guay & Dochain,
+2017). In these approaches, the standard ES controller which
+achieves optimization is treated as an integral term in a PI-like
+control, with the addition of a proportional terms whose purpose
+is faster convergence and stabilization. Overall the two time-scale
+approach can result in improved convergence properties.
+
+y = 1 + 4(x − 1.2)2 ,
+
+ẋ = f (x) + g(x)u,
+
+(174)
+
+y = h(x),
+
+the ẏ dynamics are
+ẏ = Lf h + Lg hu,
+18
+
+(175)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 26. PI-ES convergence relative to ES.
+Source: Figure adapted from Guay and
+Dochain (2017).
+
+Fig. 27. A group of agents interact with a network, with each agent xi having
+its own controller ui and access only to its own local cost function hi (x) as well
+as those of its neighbors, with the goal of minimizing the unknown global cost
+function J(x).
+Source: Figure adapted from Guay et al. (2018).
+
+and the derivative ẏ can be parameterized as
+ẏ = θ0 + θ1 (u − û) = φ T u,
+
+(176)
+
+where φ = [1, (u − û)T ]T and θ = [θ0 , θ1T ]T . Considering the error
+signals e = y − ŷ and θ̃ = θ − θ̂ the following predictor is set up
+to estimate ẏ as ŷ˙
+
+˙
+ŷ˙ = φ T θ̂ + Ke + c T θ̂ ,
+
+(177)
+
+ċ = −Kc T + φ T ,
+
+(178)
+
+˙
+ė = u̇ θ̃ − Ke − c θ̂ ,
+T
+
+T
+
+where the ES algorithm only requires notifications of changes
+registered at sensors, rather than a continuous full sensor information stream of data (Premaratne, Halgamuge, Tan, & Mareels,
+2019).
+
+(179)
+
+11. Finite time stabilizing ES
+
+where e(0) = y(0)−ŷ(0). The full details of the full predictor setup
+are described in Guay and Dochain (2017), the resulting controller
+is given by
+u = −kg θ̂1 + û + d(t),
+1
+û˙ = − θ̂1 ,
+
+The non-C 2 ES controller described above, in (156), which has
+the advantageous property that the control effort disappears as
+the stabilized equilibrium is reached has the additional property
+of finite time stabilization which can be prescribed over compact
+sets.
+For example, considering the open-loop unstable system
+
+(180)
+(181)
+
+τI
+
+where the dither d(t) satisfies the persistency of excitation condition that there exist α2 , T > 0 such that
+
+ẋ = x + u,
+
+∫ t +T
+
+√
+ω cos(ωt) − k ω sin(ωt)x2 ,
+√
+√
+1
+3
+ur = 1 = α ω cos(ωt)|x| 2 − 2k ω sin(ωt)|x| 2 ,
+
+d(τ )dT (τ )dτ > α2 I ,
+
+∀t .
+
+and two choices of controllers ur as in (156)
+ur =0 = α
+
+(182)
+
+t
+
+Convergence of this estimated derivative approach for the same
+system as above is shown in Fig. 26.
+The PI-ES method has been studied for application to systems
+that are distributed over networks (Guay et al., 2018), where p
+agents are considered, each with dynamics
+ẋi = fi (x, η) + gi (x, η)ui
+
+(183)
+
+yi = hi (x),
+
+(184)
+
+hi (x)
+
+(187)
+(188)
+
+give identical average dynamics
+x̄˙ = (1 − kα )x̄ H⇒ x̄(t) = e(1−kα )t x̄(0).
+
+(189)
+
+The advantage of the choice r = 0.5 is that we now have
+a feedback controller with vanishing oscillations, allowing the
+system to settle at equilibrium in a finite time once x(t) reaches
+0. We can estimate this finite settling time ts as it should occur
+when the amplitude of oscillation is approximately of the same
+magnitude as x(t) so that the trajectory of x(t) will swing through
+0 and stop. To do so, we consider one cycle of ES oscillation,
+t ∈ [ts , ts + ∆t ] where ∆t = 2ωπ , during which x(t) ≈ x̄(ts ). During
+this time let us consider only the dominant first term of (188)
+which can be integrated to get the oscillation
+
+where η ∈ R is a vector of unknown parameters. The overall
+goal is to minimize the total cost
+p
+∑
+
+√
+
+2
+
+q
+
+J =
+
+(186)
+
+(185)
+
+i=1
+
+while each agent only has access to its local cost hi (x) and the
+costs of its immediate neighbors hi−1 (x) and hi+1 (x), as shown in
+Fig. 27. An example of the convergence of 5 networked ES agents
+is shown in Fig. 5. The problem is solved by utilizing a dynamic
+average approach to estimate the average of the total cost, for
+which the PI-ES method is then applied (Guay, 2016; Guay &
+Dochain, 2017). Network-based control systems with multiple
+independent agents must be robust to variations in information
+transmission rates and availability. Therefore, there has also been
+development of ES for network systems with sporadic packet loss,
+
+t ∈ [ts , ts + ∆t ],
+
+√
+α
+cos(ωt) |x̄(ts )|.
+ω
+
+x(t) ≈ x̄(ts ) + √
+
+(190)
+
+This term can only reach zero if the oscillation is of the same
+magnitude as x̄, such that
+
+√
+
+α
+α
+H⇒ |x(0)|e(1−kα)ts /2 ≈ √
+ω
+ω
+(
+)
+
+|x̄(ts )| ≈ √
+
+ln
+
+H⇒ ts ≈
+19
+
+√ 2α
+ω|x(0)|
+
+1 − kα
+
+.
+
+(191)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+is said to be FTS with respect to (t0 , T , Γ (·), R) if there exist
+L(t), Q (t) such that
+Q̇ (t) ≻ Q (t)AT (t) + A(t)Q (t) + LT (t)BT (t) + B(t)L(t)
+Q (t) ≺ Γ −1 (t),
+Q (t0 ) ≻ R
+
+−1
+
+t ∈ [t0 , t0 + T ]
+
+.
+
+When a system is FTS for Q (t), L(t) then the FT stabilizing controller gain is given by
+K (t) = L(t)Q −1 (t).
+
+(194)
+
+The authors consider open-loop unstable time-varying systems
+and stabilizing feedback controllers of the form
+ẋ = A(t)x + B(t)u,
+
+√
+√
+u = α ω cos(ωt) − k ω sin(ωt)xT Π (t)x,
+
+(195)
+(196)
+
+with Lie bracket-averaged dynamics (for large ω)
+x̄˙ = A(t)x̄ − kα B(t)BT (t)Π (t)x̄.
+
+(197)
+
+System (197) is in the form of system (193) and the idea is then to
+design Π (t) so that the feedback control gain −kα B(t)BT (t)Π (t)
+renders the system FTS. Once this is accomplished a large enough
+ω must be found such that the trajectories of (195), (196) and
+(197) are sufficiently close together such that the original highly
+oscillatory system satisfies the FTS conditions.
+Towards this goal, the authors first prove the following Lemma
+which allows them to relate the FTS condition of one system to
+the other based on the distance between the original (x(t)) and
+averaged trajectories (x̄(t)).
+Lemma 1. For x(t), x̄(t) ∈ Rn , for a given ∆ > 0, assume
+
+|x(t) − x̄(t)| < ∆.
+Fig. 28. This figure shows the evolution of the trajectories and the control effort
+of system (186) using controllers developed in Scheinker and Krstić (2014b). The
+bottom plots zoom in on the first 0.25 s of evolution and the plot inserts zoom
+in vertically to show the finite time settling.
+
+Consider two symmetric, positive-definite matrix valued functions of
+time Γ (t) and Γ̄ (t) such that ∀t ∈ [t0 , t0 + T ]
+
+Γ̄ (t) =
+
+∆
+,
+mini γi (t)
+
+(200)
+
+Theorem 5. For any ∆ > 0, choose ω sufficiently large such that
+the trajectories of (195)–(197) satisfy the bounds |x(t) − x̄(t)| < ∆
+for t ∈ [t0 , t0 + T ]. If there exists some Q (t), k, α , and Π (t) such
+that
+Q̇ (t) ≻ Q (t)A(t) + AT (t)Q (t) − kα Q (t)Π (t)B(t)BT (t)
+
+− kα B(t)BT (t)Π (t)Q (t), ∀t ∈ [t0 , t0 + T ],
+Q (t) ≻ Γ̄ −1 (t), ∀t ∈ [t0 , t0 + T ],
+Q (t0 ) ≺ R−1 ,
+
+t ∈ [t0 , t0 + T ].
+
+(201)
+(202)
+(203)
+
+where Γ̄ (t) is the matrix-valued function of time defined in Lemma 1
+with
+
+The FTS condition can be extended to a closed-loop system by the
+following definition
+
+r(t) ≤ 1 −
+
+Definition 4.
+u(t) = K (t)x(t),
+
+∀r(t) ≤ 1 −
+
+The main result of the paper is then given as
+
+is said to be finite time stabilizable (FTS) with respect to (t0 , T ,
+Γ (·), R) iff
+
+ẋ = A(t)x(t) + B(t)u(t),
+
+(199)
+
+where {1/γi2 (t)} are the eigenvalues of Γ (t) at time t.
+
+(192)
+
+xT0 Rx0 ≤ 1 H⇒ xT (t)Γ (t)x(t) < 1,
+
+Γ (t).
+
+xT (t)Γ (t)x(t) < 1,
+
+Definition 3. The system
+x(t0 ) = x0 ,
+
+1
+r 2 (t)
+
+If x̄T (t)Γ̄ (t)x̄(t) < 1 for the time interval t ∈ [t0 , t0 + T , then on the
+same time interval
+
+We consider 100 random starting conditions uniformly spread
+between x(0) ∈ [−1, 1] with ω = 300, α = 0.5, and k = 5.
+From (191) these trajectories should have a settling time of ts ≤
+4.7 seconds and Fig. 28 confirms that all trajectories have settled
+by ≈4.5 seconds.
+Another finite time ES method based on a stabilizing ES
+feedback was recently developed in Mele, Tommasi, and Pironti
+(2021), in which the authors develop a finite time ES method
+for open-loop unstable dynamic systems. The authors consider
+the following definition of finite time stabilizability (Amato et al.,
+2014):
+
+ẋ = A(t)x(t),
+
+(198)
+
+∆
+,
+mini γi (t)
+
+(204)
+
+then system (195), (196) is FTS with respect to (t0 , T , R, Γ (t)) for
+the same values of k, α , and Π (t).
+
+(193)
+20
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+where D = diag {D1 , . . . , Dn }. Considering the vector of dynamics
+of the delayed tuned parameters which are delayed functions of
+inputs Ui , given by
+U1 (t − D1 )
+⎢U2 (t − D2 )⎥
+
+⎡
+
+⎤
+
+θ̇ (t − D) = ⎢
+⎣
+
+⎥,
+..
+⎦
+.
+Un (t − Dn )
+
+(210)
+
+the delays can be represented as continuous time dynamics by
+the transport equation PDE according to
+
+θ̇i (t − Di ) = ui (0, t),
+∂t ui (x, t) = ∂x ui (x, t), x ∈ [0, Di ],
+ui (Di , t) = Ui (t), i = 1, 2, . . . , n,
+
+(211)
+(212)
+(213)
+
+with solution
+ui (x, t) = Ui (t + x − Di ).
+
+The system is then analyzed by utilizing averaging theory,
+Lyapunov–Krasovskii functional analysis, and backstepping transformations in order to derive the controllers
+
+Fig. 29. Simulation results for FTS ES for five different initial conditions.
+Source: Figure adapted from Mele et al. (2021).
+
+ui (Di , t) =
+Furthermore, following an interesting analysis the authors
+give an estimate on the required magnitude of ω in order to
+guarantee the bound |x(t) − x̄(t)| < ∆, for a system with constant
+B(t) = B. The bound is given as
+
+[
+
+ω≥
+
+2(α + k)|B|η
+
+]2
+
+∆
+
+,
+
+ẋ1
+ẋ2
+
+(
+)[
+t
+0.5
+= 1+
+0
+
+10
+
+−0.1
+−0.15
+
+6.25
+0
+
+[
+
+G(t) = M(t)y(t),
+
+[
+M(t) =
+
+]
+
+Γ0 =
+
+4
+0
+
+(208)
+
+12. ES for PDEs
+
+[Q (θ (t))],
+
+sin(ωn t)
+
+.
+
+(219)
+
+(220)
+
+(221)
+(222)
+(223)
+(224)
+
+where αi : [0, Di ]× R+ → R and each domain length Di is known.
+System (221)–(224) can be solved as
+
+In order to develop ES methods for systems with delays, the ES
+analysis was extended to systems governed by partial differential
+equations (PDE), in which the delay is modeled as a PDE (Oliveira,
+Krstić, & Tsubakino, 2016).
+In Oliveira et al. (2016) the authors consider static maps with
+a tuned vector of parameters θ = (θ1 , . . . , θn ), whose influence
+on the output measurement y = Q (θ ) has distinct delays in each
+channel i given by (D1 , . . . , Dn ) > 0. The delayed relationship can
+be summarized as
+y(t) = Q (θ (t − D)) = e
+
+an
+
+Θ (t) = αi (0, t), ∀i ∈ {1, 2, . . . , n}
+∂t αi (x, t) = ∂xx αi (x, t), x ∈ (0, Di )
+∂t αi (0, t) = 0
+αi (Di , t) = θi (t)
+
+The simulation results are shown in Fig. 29 for 5 random initial
+conditions.
+
+−Ds
+
+sin(ω1 t), . . . ,
+
+]T
+
+The ES PDE method described above was then extended for
+multivariate ES of static maps with actuator dynamics governed
+by diffusion PDEs (Oliveira, Feiling, Koga, & Krstić, 2020). For each
+control vector θi the authors assumed a distinct heat equation so
+that the propagated actuator vector Θ (t) ∈ Rn has dynamics
+
+]
+
+0
+.
+6
+
+a1
+
+(218)
+2
+
+N(t) = [a1 sin(ω1 (t + D1 )), . . . , an sin(ωn (t + Dn ))]T .
+
+(207)
+
+[
+
+2
+
+The setup is shown in Fig. 30, where
+
+][ ]
+
+0
+, Γ (t) = Γ0 et /10 ,
+9.375
+
+(217)
+
+which gives an estimate of the inverse of the cost function’s
+Hessian matrix. The matrix G(t) is related to the dithering signals
+applied to the measured output
+
+where u(t) is given as (196) and
+R=
+
+(216)
+
+Γ̇ = ωr Γ − ωr Γ Ĥ Γ
+
+(206)
+
+x1
+u(t),
+x2
+
+(215)
+
+0
+
+where Γ (t) is the solution to a Riccati differential equation, as
+described above for Newton-based ES,
+
+This intuitive result shows that the square root of the minimal
+dithering frequency is inversely proportional to the maximum
+separation of trajectories ∆ and is directly proportional to the
+terms that influence the amplitude of the perturbation injected
+into the system (α , k, |B|) as well as the scale of instability A(t) of
+the system.
+The FTS ES result is demonstrated with several simulations,
+including stabilization of the time-varying unstable system
+
+[ ]
+
+s + ci
+
+[
+{
+]}
+∫ Di
+−ki zi (t) +
+ui (σ , t)dσ
+,
+
+z(t) = Γ (t)G(t),
+
+where
+t
+
+ci
+
+where ci , ki > 0, and
+
+(205)
+
+ ∫t
+
+ |A(τ )−kαBBT Γ (τ )|dτ 
+η = max e t0
+.
+
+(214)
+
+αi (x, t) = L−1
+
+[
+
+√ ]
+∗ θi (t),
+√
+
+cosh(x s)
+cosh(Di
+
+s)
+
+(225)
+
+where L−1 (·) denotes the inverse Laplace transformation and ∗ is
+the convolution operator.
+This relationship is used to define the diffusion operator D =
+diag{D1 , . . . , Dn } with
+Di [ϕ (t)] = L−1
+
+(209)
+21
+
+[
+
+1
+cosh(Di
+
+]
+√
+
+s)
+
+∗ ϕ (t), s.t. Θ (t) = D[θ (t)]. (226)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+where the Hessian matrix H = H T < 0 is unknown. A Newton
+ES method is then developed for optimization of this system, in
+an approach similar to the one described above for systems with
+delays. The overall closed-loop system dynamics are given as
+
+θ̇i = ui (0, t)
+∂t ui (x, t) = ∂xx ui (x, t), x ∈ (0, Di )
+∂x ui (0, t) = 0
+ui (Di , t) = −
+
+−
+
+ki ci
+s + ci
+
+(229)
+(230)
+(231)
+
+zi (t)
+
+ki ci
+
+∫ Di
+
+s + ci
+
+0
+
+(Di − σ )ui (σ , t)dσ ,
+
+(232)
+
+and the overall setup shown in Fig. 31.
+PDE ES methods have also been developed for wave PDE
+compensation (Oliveira & Krstić, 2021), ES for systems with delays (Oliveira et al., 2016; Rušiti, Oliveira, Krstić, & Gerdts, 2021),
+Newton-based ES for systems with time-varying delays (Rušiti
+et al., 2021), and static maps with actuation dynamics governed
+by diffusion PDEs (Feiling, Koga, Krstić, & Oliveira, 2018).
+13. Hybrid ES with dynamic inclusions
+For some systems, introducing the added flexibility of hybrid
+controllers which switch between various feedback laws can be
+advantageous and for others it is required due to the structure
+of the system dynamics. Robust hybrid controllers have been
+developed for autonomous vehicles operating under unknown
+or adversarial environments, simultaneously avoiding obstacles
+and source seeking (Poveda, Benosman, Teel, & Sanfelice, 2021),
+hybrid ES controllers have been developed for optimization with
+acceleration and resets (Poveda & Li, 2021), and a hybrid ES
+approach has been developed for global practical optimization on
+smooth compact manifolds (Strizic, Poveda, & Teel, 2017).
+A general framework has been developed to extend the application of ES to hybrid systems with combined continuous
+and discrete-time dynamics (Poveda et al., 2018; Poveda & Teel,
+2017a). In Poveda and Teel (2017a) controllers were developed
+for set-valued hybrid dynamical systems (HDS) of the form
+
+Fig. 30. Top: Newton ES setup for systems with delay. Bottom: Simulation
+convergence example.
+Source: Figures adapted from Oliveira et al. (2016).
+
+The authors then define the relationship between the scalar measurements y of the unknown static map Q (θ ), with propagated
+input (221) as
+y(t) = Q (D[θ (t)]) = Q (Θ (t)), Θ (t) = [Θ1 (t), . . . , Θn (t)]T . (227)
+The unknown static map is assumed to be locally quadratic in the
+neighborhood of the extremum point y∗ , i.e.,
+1
+2
+
+(Θ (t) − Θ ∗ )T H(Θ (t) − Θ ∗ ),
+
+x ∈ C,
+
+(233)
+
+x ∈ D,
+
+(234)
+
+where ẋ = dx/dt, x+ corresponds to values of x after an instantaneous jump, and F (x) and G(x) are the flow map and jump
+map, respectively. In the approach the dynamic systems involved
+are not limited to those governed by Lipschitz differential equations, they are extended to systems described by differential
+inclusions, which are commonly used to analyze discontinuous
+and switched systems. Because such systems are not guaranteed
+to have unique solutions the authors find optimal operating set
+points relative to all of the dynamics that emerge from compact sets of initial conditions. Such a study can be especially
+useful for real-world applications in which noise, disturbances,
+and uncertainty require a study of entire sets of possible initial
+conditions and trajectories rather than single equilibrium point.
+Such systems emerge frequently in real-world applications in optimization and control systems in the form of switched systems,
+logic and event-based controllers, continuous-time systems with
+weakly jumping parameters, supervisory-based control systems,
+and multi-agent systems with switching communication topologies. The HDS system (233), (234) is represented by the notation
+H := {C , F , D, G}.
+Before the main results are presented, a few definitions are
+required. A set-valued mapping M is outer semi-continuous (OSC)
+at x ∈ Rm if for all sequences xi → x and yi ∈ M(xi ) such that
+
+Fig. 31. Newton ES for multivariable PDEs setup.
+Source: Figure adapted from Oliveira et al. (2020).
+
+y(t) = Q (Θ (t)) = y∗ +
+
+ẋ ∈ F (x),
+x+ ∈ G(x),
+
+(228)
+22
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+where µ = [µT1 , . . . , µTn ]T ∈ Sn , µi = [µi,1 , µi,2 ]T ∈ S1 , for all
+i ∈ {1, . . . , n}, ξ evolves in a compact set Λξ = λξ B ⊂ Rn , where
+λξ > 0 is selected sufficiently large to encompass all of the complete solutions of interest, matrix D = [e1 , 0, e2 , 0, . . . , ei , . . . ,
+0, en , 0] is a block matrix where 0 ∈ Rn is a column vector of
+zeros, and ei ∈ Rn is the unit basis vector in dimension i. The
+ω-parameterized block matrix Φ : R2n → R2n is given by
+
+⎡
+Ω (ω1 )
+⎢ 0
+Φ (ω) = ⎢
+⎣ ..
+.
+
+Ω (ωi ) =
+
+J = ϕ (θ, u),
+
+...
+
+0
+
+0
+0
+
+⎤
+
+⎥
+.. ⎥
+⎦,
+.
+Ω (ωn )
+
+(239)
+
+0
+
+ωi
+
+−ωi
+
+0
+
+[
+
+]
+
+,
+
+∀i ∈ {1, . . . , n},
+
+(240)
+
+where ω = [ω1 , . . . , ωn ]T , ωi = ϵ · κi , ωL = ϵ · ω̄, (ϵ, ω̄) ∈ R2>0 ,
+κi is a rational number such that κi ̸= κj and (i, j) ∈ {1, . . . , n}.
+u = û + aDµ where a ∈ (0, 1) is a small tunable parameter,
+and û ∈ Rn is an auxiliary state. The continuous-time dynamics
+associated to the linear oscillator µ̇ = Φ (ω) · µ generates a
+vector of periodic signals with odd components given by µi,1 (t) =
+cos(ωi t)µ2i−1 (0) + sin(ωi t)µ2i (0), for each i ∈ {1, . . . , n}. These
+signals are injected into the closed-loop system to extract the
+gradient information of J.
+14. Finite time Newton ES
+
+(235)
+In Poveda and Krstić (2021) the methods developed above
+for hybrid ES-based optimization were utilized to develop ES
+methods which could optimize (in a semi-global practical sense)
+the analytically unknown output function of a static map in a
+prescribed finite time. Because the systems considered are nonLipschitz continuous, the authors consider systems of the form
+
+The authors consider a dynamical system with state θ ∈ Rm ,
+with input u ∈ Rn , and output y ∈ R, modeled by a constrained
+differential inclusion
+(θ , u) ∈ Λθ × U,
+
+...
+...
+..
+.
+
+where the block components Ω (ωi ) are given by
+
+yi → y, we have that y ∈ M(x). A set-valued mapping M is
+locally bounded (LB) at x ∈ Rm if there exists a neighborhood
+Ux of x such that M(Ux ) ⊂ Rn is bounded. Given a set X ⊂ Rm
+the mapping M is said to be OSC and LB relative to X if the setvalued mapping from Rm to Rn defined by M(x) for x ∈ X and ∅
+for x ∈
+/ X is OSC and LB at each x ∈ X . Given a hybrid system
+H as described above, and A ⊂ Rn a compact set. The set A is
+said to be uniformly globally asymptotically stable (UGAS) for H
+if there exists a KL function β such that any maximal solution x
+of H satisfies
+
+θ̇ ∈ P(θ , u),
+
+..
+.
+
+0
+
+Fig. 32. Hybrid ES setup.
+Source: Figure adapted
+from Poveda and Teel
+(2017a).
+
+|x(t , j)|A ≤ β (|x(0, 0)|A , t + j), ∀(t , j) ∈ dom(x).
+
+0
+Ω (ω2 )
+
+(236)
+
+where P is a set-valued mapping, ϕ is an output function, and u
+evolves in the closed set U = Û + B, where Û ⊂ Rn . The following
+regularity assumptions are made.
+
+x ∈ C,
+
+ẋ = F (x),
+
+(241)
+
+n
+
+where x ∈ R is the state, C ⊂ dom(F ) is a closed flow set,
+and F is a set-valued mapping that is OSC, LB, and convex-valued
+with respect to C. A solution to (241) is an absolutely continuous
+function x : dom(x) → Rn that satisfies: x(0) ∈ C ; x(t) ∈ C for
+all t ∈ dom(x); and ẋ(t) ∈ F (x(t)) for almost all t ∈ dom(x). The
+authors develop their results for dynamic systems of the form
+
+Assumption 6. The set Û is closed. The set-valued mapping P(·, ·)
+is OSC and LB relative to Rm × U, Rm × U ⊂ dom(P), and P(θ, u)
+is convex for every (θ, u) ∈ Rm × U. The mapping ϕ (·, ·) is
+continuous with respect to both arguments.
+Assumption 7. There exists a set-valued mapping H that is OSC
+and LB relative to U, such that for each ρ > 0 the compact set
+Mρ := {(θ , u) : θ ∈ H(u), u ∈ U ∩ ρ B} is UGAS for the restricted
+HDS Hpρ := {Λθ × (U ∩ ρ B), P × 0, ∅, ∅} with state [θ T , uT ]T .
+
+ẋ = f (x, u),
+
+Assumption 8. The response map J : Rn → R is analytic, and
+there exists an optimal nonempty compact set O ⊂ Û, such that
+J(u∗ ) > J(u) for all u∗ ∈ O and all u ∈ Û \ O.
+
+Assumption 9. There exists a continuous function lx : Rn →
+Rp , such that for each compact set Ku ⊂ Rn the constrained
+dynamical system (x, u) ∈ S × Ku , ẋ = f (x, u), u̇ = 0 renders
+UGAS the compact set MKu = {(x, u) ∈ S × Ku : x = lx (u)}.
+
+2
+
+(242)
+
+where f is locally Lipschitz, h is continuously differentiable, and
+the operational space S of the states of the plant is closed and
+bounded. The following assumptions are required.
+
+A class of time-invariant gradient-based hybrid extremum
+seeking controllers is considered which are comprised of dynamic
+gradient estimators with states (ξ , µ) ∈ Rn × R2n , and a hybrid
+learning mechanism with overall state xu,z := (û, ẑ) ∈ Rn × Rr
+which regulate the input of the plant to the optimal set O by extracting the gradient information of J online based only on output
+measurements. The hybrid ES setup is shown in Fig. 32, where the
+gradient estimator for the response map J has dynamics
+
+(
+
+y = h(x, u),
+
+Assumption 10. Considering the response map defined as φ (u) =
+h(lx (u), u), the function u → φ (u) is twice continuously differentiable, and the set
+Aφ = argmin φ (u),
+u∈Rn
+
+is nonempty and compact.
+
+)
+
+ξ̇ = −ωL ξ − y · Dµ ,
+
+(237)
+
+µ̇ = Φ (ω) · µ,
+
+(238)
+
+a
+
+(ξ , µ) ∈ Λξ × Sn ,
+
+As described in the previous section, the approach is then to
+regulate the input u towards the set Aφ by using only output
+measurements y without analytic knowledge of f , h, or φ .
+23
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+15. Safe ES
+Constrained optimization in unknown environments is often
+performed through the use of Gaussian Processes (GPs), where
+a measure of safety can be considered statistically. Safe optimization of quadrotor controllers is described in Berkenkamp,
+Schoellig, and Krause (2016), and a general method for doing safe
+optimization via GPs is given by Sui, Gotovos, Burdick, and Krause
+(2015).
+Several approaches have been developed for using ES to solve
+constrained optimization problems, such as in Guay et al. (2015).
+Their modified ES design also involves estimating the gradient of
+the unknown functions, and they perform their analysis without
+using classical averaging and singular perturbation theory. In Liao,
+Manzie, Chapman, and Alpcan (2019) ES is blended with ‘‘boundary tracing’’. The formalization here is based on concepts taken
+from nonlinear programming techniques. ES based algorithms
+are presented in Poveda and Quijano (2015), which can handle
+both equality and inequality constraints, inspired by evolutionary
+game theory. A robust coordinated hybrid source seeking approach with obstacle avoidance has also been developed (Poveda,
+Benosman, Teel, & Sanfelice, 2021).
+A very simple approach to constrained ES was developed
+for systems of angular velocity-actuated unicycles in Scheinker
+(2017) in which autonomous agents are attempting to minimize
+an analytically unknown cost function J based only on its noisecorrupted measurement Ĵ = J + n = J0 + Jc + n where J0 is
+an unknown source function which the agents are attempting
+to minimize and Jc is an analytically unknown collision avoidance function based on the proximity to neighboring agents. For
+example each agent might generate such a function within its
+neighborhood based on a Gaussian with maximum centered at
+the agent’s location. Physically such a signal could be a temperature level or electric field strength which naturally decays with
+distance from the source. To consider a group of N agents, we
+define their coordinates as x = (x1 , . . . , xN ) where xi = (xi1 , xi2 )
+are the 2D coordinates of each agent i. In this case the dynamics
+are given by
+
+Fig. 33. Finite time Newton ES setup.
+Source: Figure adapted from Poveda
+and Krstić (2021).
+
+Fig. 34. Finite time Newton ES simulation example.
+Source: Figure adapted from Poveda and Krstić
+(2021).
+
+The Newton-like fixed-time ES controller is then defined as (in
+what follows ẋ = dx/dτ where τ = ϵ0 t)
+
+˙û = −kFu (û, ξ )
+)
+1 (
+ξ˙1 = −
+ξ1 FH (y, ũ)ξ1 − ξ1
+ϵ2
+ξ˙2 = −
+
+(245)
+
+√
+αω cos(θ ), ẋi2 = αi ωi sin(θi ),
+(
+)
+θ̇i = ωi + ki ωi2 Ĵi (xi , t) − ηi ,
+(
+)
+η̇i = −ωi2 ηi − Ĵi (x, t) ,
+
+(246)
+
+Ĵi = Ji,0 (x, t) +
+
+ẋi1 =
+
+(244)
+
+1
+
+(ξ2 − FG (y, µ̃))
+ϵ2
+2π
+µ̇ = − Rθ µ̃
+ϵ1
+
+  
+
+minimization
+
+1
+
+f (x, û + aµ̃)
+ϵ0
+û = u − aDµ,
+ẋ =
+
+√
+
+(243)
+
+(248)
+
+where D ∈ R
+is the matrix that maps a vector x = [x1 ,
+x2 , . . . , x2n ]T ∈ R2n to a vector x̃ = [x1 , x3 , . . . , x2n−1 ]T that has
+only the odd components of x, and the learning dynamics are
+defined as
+Fu (û, ξ ) = ξ1
+
+ξ2
+ξ2
++
+|ξ2 |α1
+|ξ2 |α2
+
+)
+
+,
+
+  
+
++ ni (t) .
+
+
+(251)
+(252)
+(253)
+
+noise
+
+which is summarized for a single 2D system, for simplicity, in
+Fig. 35.
+For example, given a two agent system, the goal might be for
+each agent to minimize its own analytically unknown cost function while avoiding collision with the other agent, with functions
+Ĵi given by
+
+(247)
+
+n×2n
+
+(
+
+Ji,c (x, t)
+collision avoidance
+
+(250)
+
+Ĵ1 = (x11 − 1)2 + x212
+
+
+(249)
+
+
+
+minimization
+
++ kp e
+
+
+with Fu = 0 whenever ξ2 = 0 and the parameters (α1 , α2 ) are
+selected to guarantee continuity of Fu . For rules determining the
+settings of all of the constants involved one should refer to the
+paper. A simulation result for finite time Newton ES is shown in
+Fig. 34.
+The finite time Newton ES setup is shown in Fig. 33. Several
+other finite time ES optimization methods have now been developed including finite-time ES for unknown maps (Guay & Benosman, 2021), fixed-time Newton-like ES (Poveda & Krstić, 2020b),
+and fixed-time gradient-based ES (Poveda & Krstić, 2020a).
+
+
+
+(
+)
+−ka (x11 −x21)2 +(x12 −x22 )2
+
+
+
+collision avoidance
+
+
+
++ n1 (t),
+
+noise
+
+Ĵ2 = (x21 + 1)2 + x222
+
+
+
+
+
+minimization
+
+
+
+(
+
++ kp e
+
+
+−ka (x11 −x21)2 +(x12 −x22 )2
+
+)
+
+
+
+
+
+collision avoidance
+
++ n2 (t),
+
+noise
+
+The simulation of such a system with (kp > 0) and without
+(kp = 0) collision avoidance activated is shown in Fig. 35A, B.
+24
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+this case the controlled agent’s dynamics are open-loop unstable,
+given by
+ẋ1 =
+ẋ2 =
+
+x21 (t)
+4
+x22 (t)
+
++
+
+√
+αω cos(ωt),
+
+(254)
+
++
+
+√
+αω sin(ωt),
+
+(255)
+
+4
+and the avoidance/minimization function is given as
+Ĵ(x, t) = k0 |x(t) − r1 (t)|2 + k1 e−σ |x(t)−r1 (t)|
+
+
+
+
+
+minimization
+
+
+
+
+
+
+
+2
+
+
+
+collision avoidance
+
+2
+
++ k2 e−σ |x(t)−r2 (t)| + n(t) .
+
+ 
+
+collision avoidance
+
+(256)
+
+noise
+
+A demonstration of such safe tracking is shown in Fig. 35C, D
+where the controlled agent (x1 (t), x2 (t)) is seen to temporarily
+move away from the tracked agent r1 (t) when the third agent
+r2 (t) spirals in close to r1 (t), with close tracking resuming after
+r2 (t) has moved far away again. A plot of the distances between
+the agents shows that collisions were avoided at all times.
+Another constrained ES approach is presented in Labar, Garone,
+Kinnaert, and Ebenbauer (2019a), which is described using the
+Lie bracket formalism. They approximate the solution of the constrained optimization problem by using so called ‘‘saddle point
+dynamics’’ which introduce an additional Lagrange-multiplier
+state. The authors consider the following constrained optimization problem
+min h(x)
+x∈Rn
+
+s.t.
+
+g(x) ≤ 0,
+
+(257)
+
+where h(x) is strictly convex and C 2 and the constraint g(x) is
+convex and also C 2 . The goal is to steer x(t) towards the solution
+of (257) while ensuring
+g(x(t)) ≤ β −1 ,
+
+∀t ≥ t0 ,
+
+(258)
+
+where β ∈ R>0 is a user-defined value. Towards this goal the
+authors consider the set Ω = {x ∈ Rn : −β g(x) + 1 > 0}, for
+which they utilize a modified barrier function L(x, λ) : Ω ×R>0 →
+R defined as
+L(x, λ) = h(x) − λβ −1 log (−β g(x) + 1) .
+
+(259)
+
+Intuitively, L(x, λ) tends to infinity as g(x) approaches β . L(x, λ)
+can also be seen as the Lagrangian of the constrained optimization
+problem
+−1
+
+min h(x)
+x∈Rn
+
+Fig. 35. Example of collision avoidance. The agents are seen to collide with
+collision avoidance off (A) and automatically change their trajectories to safely
+pass when it is on (B). The blue agent (x1 (t), x2 (t)) can be seen closely tracking
+r1 (t) without collision, and automatically moving away in order to avoid collision
+with a third agent r2 (t) when it moves in close to r1 (t) (C). Non-zero distances
+are retained between the controlled and the two other agents at all times (D).
+(For interpretation of the references to color in this figure legend, the reader is
+referred to the web version of this article.)
+Source: Adapted from Scheinker (2017).
+
+s.t. β −1 log(−β g(x) + 1) ≥ 0,
+
+(260)
+
+which is equivalent to (257). The solution of (260) can be
+achieved by the following dynamics, as proposed in Dürr, Zeng,
+and Ebenbauer (2013),
+ẋ = −ρx ∇x L(x, λ),
+λ̇ = ρλ λ∇λ L(x, λ) = −ρλ λβ −1 log(−β g(x) + 1),
+
+(261)
+(262)
+
+where ρx > 0 and ρλ > 0, with the following result.
+Theorem 6. Let Ω = {x ∈ Rn : −β g(x) + 1 > 0}. Let SL ⊂ Ω × R≥0
+be the set of all saddle points for L(x, λ). Assume that SL is non-empty
+and compact. Then SL is regionally uniformly asymptotically stable
+in Ω × R>0 for system (261), (262).
+
+With avoidance on, the trajectories avoid each other as they make
+their way to their respective minimizing values.
+A more complex example is given by considering a 3 agent system in which the controlled agent x(t) = (x1 (t), x2 (t)) must track
+a second agent r1 (t) = (cos(t), sin(t)) with unknown position,
+whose tracking is based only on a measure of some distancerelated function while avoiding collision with the tracked agent
+as well as avoiding collision with a third unknown agent r2 (t)
+for which a distance-related measurement is available as well. In
+
+Next, taking into account that the set of admissible values is
+a priori unknown to a user and log(−β g(x) + 1) is not defined
+for g(x) ≥ β −1 , the authors consider a modified version of the
+minimization dynamics (261), (262), considering instead
+
+(
+ẋ = −ρx
+25
+
+−β g(x) + 1
+1 + (−β g(x) + 1)
+
+)2
+
+∇x L(x, λ),
+
+(263)
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 37. Safe ES setup for the method developed in Williams et al. (2022).
+
+λ̇ = −µρλ λ
+
+(
+
+−β g(x) + 1
+1 + (−β g(x) + 1)
+
+)2
+
+log(−βγ (χ ) + 1)
+
+β
+
+,
+
+where i ∈ {1, 2, . . . , n}, ω √> 0 and ki ∈ Q>0 with ki ̸ = kj
+for i ̸ = j, where the term 2ρx ωki cos (µki ωt + L(x, λ)) in the
+2ρ
+ẋi dynamics is in the form (119) with ωi = µki ω and α = µx .
+The Lie bracket averaged system associated with the bounded ES
+dynamics above is then shown to be system (263), (264). The
+authors demonstrate their approach with an example in which
+the following constrained optimization problem is solved
+min h(x) = (x1 − 4)2 + x22 + 96,
+x∈R2
+
+s.t. g(x) = x21 + x22 − 4 ≤ 0,
+
+and the results of using β = 0.5 and β = 2.0 are compared for
+guaranteeing g(x(t)) ≤ β −1 . The simulation results are shown in
+Fig. 36.
+Another safe ES approach for systems with analytically unknown safety constraints was recently proposed in Williams,
+Krstić, and Scheinker (2022). The authors consider a minimization
+problem in which one has direct control over a variable θ (t) with
+the goal of minimizing an analytically unknown cost function J(θ )
+while respecting an unknown safety constraint boundary defined
+by the level set of an unknown barrier function h(θ ) = 0.
+The overall dynamic optimization problem is then defined as
+
+Fig. 36. ES trajectories for constrained optimization.
+Source: Figure adapted from Labar et al. (2019a).
+
+(
+
+−β g(x) + 1
+λ̇ = ρλ λ
+1 + (−β g(x) + 1)
+
+)2
+
+∇λ L(x, λ),
+
+θ̇ = u,
+(264)
+
+y = J(θ ),
+
+(266)
+
+and the safe ES algorithm is defined as
+
+with ρx > 0 and ρλ > 0. Intuitively, considering the new
+dynamics (263), (264), no matter what the value of the estimated
+∇x L(x, λ) is, if g(x0 ) < β −1 , then g(x(t)) < β −1 , ∀t ≥ t0 . This
+approach ensures that the log(−β g(x) + 1) term in ∇λ L(x, λ) =
+−β −1 log(−β g(x) + 1) is always well defined. These results are
+summarized as
+
+θ̇ = −kGJ + Γ maxδ {kGTJ Gh − c ηh }Gh + S(t),
+ĠJ = −ωl GJ + ωl (J(θ ) − ηJ )M(t),
+
+η̇J = −ωh ηJ + ωh J(θ ),
+Ġh = −ωl Gh + ωl (h(θ ) − ηh )M(t),
+
+η̇h = −ωh ηh + ωh h(θ ),
+
+Theorem 7. Let Ω = {x ∈ R : −β g(x) + 1 > 0}. Let SL ⊂ Ω × R≥0
+be the set of all saddle points for L(x, λ). Assume that SL is non-empty
+and compact. Then SL is regionally uniformly asymptotically stable
+in Ω × R>0 for system (263), (264).
+n
+
+Γ̇ = ωl Γ (1 − Γ ∥Gh ∥2 ),
+
+(267)
+
+where the perturbation signal S and demodulation signal M are
+given by
+S(t) = [aωi cos(ωi t), . . . , aωi cos(ωn t)]T ,
+
+Finally, the authors generalize this approach for a system
+with an analytically unknown optimization function h(x) and
+analytically unknown barrier function g(x), relying only on their
+online measurements. For these unknown functions the gradient
+∇x L(x, λ) is also unknown and so a bounded ES-based version
+is developed using the bounded ES approach as in (119), as
+developed in Scheinker (2013a) and Scheinker and Krstić (2014a).
+This bounded ES version of (263), (264) is utilized so that the gradient can be estimated online in real-time. The bounded ES-based
+dynamics are
+ẋi =
+
+(265)
+
+[
+M(t) =
+
+2
+a
+
+sin(ωi t), . . . ,
+
+2
+a
+
+]T
+
+sin(ωn t)
+
+,
+
+(268)
+
+as summarized in Fig. 37.
+The functions J , h : Rn ↦ → R are scalar valued functions
+defined over the optimization variables θ . The terms (J(θ ) −
+ηJ )M(t) and (h(θ ) − ηh )M(t) are the estimates of the gradients
+of J and h, respectively, performed with the aid of the filter
+variables ηJ and ηh . The variables GJ and Gh are filtered versions
+of these estimates. The estimates of the gradients of J and h are
+not directly fed into the maxδ approximation because averaging
+
+−β g(x) + 1 √
+2ρx ωki cos (µki ωt + L(x, λ)) ,
+1 + (−β g(x) + 1)
+26
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 39. Adaptive machine learning setup using ES as feedback to tune a lowdimensional latent space representation xL (t) of a combined set of image and
+vector inputs {x(t), X (t)} in order to minimize a cost function J which compares a
+subset of an encoder–decoder generative convolutional neural network’s outputs
+ŷj (t) to measurements yj (t).
+
+create maps between extremely high dimensional objects such
+as input–output image pairs which may represent complex distributions at the input and output of a dynamic system
+
+Fig. 38. A safe ES trajectory compared to the classical ES approach to optimizing
+the same problem, using the method developed in Williams et al. (2022).
+
+{X (t), x(t)} 
+−→ Ŷ (t),
+
+in this case would be nearly impossible—with time varying terms
+appearing inside the argument of the non-linearity maxδ . The
+(nonlinear) Riccati filter Γ performs a dynamic computation of
+1/G2h > 0. The standard maximum operation is non-smooth and
+is therefore approximated by the function maxδ : R ↦ → R>0 given
+by
+
+(270)
+
+CNN
+
+where x(t) ∈ Rn may be a vector of time-varying parameters,
+X (t) ∈ RNx ×Nx are time-varying initial conditions represented
+as images which are incredibly high dimensional objects. For
+example, given a 256 × 256 pixel image, Nx ×Nx = 2562 = 65536.
+The outputs are
+
+)
+√
+1(
+x + x2 + δ ≈ max{x, 0},
+(269)
+2
+for a small parameter δ > 0. Note that maxδ {x} > max{x, 0} for
+all x ∈ R. An example of the scheme avoiding an unsafe region,
+compared to classical ES without safety is shown in Fig. 38.
+This safe ES method has recently been extended to provide semi-global practical stability (Williams, Krstić, & Scheinker,
+2023), and has been applied for the safe optimization of high energy charged particle beams (Williams, Scheinker, Huang, Taylor,
+& Krstić, 2023).
+maxδ {x} :=
+
+Ŷ (t) = ŷ1 (t), . . . , ŷN (t) ∈ RNy ×Ny ×N ,
+
+(
+
+)
+
+(271)
+
+Ny ×Ny
+
+stacks of N images ŷn (t) ∈ R
+, which are estimates being
+generated by the CNN of some unknown Y (t).
+In Scheinker (2021b), the authors consider the case where following initial training access to the time varying inputs
+{X (t), x(t)} is lost and the goal is to track the entire unknown
+Y (t) of which a partial measurement, a single projection yn (t) is
+available for online measurement. This measurement is compared
+to the CNN’s generated version via some cost function such as
+
+16. Adaptive latent space tuning: ES for enabling machine
+learning for time-varying systems
+
+J yn (t), ŷn (t), t =
+
+(
+
+)
+
+⏐
+1 ∑∑⏐
+⏐yn (i, j, t) − ŷn (i, j, t)⏐ ,
+2
+Ny
+i
+
+Machine learning (ML) techniques, especially deep convolutional neural networks, have been growing in popularity in all
+areas of science and engineering. However, one major challenge
+faced by standard ML methods is that of time varying systems,
+known in the ML community as systems with distribution shift.
+If a system or its initial conditions change over time, then the data
+that was previously collected to train an ML model such as a deep
+convolutional neural network no longer exactly represents the
+dynamic system that is supposed to be modeled. The typical solution to this phenomenon is brute force re-training, in which once
+a big enough error is noticed an entire new set of data is collected
+to update the network weights. This solution is problematic for
+most complex systems of interest for which repeatedly gathering
+new data and network re-training is time consuming and requires
+measurements which interrupt regular system operation.
+For example, at large particle accelerator facilities detailed
+beam profile measurements use destructive processes such as
+inserting screens which intercept the charged particle beams
+and interrupt all downstream operations. Such measurements
+are typically performed only during rare dedicated experimental
+times. For such systems repeated re-training is not an option.
+Recently, a control theory-based dynamic solution was introduced to the problem of initial condition distribution shift
+(Scheinker, 2021b). The authors consider a problem in which generative encoder–decoder convolutional neural networks (CNN)
+
+(272)
+
+j
+
+The idea is to use the incredible ability of encoder–decoder CNNs
+to compress images down to a very low dimensional latent space,
+in this example, the middle of the encoder–decoder network
+pinches down to a 2D latent representation xL (t) ∈ R2 from
+which the outputs Ŷ (t) are then generated. ES is utilized to adaptively move in this low-dimensional latent space in real time to
+minimize (272) for unknown and time-varying inputs {X (t), x(t)}
+according to the bounded stabilizing ES feedback
+Ŷ (t) = FCNN (xL (t)) ,
+
+(
+(
+))
+√
+ẋL,i (t) = αωi cos ωi t + kJ yn (t), ŷn (t), t ,
+
+(273)
+(274)
+
+as shown in Fig. 39.
+Recently, a study of this adaptive latent space tuning approach
+demonstrated that incorporating ES-based feedback within the
+autoencoder architecture greatly improves the robustness of neural network-based predictions far beyond the span of the training
+data (Scheinker, Cropp, & Filippetto, 2023).
+This method was also extended to develop a robust framework combining machine learning, an online physics model, and
+adaptive tuning via ES in order to accurately predict and track 2D
+phase space distributions of charged particle beams despite timevarying initial beam conditions as well as time-varying particle
+accelerator components (Scheinker, Cropp, Paiagua, & Filippetto,
+2021). ES has also been studied for enabling more general ML
+27
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Table 1
+Comparison of the various ES methods shown in Fig. 40 relative to the assumptions made about the systems to which they are applied. In each column, the most
+general/capable ES approaches are highlighted in bold.
+Comparison of ES methods and required system assumptions
+ES method
+
+Open loop stability
+assumed
+
+Hybrid systems
+allowed
+
+Time-varying
+systems allowed
+
+Periodic time
+variation assumed
+
+Classical ES (Krstić & Wang, 2000)
+ES for games (Stanković et al., 2010)
+Stochastic ES (Liu & Krstić, 2012)
+Newton ES (Nesić et al., 2010)
+Newton ES delays (Oliveira et al., 2016)
+Newton ES PDEs (Oliveira et al., 2020)
+Finite time Newton ES (Poveda & Krstić, 2021)
+Safe ES (Williams et al., 2022)
+Hybrid ES (Poveda et al., 2018)
+Stabilizing ES (Scheinker & Krstić, 2012a)
+Bounded ES (Scheinker, 2013a)
+PI ES (Guay & Dochain, 2017)
+Adaptive latent space ES (Scheinker, 2021b)
+
+YES
+YES
+YES
+YES
+YES
+YES
+YES
+NO
+YES
+NO
+NO
+NO
+NO
+
+NO
+NO
+NO
+NO
+NO
+NO
+NO
+NO
+YES
+NO
+NO
+NO
+NO
+
+NO
+NO
+NO
+NO
+NO
+NO
+NO
+YES
+NO
+YES
+YES
+YES
+YES
+
+NA
+NA
+NA
+NA
+NA
+NA
+NA
+YES
+NA
+NO
+NO
+YES
+NO
+
+for time-varying problems (Scheinker, 2021a), and has been applied for 3D coherent diffraction imaging problems (Scheinker &
+Pokharel, 2020).
+
+rather than relying on a specific controller which constrains the
+ES to modify a parameter within the control function
+
+17. ES methods summary
+
+One possible advantage of utilizing an ES-based feedback as a
+controller directly is the added flexibility of finding and tracking unknown optimal points which may exist for analytically
+unknown systems.
+For example, if we consider the typical ES setup there is
+usually a pre-existing controller α (x, θ, t) which guarantees the
+existence of a smooth output steady state manifold l such that
+the system equilibrium f (x, α (x, θ )) = 0 is achieved at x =
+l(θ ) and the ES dynamics evolve along this manifold as they
+find the optimal value of some J(x). For a large and complex
+system with unknowns, which is the type of system for which
+ES is most useful, it is possible that some other controller may
+achieve a more optimal setting than what is constrained to l(θ )
+by having the freedom to explore the space more completely.
+Such an example is illustrated in Fig. 41 in which the classic
+ES scheme quickly converges to and evolves along l(θ ) to the
+global maximum relative to the l(θ ) manifold as enforced by a
+pre-existing controller α (x, θ ). For this same system when using
+the approach where ES is the direct feedback itself, from the same
+starting conditions it is able to find the global maximum that is
+outside of the l(θ ) constraints.
+
+ẋ = f (x, u, t),
+
+A large family of various ES-based controllers and optimization
+methods has been presented for dynamic systems. In Fig. 40 an
+incomplete summary of various ES methods is presented showing
+the signal pathways and setups for the various ES versions with
+the various methods broadly categorized in two families: (1).
+Classical ES approaches and their modifications for the optimization of an analytically unknown output function of an a priori
+stabilized dynamic system by tuning a control parameter. (2).
+ES-based feedback stabilization and optimization approaches in
+which the dynamic system is not assumed to be controlled and
+ES plays the dual role of optimizing an analytically unknown
+output function and of forcing the optimal point to be a stable
+equilibrium of the dynamic system (see Table 1).
+Starting at the top of the left column of Fig. 40, we have the
+classical ES algorithm for which the first analytic proofs were
+presented in Krstić and Wang (2000). As we continue down the
+left column we see the various modifications and additions that
+have been made to the ES method over the years including a
+stochastic version, a multi-agent version for games, a Newtonbased ES setup, the extension of the Newton approach to systems
+with delays and systems governed by a class of PDEs, finite-time
+Newton ES, a hybrid ES scheme for systems whose dynamics are
+a combination of continuous movement and discrete jumps, and
+safe ES in which analytically unknown boundary constraints must
+be satisfied by the ES dynamics while minimizing an analytically
+unknown output function.
+Starting at the top of the right column of Fig. 40, we have the
+ES-based feedback control algorithm first proposed in Scheinker
+(2012). As we continue down the right column we see various
+modifications of the ES-based feedback approach including the
+bounded form of ES, the PI-based ES feedback, and ES coupled
+with convolutional neural networks for adaptive latent space
+tuning.
+Both of the ES approaches have proven to be useful for an
+extremely large number of applications, as described below, and
+for an extremely large family of dynamic systems, as described
+above. Each family of ES approaches also has its own benefits. The
+family of classical ES-based optimizers is older, larger, and has
+many more variants. On the other hand the smaller family of ESbased feedbacks has its own advantage in the increased flexibility
+of allowing the ES to act directly as the feedback controller
+ẋ = f (x, u, t),
+
+u = uES (x, t),
+
+u = α (x, θES , t).
+
+(276)
+
+18. Patents
+As described above, the various versions of ES, which continue
+to grow as it is an active field of research, are applicable to an
+incredibly wide range of dynamic systems. Furthermore, because
+ES is by design useful for uncertain systems, it has been widely
+applied outside of academic studies for real world problems,
+including scientific studies and industrial settings. It is worth
+noting the significant impact of ES on industry which can be
+somewhat quantified by the large volume and diversity of ESrelated patents. First of all, there is of course the original 1922
+paper of Leblanc which reads more like a patent/design than
+a typical academic article and now has 277 citations (Leblanc,
+1922). Moving on, a simple public search of the US Patent and
+Trademark Office for the two terms ‘‘extremum’’ and ‘‘seeking’’
+returns 1919 records. To give a few concrete examples, a search
+for ‘‘extremum seeking patent’’ was performed in Google Scholar,
+which returns 9750 results (many of which are articles rather
+than patents). These results are ranked by ‘‘relevance’’ as determined by Google’s algorithms. If one starts to browse through
+the patents they include ES applications for regulating the airflow into a building (Seem, 2010), a method for predicting and
+
+(275)
+28
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 40. Extremum Seeking Zoo: Several major forms of the ES algorithm discussed in this survey.
+
+29
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 41. ES for finding a maximum of an unknown function y(x1 , x2 ). Classical ES (red) slowly converges to the local maximum equilibrium dictated by a predefined
+control structure whereas stabilizing ES (black) quickly finds the global maximum. (For interpretation of the references to color in this figure legend, the reader is
+referred to the web version of this article.)
+
+equations for the motion of a rigid body in an ideal fluid
+dL
+
+dA
++ Ω k × L = 0,
+= k([U V ]T × L) = 0,
+(277)
+dt
+dt
+where L and A are the linear and angular momenta of the body
+fluid system and U, V , and Ω are the translational and rotational
+velocities.
+For the three-linked fish model shown in Fig. 42 the ES control
+law used to maximize the analytically unknown cost function J is
+given by
+
+θ̇1 = aω sin(ωt) − c η cos(ωt),
+θ̇2 = aω cos(ωt) + c η cos(ωt),
+
+(278)
+
+η=
+
+(280)
+
+s
+
+s+h
+
+[J ].
+
+(279)
+
+For the Joukowski foil model, the ES controller used is
+
+η̇ = aω cos(ωt) + c η sin(ωt),
+)2
+(
+s
+.
+η = H(s)[J ], H(s) =
+s+h
+
+(281)
+(282)
+
+It was shown that both of the simulated fish models could utilized ES algorithms to autonomously track source J(x, y, t) whose
+signal strengths fall off with distance, as shown in Fig. 43.
+20. Active flow control
+
+Fig. 42. Fish model setup for a three-linked fish (top) and a Joukowski foil
+(bottom).
+Source: Figure adapted from Cochran, Kanso, Kelly, Xiong, and Krstić (2009).
+
+Active flow control is a method which exploits flow instabilities in order to enhance the region of operation of an aircraft
+over a wide range of operating conditions, including providing
+extra lift at very a high angle of attack. Airflow is a highly
+stochastic and time-varying process with various environmental
+disturbances and requires a very robust and fast online feedback, which makes ES a very strong candidate. ES has been
+utilized for active flow control (Becker, King, Petz, & Nitsche,
+2007; Brunn, Henning, Nitsche, & King, 2008; Henning et al.,
+2008; Kim, Kasnakoglu, Serrani, & Samimy, 2009; King et al.,
+2006), and for aeropropulsion (Moeck, Bothien, Paschereit, Gelbert, & King, 2007; Wiederhold et al., 2009). In Becker et al. (2007)
+the authors developed a Multi-input multi-output (MIMO) ES
+method for maximizing the lift of a wing by actively controlling
+pulsating jets in order to control flow separation, as shown in
+Fig. 44. For the MIMO ES setup the three ES controllers used,
+(ES1 , ES2 , ES3 ) were each of the form
+
+stabilizing compressor stall (Krener & Krstić, 2000), for chilled
+water plant control (Salsbury & House, 2019), for vapor compression (Burns, Guay, & Weiss, 2017), for RF impedance matching (Burry, Radomski, Aung, & Klein, 2020), and for flight formation (Ryan, 2018). In the following sections, we present several
+detailed overviews of ES applications.
+19. Autonomous vehicle control
+Autonomous underwater vehicles, which do not need input
+from an operator, are being utilized for scientific and commercial exploration including seafloor mapping and chemical concentration mapping, and for various military applications. Extremum seeking methods have been developed for such systems,
+for steering vehicles towards a source in GPS-denied environments. In Cochran et al. (2009) and Cochran and Krstić (2009), the
+authors modeled the mechanics of a fish in two different ways,
+as a three linked fish and as a Joukowski foil, as shown in Fig. 42.
+For both of the fish models considered in Cochran et al. (2009)
+the equations governing locomotion are variations of Kirchhoff’s
+
+ui = u0 + a sin(ωt + θi ) + û,
+
+∫ t
+
+η(τ )dτ ,
+
+(284)
+
+ω
+ξ sin(ωt + θi ),
+ωl + s
+
+(285)
+
+û = K
+
+η(t) =
+30
+
+(283)
+
+0
+l
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 43. A fish model utilizing ES to track a stationary and a moving source.
+Source: Figure adapted from Cochran et al. (2009).
+
+∆∗ ψ = −µ0 rjxt (r , z , t),
+∆∗ ψ = 0 ,
+
+in the conductors,
+
+elsewhere,
+
+(288)
+(289)
+
+where ψ (r , z) is the poloidal flux per radian, µ0 is the vacuum
+magnetic permeability, jext is the toroidal current density in the
+external conductors, p is the kinetic pressure profile, f is the
+poloidal current function profile, and the operator ∆∗ is defined
+as
+
+∂
+∆ =r
+∂r
+∗
+
+(
+
+1 ∂ψ
+
+)
+
+µr r ∂ r
+
+∂
++
+∂z
+
+(
+
+1 ∂ψ
+
+)
+
+µr ∂ z
+
+.
+
+(290)
+
+It can be shown that
+
+σ
+
+σ
+
+y = δ IAT δ Ip δ Zc
+
+)T
+
+ψ̇ +
+u,
+(291)
+r
+2π r
+where u is the voltage applied to the coils and σ is the electric
+conductivity, with the equation integrated over the conductor
+regions. The measured outputs were defined as
+jext = −
+
+(
+
+,
+
+(292)
+
+where δ IA are the deviations of the circuit currents from equilibrium values, δ Ip is the deviation of the plasma current from
+equilibrium, and δ Zc is the deviation of the vertical position of the
+plasma centroid from equilibrium. This input was passed into a
+Kalman filter to generate a Lyapunov-like function V = x̂2 of the
+unstable plasma state for minimization by using the stabilizing
+feedback-based ES method of the form
+u=α
+
+Fig. 44. MIMO ES-based airfoil control.
+Source: Figure adapted from King et al.
+(2006).
+
+√
+
+√
+ω cos(ωt) − k ω sin(ωt)V (x̂),
+
+(293)
+
+as shown in Fig. 44, where each ESi utilized the same frequency
+ES dithers, but with different phase shifts θi for the 3 different
+controllers.
+
+as shown in Fig. 45(C). Various examples of plasma stabilization
+were demonstrated. In Fig. 45 we show just the response of the
+plasma to two different disturbances: VDE of 5 cm and MD, where
+a VDE is an instantaneous motion of the system’s state along an
+unstable mode resulting in vertical displacement of the plasma
+centroid and MD represents a loss of plasma thermal energy. The
+ES method was shown to be incredibly robust over a wide range
+of conditions with the various Equation numbers in the figure
+referring to plasma characteristics as described in the paper.
+
+21. Plasma control
+
+22. Particle accelerator control
+
+ξ (t) =
+
+s
+s + ωh
+
+y
+
+(286)
+
+Particle accelerators are some of the most powerful scientific
+tools for studying fundamental physics, biology, and material
+science. Large accelerators are kilometers in length and are composed of thousands of coupled components such as resonant radio
+frequency (RF) electromagnetic accelerating cavities and magnets
+and their associated power sources and amplifiers. The performance of large collections of electromagnetic components is constantly being perturbed by environmental disturbances such as
+temperature drifts, high voltage ripple, and vibrations, all components face uncertainty in terms of precise alignment at the sub
+µm scale, and components such as magnets suffer from hysteresis
+effects which introduces in an uncertainty in the mapping between a control parameter such as a power supply current and
+
+High energy plasmas, such as those created inside of Tokomak
+reactors, are extremely complex dynamic systems which are very
+difficult to control, for which various ES methods have been
+developed (Centioli et al., 2008; Luo & Schuster, 2009; Ou et al.,
+2008). Recently, an innovative Kalman filter-based ES controller
+was designed for plasma control in Dubbioso et al. (2022) and
+Tommasi, Dubbioso, Mele, and Pironti (2021).
+The Kalman-based ES setup is shown in Fig. 45. The tokamak
+plasma model used was based on the Grad–Shafranov PDE which,
+in cylindrical coordinates, is given by
+
+∆∗ ψ = − f
+
+df
+dψ
+
+− µ0 r 2
+
+dp
+dψ
+
+,
+
+in plasma region,
+
+(287)
+31
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 45. Tokomak Kalman-based ES controller.
+Source: Figure adapted from Dubbioso et al.
+(2022).
+
+the controlled variable which may be the magnetic field which
+focuses charged particles. Furthermore, charged particle beams
+themselves are time-varying with typical beams composed of
+109 − 1014 individual particles whose dynamics are governed by
+complex collective effects such as space charge forces. The result
+is that a measurable output function of an accelerator, such as a
+beam current monitor at a particular location, is an analytically
+unknown function of a control parameter such as a magnet power
+supply setting, and is governed by an uncertain and time-varying
+dynamic system.
+Two ES feedbacks running at multiple time-scales have been
+utilized for online multi-objective optimization at the plasma
+wakefield accelerator (AWAKE) at CERN for simultaneous emittance and orbit control (Scheinker et al., 2020) as shown in
+Fig. 46(A). In Scheinker et al. (2020) one set of 5 ES parameters that were slowly tuned were 2 solenoid magnets and 3
+quadrupole magnets which had an influence over the electron
+beam size at electron–proton overlap region of the AWAKE beamline, denoted as
+p1 = (p11 , p12 , . . . , p15 ).
+
+f1 (p, t) = w1 XRMSE (p, t),
+
+ṗ1i =
+ṗ2i =
+
+p
+
+p
+
+√
+√
+
+α1 ω1i cos(ω1i t + kF (p, t)),
+
+(298)
+
+α2 ω2i cos(ω2i t + kF (p, t)),
+
+(299)
+
+where the two time-scale ES dithering frequencies were defined
+as
+
+ω1i = ω0 r1i , r1i ∈ {1.0, . . . , 1.75}, i = 1, . . . , 5
+ω2i = 3 × ω0 r2i , r2i ∈ {1.0, . . . , 1.75}, i = 1, . . . , 10,
+with the initial beam shaping magnets moving much slower than
+the trajectory-controlling magnets further down stream.
+ES has been applied for maximizing free electron laser (FEL)
+pulse energy at two of the most advanced FEL facilities in the
+world: the Linac Coherent Light Source (LCLS) at SLAC National
+Accelerator Laboratory and the European X-ray FEL (EuXFEL) at
+DESY laboratory, as shown with ES automatically more than
+doubling the average light output energy of the EuXFEL within
+4 minutes in Fig. 46(B) (Scheinker et al., 2019).
+ES has also been combined with machine learning-based neural network tools for automatically controlling the (z , E) longitudinal phase space of electron beams at the LCLS FEL as shown in
+Fig. 46 (C) (Scheinker, Edelen, Bohler, Emma, & Lutman, 2018).
+Various other ES applications for accelerator tuning include
+accelerator magnet tuning (Scheinker, Pang, & Rybarcyk, 2013),
+adaptive electron beam profile prediction (Scheinker & Gessner,
+2015), time varying resonance control (Scheinker, 2016), for min-
+
+(294)
+
+(295)
+
+to keep the beam centered on a screen during the beam shape
+optimization. Considering all 15 tuned ES parameters as p =
+(p1 , p2 ), the multi-objective ES problem was of the form:
+min {F (p, t)} = min {f1 (p, t), f2 (p, t)} ,
+
+(297)
+
+where XRMSE denotes RMS error of the beam trajectory and σxy is
+a measure of the (x, y) beam size on the screen.
+The two time-scale ES controllers were defined as
+
+However, because the beam is not perfectly aligned, changing
+the solenoid and quadruople magnets not only affected the beam
+shape, but also its trajectory. Therefore, another set of 10 ES
+parameters running at a 3× faster rate controlled 10 (x, y) downstream steering magnets, denoted as
+p2 = (p21 , p22 , . . . , p210 ),
+
+f2 (p, t) = w2 σxy (p, t),
+
+(296)
+32
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 46. (A) Application of two ES loops running simultaneously at two different time scales for real-time multi-objective optimization (beam trajectory control
+and emittance growth minimization) at the AWAKE accelerator at CERN. (B) Application of ES for automatic pulse energy maximization at the European X-ray free
+electron laser at DESY. (C) Combination of ES and a neural network for direct tuning of the 2D (z , E) longitudinal phase space distribution of the electron beam at
+the LCLS free electron laser at SLAC National Accelerator Laboratory.
+
+23. Maximum power point tracking
+
+imizing beam oscillations in a time-varying magnetic lattice at
+SPEAR3 at SLAC (Scheinker, Huang, & Wu, 2017), and is now
+regularly used as a beam tuning tool at the Los Alamos National Laboratory linear particle accelerator LANSCE for beam loss
+minimization (Scheinker, Huang, & Taylor, 2021).
+
+Photovoltaic generators which convert solar energy into electricity have current–voltage and power–voltage characteristics
+which strongly depend on temperature as shown in Fig. 47(A)
+33
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Γ̂˙ = −ωl Ĝ + ωl M(t)Pac (t),
+
+(306)
+
+where M(t) is a matrix of ES perturbation signals. The performance and advantages of the Newton ES-based MPPT approach
+are shown in Fig. 48. MPPT is an important problem well suited
+for ES-based methods and has been studied with numerous additional ES-based approaches (Bazzi & Krein, 2011; Bizon, 2016;
+Brunton, Rowley, Kulkarni, & Clarkson, 2009, 2010; Heydaridoostabad, Keypour, Khalghani, & Khooban, 2013; Li, Li, Seem, &
+Lei, 2011, 2015; Reisi, Moradi, & Jamasb, 2013; Yau & Wu, 2011).
+24. Bioreactor growth rate optimization
+An innovative combination of ES with neural networks has
+also been applied for the control of complex nonlinear bioreactor systems with unknown growth kinetics for biomass production rate maximization (Guay et al., 2004). The authors consider
+microbial growth dynamics of the form
+
+Fig. 47. Voltage, current, power relationships as a function of temperature (0
+to 75 degrees C).
+Source: Figure adapted from Leyva et al. (2006).
+
+16
+a2
+4
+
+sin2 (ωj t) −
+
+1
+2
+
+[
+si (z) = exp
+
+The general ES methods described above have proven to be
+useful for many real-world applications and there are many approaches and applications which were beyond the scope of this
+survey, some of which we mention here briefly. Beyond what
+was described, ES has been implemented for cooling systems (Li,
+Li, & Seem, 2009; Li, Rotea, Chiu, Mongeau, & Paek, 2005), wind
+energy (Creaby, Li, & Seem, 2009), photovoltaics (Lei, Li, Chen, &
+Seem, 2010), human exercise machines (Zhang, Dawson, Dixon,
+& Xian, 2006), optimizing the control of nonisothermal continuously stirred tank reactors (Guay, Dochain, & Perrier, 2005),
+reducing the impact velocity of an electromechanical valve actuator (Peterson & Stefanopoulou, 2004), Newton-like ES for thermoacousic instability control (Moase et al., 2010), torque maximization of motors (Antonello, Carraro, & Zigliotto, 2013), optimization of variable CAM timing engine operation (Popovic,
+Jankovic, Magner, & Teel, 2006), ES for cascaded Raman optical
+
+,
+
+1
+
+˙
+
+D̃ = −Kn Γ Ĝ,
+
+(304)
+
+Γ̇ = ρ Γ − ρ Γ Ĥ Γ ,
+
+(305)
+
+i = 1, 2, . . . , l,
+
+25. Conclusions
+
+(301)
+
+WQ T HQ + WQ T H D̃ + O(a),
+(303)
+2
+where Pac is the alternating component of the measured output
+power and
+W (t)Pac =
+
+]
+−(z − φi )T (z − φi )
+,
+σi2
+
+with centers φi and standard deviations σi . The method is demonstrated to perform incredibly well with and without Gaussian
+measurement noise added to the biomass and substrate concentration measurements, as shown in Fig. 49.
+
+sin(ωj t) sin(ωk t), j ̸ = k,
+(302)
+a2
+is used to extract an estimate of the Hessian via the first term of
+the product
+Wjk =
+
+(310)
+
+S(z) = [s1 (z), s2 (z), . . . , sl (z)]T ,
+
+where ωi ̸ = ωj . A matrix W of perturbation signals of the form
+Wjj =
+
+(309)
+
+where W ∗ is unknown, µl (t) is the neural network error, and S(z)
+is an RBF basis function vector
+
+where H is the unknown Hessian matrix, D = D + D̃ + Q (t), with
+D̃ = D̂ − D an estimation error, R represents higher order terms,
+and Q (t) is a vector of ES dither signals of the form
+
+)
+
+(308)
+
+y = k2 µ(x, s)x,
+
+ϕ (z) = W ∗T S(z) + µl (t),
+
+∗
+
+(
+
+(307)
+
+ṡ = −k1 µ(s, x)x + u(s0 − s),
+
+where x, s ∈ R+ denote biomass and substrate concentrations,
+respectively, u ≥ 0 is the dilution rate, y is the production rate
+of the reaction product, s0 is the concentration of the substrate
+in the feed, and k1 , k2 > 0 are yield coefficients. The authors
+consider a case in which only x and s are measurable and y is
+not available for measurement and control. The goal of the ES
+controller is to maximize the steady-state production rate y∗ by
+finding the optimal dilution rate u∗ .
+In this work, the substrate-dependent growth rate expression
+µ(x, s) is considered to be unknown and is approximated by a radial basis function (RBF)-based neural network giving an estimate
+of the form
+
+and vary in response to atmospheric conditions. Therefore, the
+problem of maximum power point tracking (MPPT), becomes an
+adaptive optimization problem for which ES methods were first
+demonstrated in Leyva et al. (2006, 2011) and Leyva, Artillan,
+Cabal, Estibals, and Alonso (2011). The authors present an ESbased MPPT algorithm for efficient extraction of PV array energy
+by automatic adjustment of the array voltage via modulation
+of the duty cycle of a switched mode power converter while
+ensuring the stability of the adjusting process for sudden or fast
+variations of the external conditions. The ES MPPT setup is shown
+in Fig. 47(B).
+A multivariable Newton ES-based method for MPPT has also
+been developed for photo-voltaic power optimization (Ghaffari
+et al., 2014). In that approach the power to be maximized, P(D, t),
+is considered as a function of switching pulse duration D =
+[D1 , D2 , . . . , Dn ]T and is assumed to have a Taylor series expansion at its optimal pulse duration point D∗ = [D∗1 , D∗2 , . . . , D∗n ]T of
+the form
+1
+P = P ∗ + (D̃ + Q (t))T H(D̃ + Q (t)) + R(D̃ + Q (t)),
+(300)
+2
+
+Q (t) = a[sin(ω1 t), . . . , sin(ωn t)]T ,
+
+ẋ = µ(s, d)x − ux,
+
+34
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+
+Fig. 48. MPPT with Newton-based ES. Power output as a function of pulse duration for a two-pulse setup D = [D1 , D2 ], is shown (A). Following an initial transient
+time, the Newton-based ES approach has faster settling time than a gradient method alone (B). The Newton-based ES shows superior response to fast power level
+changes (C, D).
+Source: Figure adapted from Ghaffari, Krstić, and Seshagiri (2014).
+
+Fig. 49. ES for bioreactor optimization with and without Gaussian measurement noise.
+Source: Figure adapted from Guay, Dochain, and Perrier (2004).
+
+amplifiers (Dower, Farrell, & Nesic, 2008), ES for traffic congestion
+control (Yu, Koga, Oliveira, & Krstić, 2021), GPS-denied source
+localization (Ghadiri-Modarres et al., 2016a), ES for maximizing
+RF heating (Carnevale et al., 2009), electromagnetic actuator control (Benosman & Atınç, 2015), for high voltage converter modulator optimization (Scheinker, Bland, Krstić, & Audia, 2013), multiobjective ES has been implemented for mineral grinding (Lu,
+Krstić, Chai, & Fu, 2020), and sampled-data ES for constrained
+optimization (Hazeleger, Nešić, & van de Wouw, 2022). The field
+of ES research is active and continuously growing.
+Various extensions and modifications of the ES method continue to generalize to larger classes of systems and to find new
+applications for real-time control, stabilization, and optimization.
+Some of the particularly active topics in ES these days include
+further work on finite time convergence, ES for PDEs, and the
+combination of ES with machine learning in order to increase the
+robustness of standard ML techniques for time-varying systems
+and for input distribution shift. This survey has only brushed
+the surface of the many published results. As clearly seen from
+just the few topics in Fig. 2, ES methods continue to branch
+out and also to overlap. Existing techniques are constantly being
+generalized for larger class of systems while new techniques are
+also being developed. ES is a very active field of research with a
+growing number of approaches and applications.
+
+Abdelgalil, M., & Taha, H. (2022). Recursive averaging with application to
+bio-inspired 3-D source seeking. IEEE Control Systems Letters, 6, 2816–2821.
+Adetola, V., & Guay, M. (2006). Adaptive output feedback extremum seeking
+receding horizon control of linear systems. Journal of Process Control, 16(5),
+521–533.
+Adetola, V., & Guay, M. (2007). Parameter convergence in adaptive extremumseeking control. Automatica, 43(1), 105–110.
+Albertini, F., & Sontag, E. D. (1997). Control-Lyapunov functions for time-varying
+set stabilization. In 1997 European control conference (pp. 1999–2004). IEEE.
+Amato, F., Ambrosino, R., Ariola, M., Cosentino, C., Tommasi, G. De, et al. (2014).
+Finite-time stability and control, volume 453. Springer.
+Antonello, R., Carraro, M., & Zigliotto, M. (2013). Maximum-torque-per-ampere
+operation of anisotropic synchronous permanent-magnet motors based on
+extremum seeking control. IEEE Transactions on Industrial Electronics, 61(9),
+5086–5093.
+Ariyur, K. B., & Krstić, M. (2003). Real-time optimization by extremum-seeking
+control. Hoboken, NJ: John Wiley & Sons.
+Åström, K. J., & Wittenmark, B. (1995a). Adaptive control. Reading, MA: Addison
+Wesley.
+Åström, K. J., & Wittenmark, B. (1995b). A survey of adaptive control applications.
+In Proceedings of 1995 34th IEEE conference on decision and control, volume 1
+(pp. 649–654). IEEE.
+Bazzi, A. M., & Krein, P. T. (2011). Concerning ‘‘Maximum power point tracking
+for photovoltaic optimization using ripple-based extremum seeking control’’.
+IEEE Transactions on Power Electronics, 26(6), 1611–1612.
+Becker, R., King, R., Petz, R., & Nitsche, W. (2007). Adaptive closed-loop separation control on a high-lift configuration using extremum seeking. AIAA
+journal, 45(6), 1382–1392.
+Benosman, M. (2016). Multi-parametric extremum seeking-based iterative feedback gains tuning for nonlinear control. International Journal of Robust and
+Nonlinear Control, 26(18), 4035–4055.
+Benosman, M., & Atınç, G. M. (2015). Extremum seeking-based adaptive control
+for electromagnetic actuators. International Journal of Control, 88(3), 517–530.
+
+References
+Abdelgalil, M., Aboelkassem, Y., & Taha, H. (2022). Sea urchin sperm exploit
+extremum seeking control to find the egg. Physical Review E, 106(6), Article
+L062401.
+35
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Freeman, R., & Kokotovic, P. V. (1996). Robust nonlinear control design: State-space
+and Lyapunov techniques. Boston: Birkhauser.
+Frihauf, P., Krstić, M., & Basar, T. (2011). Nash equilibrium seeking in
+noncooperative games. IEEE Transactions on Automatic Control, 57(5),
+1192–1207.
+Frihauf, P., Krstić, M., & Başar, T. (2013). Finite-horizon LQ control for unknown
+discrete-time linear systems via extremum seeking. European Journal of
+Control, 19(5), 399–407.
+Ge, S. S., Yang, C., & Lee, T. H. (2008). Adaptive robust control of a class
+of nonlinear strict-feedback discrete-time systems with unknown control
+directions. Systems & Control Letters, 57(11), 888–895.
+Ghadiri-Modarres, M. A., Mojiri, M., & Zangeneh, H. R. Z. (2016a). New schemes
+for GPS-denied source localization using a nonholonomic unicycle. IEEE
+Transactions on Control Systems Technology, 25(2), 720–727.
+Ghadiri-Modarres, M. A., Mojiri, M., & Zangeneh, H. R. Z. (2016b). Nonholonomic
+source localization in 3-D environments without position measurement. IEEE
+Transactions on Automatic Control, 61(11), 3563–3567.
+Ghaffari, A., Krstić, M., & Nešić, D. (2012). Multivariable Newton-based extremum
+seeking. Automatica, 48(8), 1759–1767.
+Ghaffari, A., Krstić, M., & Seshagiri, S. (2014). Power optimization for photovoltaic
+microconverters using multivariable newton-based extremum seeking. IEEE
+Transactions on Control Systems Technology, 22(6), 2141–2149.
+Grushkovskaya, V., & Ebenbauer, C. (2016). Multi-agent coordination with
+Lagrangian measurements. IFAC-PapersOnLine, 49(22), 115–120.
+Grushkovskaya, V., & Ebenbauer, C. (2021). Extremum seeking control of nonlinear dynamic systems using Lie bracket approximations. International Journal
+of Adaptive Control and Signal Processing, 35(7), 1233–1255.
+Grushkovskaya, V., Michalowsky, S., Zuyev, A., May, M., & Ebenbauer, C. (2018). A
+family of extremum seeking laws for a unicycle model with a moving target:
+Theoretical and experimental studies. In 2018 European control conference
+(pp. 1–6). IEEE.
+Grushkovskaya, V., Zuyev, A., & Ebenbauer, C. (2018a). On a class of generating
+vector fields for the extremum seeking problem: Lie bracket approximation
+and stability properties. Automatica, 94, 151–160.
+Grushkovskaya, V., Zuyev, A., & Ebenbauer, C. (2018b). On extremum seeking controllers based on the Lie bracket approximation in domains with
+obstacles. Proceedings in Applied Mathematics and Mechanics, 18(1), Article
+e201800298.
+Guay, M. (2014). A time-varying extremum-seeking control approach for
+discrete-time systems. Journal of Process Control, 24(3), 98–112.
+Guay, M. (2016). A perturbation-based proportional integral extremum-seeking
+control approach. IEEE Transactions on Automatic Control, 61(11), 3370–3381.
+Guay, M., & Benosman, M. (2021). Finite-time extremum seeking control for a
+class of unknown static maps. International Journal of Adaptive Control and
+Signal Processing, 35(7), 1188–1201.
+Guay, M., & Dochain, D. (2015a). A multi-objective extremum-seeking controller
+design technique. International Journal of Control, 88(1), 38–53.
+Guay, M., & Dochain, D. (2015b). A time-varying extremum-seeking control
+approach. Automatica, 51, 356–363.
+Guay, M., & Dochain, D. (2017). A proportional-integral extremum-seeking
+controller design technique. Automatica, 77, 61–67.
+Guay, M., Dochain, D., & Perrier, M. (2004). Adaptive extremum seeking control of continuous stirred tank bioreactors with unknown growth kinetics.
+Automatica, 40(5), 881–888.
+Guay, M., Dochain, D., & Perrier, M. (2005). Adaptive extremum-seeking control
+of nonisothermal continuous stirred tank reactors. Chemical Engineering
+Science, 60(13), 3671–3681.
+Guay, M., Dochain, D., Perrier, M., & Hudon, N. (2007). Flatness-based extremumseeking control over periodic orbits. IEEE Transactions on Automatic Control,
+52(10), 2005–2012.
+Guay, M., Moshksar, E., & Dochain, D. (2015). A constrained extremum-seeking
+control approach. International Journal of Robust and Nonlinear Control, 25(16),
+3132–3153.
+Guay, M., Vandermeulen, I., Dougherty, S., & McLellan, P. J. (2018). Distributed
+extremum-seeking control over networks of dynamically coupled unstable
+dynamic agents. Automatica, 93, 498–509.
+Guay, M., & Zhang, T. (2003). Adaptive extremum seeking control of nonlinear dynamic systems with parametric uncertainties. Automatica, 39(7),
+1283–1293.
+Gurvits, L. (1992). Averaging approach to nonholonomic motion planning. In
+Proceedings 1992 IEEE international conference on robotics and automation (pp.
+2541–2542). IEEE Computer Society.
+Gurvits, L., & Li, Z. (1992). Smooth time-periodic solutions for nonholonomic
+motion planning, In Z. X. Li, & J. F. Canny (Eds.), Nonholonomic motion planning: Vol. 1, (1st ed.). Alphen aan den Rijn, Netherlands: Kluwer Academic
+Publishers.
+Haring, M., van de Wouw, N., & Nešić, D. (2013). Extremum-seeking control
+for nonlinear systems with periodic steady-state outputs. Automatica, 49(6),
+1883–1891.
+
+Benosman, M., Farahmand, A. M., & Xia, M. (2019). Learning-based iterative
+modular adaptive control for nonlinear systems. International Journal of
+Adaptive Control and Signal Processing, 33(2), 335–355.
+Berkenkamp, F., Schoellig, A. P., & Krause, A. (2016). Safe controller optimization
+for quadrotors with Gaussian processes. In 2016 IEEE international conference
+on robotics and automation (pp. 491–496). IEEE.
+Bhattacharjee, D., & Subbarao, K. (2021). Extremum seeking control with
+attenuated steady-state oscillations. Automatica, 125, Article 109432.
+Bizon, N. (2016). Global maximum power point tracking (GMPPT) of photovoltaic
+array using the extremum seeking control (ESC): A review and a new GMPPT
+ESC scheme. Renewable and Sustainable Energy Reviews, 57, 524–539.
+Blackman, P. F. (1962). Extremum-seeking regulators, In J. H.Westcott (Ed.), An
+exposition of adaptive control: Vol. 2, (1st ed.). (pp. 125–247). New York:
+Macmillan.
+Brunn, A., Henning, L., Nitsche, W., & King, R. (2008). Application of slopeseeking to a generic car model for active drag control. In 26th AIAA applied
+aerodynamics conference (p. 6734).
+Brunton, S. L., Rowley, C. W., Kulkarni, S. R., & Clarkson, C. (2009). Maximum
+power point tracking for photovoltaic optimization using extremum seeking.
+In 2009 34th IEEE photovoltaic specialists conference (pp. 000013–000016).
+IEEE.
+Brunton, S. L., Rowley, C. W., Kulkarni, S. R., & Clarkson, C. (2010). Maximum power point tracking for photovoltaic optimization using ripple-based
+extremum seeking control. IEEE Transactions on Power Electronics, 25(10),
+2531–2540.
+Burns, D., Guay, M., & Weiss, W. (2017). Time-varying extremum seeking for
+controlling vapor compression systems. US Patent 9,625,274.
+Burry, A. M., Radomski, A. T., Aung, T. O. E., & Klein, J. N. (2020). Extremum
+seeking control apparatus and method for automatic frequency tuning for
+RF impedance matching. US Patent 10,741,363.
+Carnevale, D., Astolfi, A., Centioli, C., Podda, S., Vitale, V., & Zaccarian, L. (2009). A
+new extremum seeking technique and its application to maximize RF heating
+on FTU. Fusion Engineering and Design, 84(2–6), 554–558.
+Centioli, C., Iannone, F., Mazza, G., Panella, M., Pangione, L., Podda, S., et al.
+(2008). Maximization of the lower hybrid power coupling in the Frascati
+Tokamak upgrade via extremum seeking. Control Engineering Practice, 16(12),
+1468–1478.
+Choi, J. Y., Krstić, M., Ariyur, K. B., & Lee, J. S. (2002). Extremum seeking
+control for discrete-time systems. IEEE Transactions on Automatic Control,
+47(2), 318–323.
+Cochran, J., Kanso, E., Kelly, S. D., Xiong, H., & Krstić, M. (2009). Source seeking for
+two nonholonomic models of fish locomotion. IEEE Transactions on Robotics,
+25(5), 1166–1176.
+Cochran, J., & Krstić, M. (2009). Nonholonomic source seeking with tuning of
+angular velocity. IEEE Transactions on Automatic Control, 54(4), 717–731.
+Conway, J. B. (1990). A course in functional analysis, volume 96. New York, NY:
+Springer.
+Creaby, J., Li, Y., & Seem, J. E. (2009). Maximizing wind turbine energy capture
+using multivariable extremum seeking control. Wind Engineering, 33(4),
+361–387.
+DeHaan, D., & Guay, M. (2005). Extremum-seeking control of state-constrained
+nonlinear systems. Automatica, 41(9), 1567–1574.
+Dower, P. M., Farrell, P. M., & Nesic, D. (2008). Extremum seeking control
+of cascaded Raman optical amplifiers. IEEE Transactions on Control Systems
+Technology, 16(3), 396–407.
+Draper, C. S., & Li, Y. Y. (1951). Principles of optimalizing control systems and
+an application to the internal combustion engine, In R. Oldenburger (Ed.),
+Optimal and self-optimizing control: Vol. 1, (1st ed.). Boston, MA: M.I.T. Press.
+Dubbioso, S., di Grazia, L. E., Tommasi, G. De, Mattei, M., Mele, A., & Pironti, A.
+(2022). Vertical stabilization of tokamak plasmas via extremum seeking. IFAC
+Journal of Systems and Control, 21, Article 100203.
+Dürr, H. B., Krstić, M., Scheinker, A., & Ebenbauer, C. (2015). Singularly perturbed
+lie bracket approximation. IEEE Transactions on Automatic Control, 60(12),
+3287–3292.
+Dürr, H. B., Krstić, M., Scheinker, A., & Ebenbauer, C. (2017). Extremum seeking
+for dynamic maps using Lie brackets and singular perturbations. Automatica,
+83, 91–99.
+Dürr, H. B., Stanković, M. S., Ebenbauer, C., & Johansson, K. H. (2013). Lie bracket
+approximation of extremum seeking systems. Automatica, 49(6), 1538–1552.
+Dürr, H. B., Stanković, M. S., Johansson, K. H., & Ebenbauer, C. (2014). Extremum seeking on submanifolds in the Euclidian space. Automatica, 50(10),
+2591–2596.
+Dürr, H. B., Zeng, C., & Ebenbauer, C. (2013). Saddle point seeking for convex
+optimization problems. IFAC Proceedings Volumes, 46(23), 540–545.
+Favache, A., Dochain, D., Perrier, M., & Guay, M. (2008). Extremum-seeking
+control of retention for a microparticulate system. The Canadian Journal of
+Chemical Engineering, 86(5), 815–827.
+Feiling, J., Koga, S., Krstić, M., & Oliveira, T. R. (2018). Gradient extremum
+seeking for static maps with actuation dynamics governed by diffusion PDEs.
+Automatica, 95, 197–206.
+36
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Li, Y., Rotea, M. A., Chiu, G. T.-C., Mongeau, L. G., & Paek, I.-S. (2005). Extremum
+seeking control of a tunable thermoacoustic cooler. IEEE Transactions on
+Control Systems Technology, 13(4), 527–536.
+Liao, C.-K., Manzie, C., Chapman, A., & Alpcan, T. (2019). Constrained extremum
+seeking of a MIMO dynamic system. Automatica, 108, Article 108496.
+Liu, S.-J., & Krstić, M. (2010). Stochastic averaging in continuous time and its
+applications to extremum seeking. IEEE Transactions on Automatic Control,
+55(10), 2235–2250.
+Liu, S.-J., & Krstić, M. (2012). Stochastic averaging and stochastic extremum seeking.
+Berlin, Germany: Springer Science & Business Media.
+Liu, S.-J., & Krstić, M. (2014). Newton-based stochastic extremum seeking.
+Automatica, 50(3), 952–961.
+Liu, S.-J., & Krstić, M. (2015). Stochastic averaging in discrete time and its
+applications to extremum seeking. IEEE Transactions on Automatic control,
+61(1), 90–102.
+Lu, X., Krstić, M., Chai, T., & Fu, J. (2020). Hardware-in-the-loop multiobjective
+extremum-seeking control of mineral grinding. IEEE Transactions on Control
+Systems Technology, 29(3), 961–971.
+Luo, L., & Schuster, E. (2009). Mixing enhancement in 2D magnetohydrodynamic
+channel flow by extremum seeking boundary control. In 2009 American
+control conference (pp. 1530–1535). IEEE.
+Luxat, J. C., & Lees, L. H. (1971). Stability of peak-holding control systems. IEEE
+Transactions on Industrial Electronics and Control Instrumentation, (1), 11–15.
+Manzie, C., & Krstić, M. (2009). Extremum seeking with stochastic perturbations.
+IEEE Transactions on Automatic Control, 54(3), 580–585.
+Matveev, A. S., Hoy, M. C., & Savkin, A. V. (2014). 3D environmental extremum
+seeking navigation of a nonholonomic mobile robot. Automatica, 50(7),
+1802–1815.
+Meerkov, S. M. (1967). Asymptotic methods for investigating a class of
+forced states in extremal systems. Automation and Remote Control, 28(12),
+1916–1920.
+Mele, A., Tommasi, G. De, & Pironti, A. (2021). Finite-time stabilization of
+linear systems with unknown control direction via extremum seeking. IEEE
+Transactions on Automatic Control, 67(10), 5594–5601.
+Menon, A., & Baras, J. S. (2014). Collaborative extremum seeking for welfare
+optimization. In 53rd IEEE conference on decision and control (pp. 346–351).
+IEEE.
+Michalowsky, S., & Ebenbauer, C. (2013). Swinging up the stephenson-Kapitza
+pendulum. In 52nd IEEE conference on decision and control (pp. 3981–3987).
+IEEE.
+Michalowsky, S., Gharesifard, B., & Ebenbauer, C. (2018). On the Lie
+bracket approximation approach to distributed optimization: Extensions and
+limitations. In 2018 European control conference (pp. 119–124). IEEE.
+Mills, G., & Krstić, M. (2018). Maximizing map sensitivity and higher derivatives via extremum seeking. IEEE Transactions on Automatic Control, 63(10),
+3232–3247.
+Moase, W. H., & Manzie, C. (2011). Semi-global stability analysis of observerbased extremum-seeking for Hammerstein plants. IEEE Transactions on
+Automatic Control, 57(7), 1685–1695.
+Moase, W. H., & Manzie, C. (2012). Fast extremum-seeking for Wiener–
+Hammerstein plants. Automatica, 48(10), 2433–2443.
+Moase, W. H., Manzie, C., & Brear, M. J. (2009). Newton-like extremum-seeking
+part I: Theory. In Proceedings of the 48h IEEE conference on decision and control
+held jointly with 2009 28th Chinese control conference (pp. 3839–3844). IEEE.
+Moase, W. H., Manzie, C., & Brear, M. J. (2010). Newton-like extremum-seeking
+for the control of thermoacoustic instability. IEEE Transactions on Automatic
+Control, 55(9), 2094–2105.
+Moeck, J., Bothien, M., Paschereit, C., Gelbert, G., & King, R. (2007). Twoparameter extremum seeking for control of thermoacoustic instabilities and
+characterization of linear growth. In 45th AIAA aerospace sciences meeting and
+exhibit (p. 1416).
+Moreau, L., & Aeyels, D. (2000). Practical stability and stabilization. IEEE
+Transactions on Automatic Control, 45(8), 1554–1558.
+Morosanov, I. S. (1957). Method of extremum control. Automatic and Remote
+Control, 18, 1077–1092.
+Mudgett, D., & Morse, A. (1985). Adaptive stabilization of linear systems with
+unknown high-frequency gains. IEEE Transactions on Automatic Control, 30(6),
+549–554.
+Nesic, D., Mohammadi, A., & Manzie, C. (2012). A framework for extremum
+seeking control of systems with parameter uncertainties. IEEE Transactions
+on Automatic Control, 58(2), 435–448.
+Nešić, D., Nguyen, T., Tan, Y., & Manzie, C. (2013). A non-gradient approach
+to global extremum seeking: An adaptation of the shubert algorithm.
+Automatica, 49(3), 809–815.
+Nesić, D., Tan, Y., Moase, W. H., & Manzie, C. (2010). A unifying approach to
+extremum seeking: Adaptive schemes based on estimation of derivatives. In
+49th IEEE conference on decision and control (pp. 4625–4630). IEEE.
+Nussbaum, R. D. (1983). Some remarks on a conjecture in parameter adaptive
+control. Systems & Control Letters, 3(5), 243–246.
+Obabkov, V. K. (1967). Theory of multichannel extremal control systems with
+sinusoidal probe signals. Automation and Remote Control, 28, 48–54.
+
+Hazeleger, L., Haring, M., & van de Wouw, N. (2020). Extremum-seeking control
+for optimization of time-varying steady-state responses of nonlinear systems.
+Automatica, 119, Article 109068.
+Hazeleger, L., Nešić, D., & van de Wouw, N. (2022). Sampled-data extremumseeking framework for constrained optimization of nonlinear dynamical
+systems. Automatica, 142, Article 110415.
+Henning, L., Becker, R., Feuerbach, G., Muminovic, R., King, R., Brunn, A., et
+al. (2008). Extensions of adaptive slope-seeking for active flow control.
+Proceedings of the Institution of Mechanical Engineers, Part I (Journal of Systems
+and Control Engineering), 222(5), 309–322.
+Heydari-doostabad, H., Keypour, R., Khalghani, M. R., & Khooban, M. H. (2013).
+A new approach in MPPT for photovoltaic array based on extremum seeking
+control under uniform and non-uniform irradiances. Solar Energy, 94, 28–36.
+Kazakevich, V. V. (1943). Technique of automatic control of different processes
+to maximum or to minimum. Avtorskoe svidetelstvo, (USSR Patent), (66335).
+Kazakevich, V. V. (1944). On extremum seeking (Ph.D. thesis), Moscow High
+Technical University.
+Khong, S. Z., Nešić, D., & Krstić, M. (2016). Iterative learning control based on
+extremum seeking. Automatica, 66, 238–245.
+Khong, S. Z., Nešić, D., Tan, Y., & Manzie, C. (2013). Unified frameworks for
+sampled-data extremum seeking control: Global optimisation and multi-unit
+systems. Automatica, 49(9), 2720–2733.
+Kim, K., Kasnakoglu, C., Serrani, A., & Samimy, M. (2009). Extremum-seeking
+control of subsonic cavity flow. AIAA journal, 47(1), 195–205.
+King, R., Becker, R., Feuerbach, G., Henning, L., Petz, R., Nitsche, W., et al.
+(2006). Adaptive flow control using slope seeking. In 2006 14th Mediterranean
+conference on control and automation (pp. 1–6). IEEE.
+Krener, A. J., & Krstić, M. (2000). Method and apparatus for predicting and
+stabilizing compressor stall. US Patent 6,098,010.
+Krstić, M., & Deng, H. (1998). Stabilization of nonlinear uncertain systems. New
+York, NY: Springer.
+Krstić, M., Kokotovic, P. V., & Kanellakopoulos, I. (1995). Nonlinear and adaptive
+control design. New York, NY: John Wiley & Sons, Inc..
+Krstić, M., & Wang, H. H. (2000). Stability of extremum seeking feedback for
+general nonlinear dynamic systems. Automatica, 36(4), 595–602.
+Kurzweil, J., & Jarník, J. (1988). Iterated Lie brackets in limit processes in ordinary
+differential equations. Results in Mathematics, 14, 125–137.
+Kvaternik, K., & Pavel, L. (2011). Interconnection conditions for the stability
+of nonlinear sampled-data extremum seeking schemes. In 2011 50th IEEE
+conference on decision and control and European control conference (pp.
+4448–4454). IEEE.
+Kvaternik, K., & Pavel, L. (2012a). Analysis of decentralized extremum seeking
+schemes: Technical report, Toronto: Systems Control Group, University of
+Toronto.
+Kvaternik, K., & Pavel, L. (2012b). An analytic framework for decentralized extremum seeking control. In 2012 American control conference (pp.
+3371–3376). IEEE.
+Labar, C., Ebenbauer, C., & Marconi, L. (2022). ISS-like properties in Lie-bracket
+approximations and application to extremum seeking. Automatica, 136,
+Article 110041.
+Labar, C., Garone, E., Kinnaert, M., & Ebenbauer, C. (2019a). Constrained extremum seeking: A modified-barrier function approach. IFAC-PapersOnLine,
+52(16), 694–699.
+Labar, C., Garone, E., Kinnaert, M., & Ebenbauer, C. (2019b). Newton-based
+extremum seeking: A second-order Lie bracket approximation approach.
+Automatica, 105, 356–367.
+Leblanc, M. (1922). Sur l’electri"cation des chemins de fer au moyen de courants
+alternatifs de frequence elevee. Revue Generale de l’Electricite, 12(8), 275–277.
+Lei, P., Li, Y., Chen, Q., & Seem, J. E. (2010). Extremum seeking control based
+integration of MPPT and degradation detection for photovoltaic arrays. In
+Proceedings of the 2010 American control conference (pp. 3536–3541). IEEE.
+Leyva, R., Alonso, C., Queinnec, I., Cid-Pastor, A., Lagrange, D., & MartinezSalamero, L. (2006). MPPT of photovoltaic systems using extremum-seeking
+control. IEEE Transactions on Aerospace and Electronic Systems, 42(1), 249–258.
+Leyva, R., Artillan, P., Cabal, C., Estibals, B., & Alonso, C. (2011). Dynamic
+performance of maximum power point tracking circuits using sinusoidal
+extremum seeking control for photovoltaic generation. International Journal
+of Electronics, 98(4), 529–542.
+Leyva, R., Olalla, C., Zazo, H., Cabal, C., Cid-Pastor, A., Queinnec, I., et al. (2011).
+MPPT based on sinusoidal extremum-seeking control in PV generation.
+International Journal of Photoenergy, 2012.
+Li, P., Li, Y., & Seem, J. E. (2009). Extremum seeking control for efficient
+and reliable operation of air-side economizers. In 2009 American control
+conference (pp. 20–25). IEEE.
+Li, X., Li, Y., Seem, J. E., & Lei, P. (2011). Maximum power point tracking for
+photovoltaic systems using adaptive extremum seeking control. In Dynamic
+systems and control conference: Vol. 54754, (pp. 803–810).
+Li, X., Li, Y., Seem, J. E., & Lei, P. (2015). Detection of internal resistance change
+for photovoltaic arrays using extremum-seeking control MPPT signals. IEEE
+Transactions on Control Systems Technology, 24(1), 325–333.
+37
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Scheinker, A. (2013b). Simultaneous stabilization and optimization of unknown,
+time-varying systems. In 2013 American control conference (pp. 2637–2642).
+IEEE.
+Scheinker, A. (2016). Application of extremum seeking for time-varying systems
+to resonance control of RF cavities. IEEE Transactions on Control Systems
+Technology, 25(4), 1521–1528.
+Scheinker, A. (2017). Bounded extremum seeking for angular velocity actuated
+control of nonholonomic unicycle. Optimal Control Applications & Methods,
+38(4), 575–585.
+Scheinker, A. (2021a). Adaptive machine learning for robust diagnostics and control of time-varying particle accelerator components and beams. Information,
+12(4), 161.
+Scheinker, A. (2021b). Adaptive machine learning for time-varying systems: Low
+dimensional latent space tuning. Journal of Instrumentation, 16(10), Article
+P10008.
+Scheinker, A., Bland, M., Krstić, M., & Audia, J. (2013). Extremum seeking-based
+optimization of high voltage converter modulator rise-time. IEEE Transactions
+on Control Systems Technology, 22(1), 34–43.
+Scheinker, A., Bohler, D., Tomin, S., Kammering, R., Zagorodnov, I., Schlarb, H.,
+et al. (2019). Model-independent tuning for maximizing free electron laser
+pulse energy. Physical Review Accelerators and Beams, 22(8), Article 082802.
+Scheinker, A., Cropp, F., & Filippetto, D. (2023). Adaptive autoencoder latent
+space tuning for more robust machine learning beyond the training set
+for six-dimensional phase space diagnostics of a time-varying ultrafast
+electron-diffraction compact accelerator. Physical Review E, 107(4), Article
+045302.
+Scheinker, A., Cropp, F., Paiagua, S., & Filippetto, D. (2021). An adaptive approach
+to machine learning for compact particle accelerators. Scientific Reports, 11(1),
+Article 19187.
+Scheinker, A., Edelen, A., Bohler, D., Emma, C., & Lutman, A. (2018). Demonstration of model-independent control of the longitudinal phase space
+of electron beams in the linac-coherent light source with femtosecond
+resolution. Physical Review Letters, 121(4), Article 044801.
+Scheinker, A., & Gessner, S. (2015). Adaptive method for electron bunch profile
+prediction. Physical Review Special Topics-Accelerators and Beams, 18(10),
+Article 102801.
+Scheinker, A., Hirlaender, S., M.Velotti, F., Gessner, S., Porta, G. Z. Della, Kain, V.,
+et al. (2020). Online multi-objective particle accelerator optimization of the
+AWAKE electron beam line for simultaneous emittance and orbit control. AIP
+Advances, 10(5).
+Scheinker, A., Huang, E.-C., & Taylor, C. (2021). Extremum seeking-based control
+system for particle accelerator beam loss minimization. IEEE Transactions on
+Control Systems Technology, 30(5), 2261–2268.
+Scheinker, A., Huang, X., & Wu, J. (2017). Minimization of betatron oscillations
+of electron beam injected into a time-varying lattice via extremum seeking.
+IEEE Transactions on Control Systems Technology, 26(1), 336–343.
+Scheinker, A., & Krstić, M. (2012a). Minimum-seeking for CLFs: Universal
+semiglobally stabilizing feedback under unknown control directions. IEEE
+Transactions on Automatic Control, 58(5), 1107–1122.
+Scheinker, A., & Krstić, M. (2012b). A universal extremum seeking-based stabilizer for unknown LTV systems with unknown control directions. In 2012
+American control conference (pp. 1129–1136). IEEE.
+Scheinker, A., & Krstić, M. (2014a). Extremum seeking with bounded update
+rates. Systems & Control Letters, 63, 25–31.
+Scheinker, A., & Krstić, M. (2014b). Non-C 2 Lie bracket averaging for nonsmooth
+extremum seekers. Journal of Dynamic Systems, Measurement, and Control,
+136(1), Article 011010.
+Scheinker, A., & Krstić, M. (2017). Model-free stabilization by extremum seeking.
+Cham, Switzerland: Springer.
+Scheinker, A., Pang, X., & Rybarcyk, L. (2013). Model-independent particle
+accelerator tuning. Physical Review Special Topics-Accelerators and Beams,
+16(10), Article 102803.
+Scheinker, A., & Pokharel, R. (2020). Adaptive 3D convolutional neural networkbased reconstruction method for 3D coherent diffraction imaging. Journal of
+Applied Physics, 128(18).
+Scheinker, A., & Scheinker, D. (2016). Bounded extremum seeking with
+discontinuous dithers. Automatica, 69, 250–257.
+Scheinker, A., & Scheinker, D. (2018). Constrained extremum seeking stabilization
+of systems not affine in control. International Journal of Robust and Nonlinear
+Control, 28(2), 568–581.
+Scheinker, A., & Scheinker, D. (2021). Extremum seeking for optimal control
+problems with unknown time-varying systems and unknown objective
+functions. International Journal of Adaptive Control and Signal Processing, 35(7),
+1143–1161.
+Seem, J. E. (2010). Adaptive real-time optimization control. US Patent 7,827,813.
+Sepulchre, R., Jankovic, M., & Kokotovic, P. V. (2012). Constructive nonlinear
+control. Berlin, Germany: Springer Science & Business Media.
+Shao, G., Teel, A. R., Tan, Y., Liu, K.-Z., & Wang, R. (2019). Extremum seeking
+control with input dead-zone. IEEE Transactions on Automatic Control, 65(7),
+3184–3190.
+
+Oliveira, T. R., Feiling, J., Koga, S., & Krstić, M. (2020). Multivariable extremum
+seeking for PDE dynamic systems. IEEE Transactions on Automatic Control,
+65(11), 4949–4956.
+Oliveira, T. R., & Krstić, M. (2021). Extremum seeking feedback with wave partial
+differential equation compensation. Journal of Dynamic Systems, Measurement,
+and Control, 143(4), Article 041002.
+Oliveira, T. R., Krstić, M., & Tsubakino, D. (2016). Extremum seeking for static
+maps with delays. IEEE Transactions on Automatic Control, 62(4), 1911–1926.
+Oliveira, T. R., Peixoto, A. J., & Hsu, L. (2012). Global real-time optimization by
+output-feedback extremum-seeking control with sliding modes. Journal of
+the Franklin Institute, 349(4), 1397–1415.
+Ostrovsky, Y. I. (1957). Extremum regulation. Avtomatika i Telemekhanika, 18,
+852–858.
+Ou, Y., Xu, C., Schuster, E., Luce, T. C., Ferron, J. R., Walker, M. L., et al. (2008).
+Design and simulation of extremum-seeking open-loop optimal control of
+current profile in the DIII-D tokamak. Plasma Physics and Controlled Fusion,
+50(11), Article 115001.
+Peterson, K. S., & Stefanopoulou, A. G. (2004). Extremum seeking control
+for soft landing of an electromechanical valve actuator. Automatica, 40(6),
+1063–1069.
+Popovic, D., Jankovic, M., Magner, S., & Teel, A. R. (2006). Extremum seeking
+methods for optimization of variable cam timing engine operation. IEEE
+Transactions on Control Systems Technology, 14(3), 398–407.
+Poveda, J. I., Benosman, M., & Teel, A. R. (2017). Distributed extremum seeking
+in multi-agent systems with arbitrary switching graphs. IFAC-PapersOnLine,
+50(1), 735–740.
+Poveda, J. I., Benosman, M., Teel, A. R., & Sanfelice, R. G. (2021). Robust
+coordinated hybrid source seeking with obstacle avoidance in multivehicle
+autonomous systems. IEEE Transactions on Automatic Control, 67(2), 706–721.
+Poveda, J. I., Benosman, M., & Vamvoudakis, K. G. (2021). Data-enabled extremum
+seeking: A cooperative concurrent learning-based approach. International
+Journal of Adaptive Control and Signal Processing, 35(7), 1256–1284.
+Poveda, J. I., & Krstić, M. (2020a). Fixed-time gradient-based extremum seeking.
+In 2020 American control conference (pp. 2838–2843). IEEE.
+Poveda, J. I., & Krstić, M. (2020b). Fixed-time Newton-like extremum seeking.
+IFAC-PapersOnLine, 53(2), 5356–5361.
+Poveda, J. I., & Krstić, M. (2021). Nonsmooth extremum seeking control
+with user-prescribed fixed-time convergence. IEEE Transactions on Automatic
+Control, 66(12), 6156–6163.
+Poveda, J. I., Krstić, M., & Başar, T. (2022). Fixed-time Nash equilibrium seeking
+in time-varying networks. IEEE Transactions on Automatic Control, 68(4),
+1954–1969.
+Poveda, J. I., Kutadinata, R., Manzie, C., Nešić, D., Teel, A. R., & Liao, C-K. (2018).
+Hybrid extremum seeking for black-box optimization in hybrid plants: An
+analytical framework. In 2018 IEEE conference on decision and control (pp.
+2235–2240). IEEE.
+Poveda, J. I., & Li, N. (2021). Robust hybrid zero-order optimization algorithms
+with acceleration via averaging in time. Automatica, 123, Article 109361.
+Poveda, J. I., & Quijano, N. (2013). Extremum seeking for multi-population games.
+In 52nd IEEE conference on decision and control (pp. 409–414). IEEE.
+Poveda, J. I., & Quijano, N. (2015). Shahshahani gradient-like extremum seeking.
+Automatica, 58, 51–59.
+Poveda, J. I., & Teel, A. R. (2017a). A framework for a class of hybrid extremum
+seeking controllers with dynamic inclusions. Automatica, 76, 113–126.
+Poveda, J. I., & Teel, A. R. (2017b). A robust event-triggered approach for fast
+sampled-data extremization and learning. IEEE Transactions on Automatic
+Control, 62(10), 4949–4964.
+Premaratne, U., Halgamuge, S., Tan, Y., & Mareels, I. M. Y. (2019). Extremum
+seeking control with sporadic packet transmission for networked control
+systems. IEEE Transactions on Control of Network Systems, 7(2), 758–769.
+Reisi, A. R., Moradi, M. H., & Jamasb, S. (2013). Classification and comparison
+of maximum power point tracking techniques for photovoltaic system: A
+review. Renewable and Sustainable Energy Reviews, 19, 433–443.
+Rotea, M. A. (2000). Analysis of multivariable extremum seeking algorithms.
+In Proceedings of the 2000 American control conference. ACC (IEEE Cat. No.
+00CH36334), volume 1 (pp. 433–437). IEEE.
+Rušiti, D., Evangelisti, G., Oliveira, T. R., Gerdts, M., & Krstić, M. (2018). Stochastic
+extremum seeking for dynamic maps with delays. IEEE Control Systems
+Letters, 3(1), 61–66.
+Rušiti, D., Oliveira, T. R., Krstić, M., & Gerdts, M. (2021). Newton-based extremum
+seeking of higher-derivative maps with time-varying delays. International
+Journal of Adaptive Control and Signal Processing, 35(7), 1202–1216.
+Ryan, J. J. (2018). Formation flight system extremum-seeking-control using
+blended performance parameters. US Patent 9,864,380.
+Salsbury, T. I., & House, J. M. (2019). Extremum-seeking control system for a
+chilled water plant. US Patent 10,352,576.
+Scheinker, A. (2012). Extremum seeking for stabilization. San Diego: University of
+California.
+Scheinker, A. (2013a). Model independent beam tuning. In Proceedings of the
+2013 international particle accelerator conference (pp. 12–17).
+38
+
+A. Scheinker
+
+Automatica 161 (2024) 111481
+Williams, A., Krstić, M., & Scheinker, A. (2023). Semi-global practical extremum
+seeking with practical safety. arXiv preprint arXiv:2309.15401.
+Williams, A., Scheinker, A., Huang, E-C., Taylor, C., & Krstić, M. (2023). Experimental safe extremum seeking for accelerators. arXiv preprint arXiv:
+2308.15584.
+Yau, H.-T., & Wu, C.-H. (2011). Comparison of extremum-seeking control techniques for maximum power point tracking in photovoltaic systems. Energies,
+4(12), 2180–2195.
+Ye, M., & Hu, G. (2016). Distributed extremum seeking for constrained networked
+optimization and its application to energy consumption control in smart grid.
+IEEE Transactions on Control Systems Technology, 24(6), 2048–2058.
+Ye, M., Hu, G., & Xu, S. (2020). An extremum seeking-based approach for Nash
+equilibrium seeking in N-cluster noncooperative games. Automatica, 114,
+Article 108815.
+Yin, C., Chen, Y., & Zhong, S.-M. (2014). Fractional-order sliding mode based
+extremum seeking control of a class of nonlinear systems. Automatica, 50(12),
+3173–3181.
+Yu, H., Koga, S., Oliveira, T. R., & Krstić, M. (2021). Extremum seeking for
+traffic congestion control with a downstream bottleneck. Journal of Dynamic
+Systems, Measurement, and Control, 143(3), Article 031007.
+Zhang, C., Arnold, D., Ghods, N., Siranosian, A., & Krstić, M. (2007). Source
+seeking with non-holonomic unicycle without position measurement and
+with tuning of forward velocity. Systems & Control Letters, 56(3), 245–252.
+Zhang, X. T., Dawson, D. M., Dixon, W. E., & Xian, B. (2006). Extremum-seeking
+nonlinear controllers for a human exercise machine. IEEE/ASME Transactions
+on Mechatronics, 11(2), 233–240.
+Zhang, C., & Ordóñez, R. (2011). Extremum-seeking control and applications: A
+numerical optimization-based approach. Berlin, Germany: Springer Science &
+Business Media.
+Zhang, C., Siranosian, A., & Krstić, M. (2007). Extremum seeking for moderately unstable systems and for autonomous vehicle target tracking without
+position measurements. Automatica, 43(10), 1832–1839.
+Zhu, Y., & Fridman, E. (2022). Extremum seeking via a time-delay approach to
+averaging. Automatica, 135, Article 109965.
+
+Sontag, E. D. (1989). A ‘universal’construction of Artstein’s theorem on nonlinear
+stabilization. Systems & Control Letters, 13(2), 117–123.
+Stanković, M. S., Johansson, K. H., & Stipanović, D. M. (2010). Distributed seeking
+of Nash equilibria in mobile sensor networks. In 49th IEEE conference on
+decision and control (pp. 5598–5603). IEEE.
+Stanković, M. S., & Stipanović, D. M. (2010). Extremum seeking under stochastic
+noise and applications to mobile sensors. Automatica, 46(8), 1243–1251.
+Strizic, T., Poveda, J. I., & Teel, A. R. (2017). Hybrid gradient descent for robust
+global optimization on the circle. In 2017 IEEE 56th annual conference on
+decision and control (pp. 2985–2990). IEEE.
+Sui, Y., Gotovos, A., Burdick, J., & Krause, A. (2015). Safe exploration for
+optimization with Gaussian processes. In International conference on machine
+learning (pp. 997–1005). PMLR.
+Sussmann, H. J. (1992). New differential geometric methods in nonholonomic
+path finding. In Systems, models and feedback: theory and applications:
+Proceedings of a US-Italy workshop in honor of Professor Antonio Ruberti, Capri,
+15–17, June 1992.
+Sussmann, H. J., & Liu, W. (1991). Limits of highly oscillatory controls and
+the approximation of general paths by admissible trajectories. In [1991]
+Proceedings of the 30th IEEE conference on decision and control (pp. 437–442).
+IEEE.
+Suttner, R. (2019). Extremum seeking control with an adaptive dither signal.
+Automatica, 101, 214–222.
+Suttner, R. (2020). Extremum seeking control for a class of nonholonomic
+systems. SIAM Journal on Control and Optimization, 58(4), 2588–2615.
+Suttner, R., & Dashkovskiy, S. (2017). Exponential stability for extremum seeking
+control systems. IFAC-PapersOnLine, 50(1), 15464–15470.
+Suttner, R., & Sun, Z. (2018). Formation shape control based on distance
+measurements using Lie bracket approximations. SIAM Journal on Control and
+Optimization, 56(6), 4405–4433.
+Tan, Y., Moase, W. H., Manzie, C., Nešić, D., & Mareels, I. M. Y. (2010). Extremum
+seeking from 1922 to 2010. In Proceedings of the 29th Chinese control
+conference (pp. 14–26). IEEE.
+Tan, Y., Nešić, D., & Mareels, I. (2006). On non-local stability properties of
+extremum seeking control. Automatica, 42(6), 889–903.
+Tan, Y., Nešić, D., & Mareels, I. (2008). On the choice of dither in extremum
+seeking systems: A case study. Automatica, 44(5), 1446–1450.
+Tan, Y., Nešić, D., Mareels, I. M. Y., & Astolfi, A. (2009). On global extremum
+seeking in the presence of local extrema. Automatica, 45(1), 245–251.
+Teel, A. R., & Popovic, D. (2001). Solving smooth and nonsmooth multivariable
+extremum seeking problems by the methods of nonlinear programming. In
+Proceedings of the 2001 American control conference. (Cat. No. 01CH37148),
+volume 3 (pp. 2394–2399). IEEE.
+Tommasi, G. De, Dubbioso, S., Mele, A., & Pironti, A. (2021). Stabilizing elongated
+plasmas using extremum seeking: The ITER tokamak case study. In 2021 29th
+Mediterranean conference on control and automation (pp. 472–478). IEEE.
+Tsien, H. S. (1954). Engineering cybernetics. New York, NY: The Macmillan
+Company.
+Wang, L., Chen, S., & Ma, K. (2016). On stability and application of extremum
+seeking control without steady-state oscillation. Automatica, 68, 18–26.
+Wiederhold, O., King, R., Noack, B., Neuhaus, L., Neise, W., Enghardt, L., et al.
+(2009). Extensions of extremum-seeking control to improve the aerodynamic
+performance of axial turbomachines. In 39th AIAA fluid dynamics conference
+(p. 4175).
+Williams, A., Krstić, M., & Scheinker, A. (2022). Practically safe extremum seeking.
+In 2022 IEEE 61st conference on decision and control (pp. 1993–1998). IEEE.
+
+Alexander Scheinker received undergraduate degrees
+in Mathematics and Physics from Washington University in St. Louis in 2006 and a M.S. in Mathematics
+and a Ph.D. in control theory from the University of
+California, San Diego in 2008 and 2012, respectively. He
+has been a staff researcher at Los Alamos National Laboratory since 2011 where he is the Adaptive Machine
+Learning team leader in the Applied Electrodynamics
+group. His research focus is on applying advanced
+control theory and machine learning methods to electrodynamics and for the stabilization and optimization
+of noisy and analytically unknown complex time-varying systems. He has been
+developing ES algorithms, proving their stability properties, and applying them
+for non-invasive diagnostics and for the control of intense charged particle
+beams in large particle accelerator facilities. Recently he has been focused on
+combining ES with deep learning methods such as 3D convolutional neural
+networks, to develop AI tools that are robust for time-varying systems with
+distribution shift. Alexander has coauthored over 20 journal papers on extremum seeking theory and applications and the book Model-Free Stabilization
+by Extremum Seeking.
+
+39
+
+
