@@ -46,7 +46,7 @@ for cand in ["Noto Sans CJK SC", "WenQuanYi Zen Hei", "SimHei", "Microsoft YaHei
 plt.rcParams["axes.unicode_minus"] = False
 
 # status 输出中被监控的字段（分组到 4 个子图）
-FIELDS = ["curKp", "curKd", "baselineKp", "baselineKd", "gradKp", "gradKd",
+FIELDS = ["curKp", "curKd", "baseKp", "baseKd", "gradKp", "gradKd",
           "lastJ", "osc", "escPhase", "winCounter", "demodCount", "refAgeSec",
           "established", "enabled"]
 
@@ -175,8 +175,8 @@ class Monitor:
         ax.clear()
         ax.plot(tt, g("curKp"), "b-", label="curKp")
         ax.plot(tt, g("curKd"), "r-", label="curKd")
-        ax.plot(tt, g("baselineKp"), "b--", alpha=0.5, label="baseKp")
-        ax.plot(tt, g("baselineKd"), "r--", alpha=0.5, label="baseKd")
+        ax.plot(tt, g("baseKp"), "b--", alpha=0.5, label="baseKp")
+        ax.plot(tt, g("baseKd"), "r--", alpha=0.5, label="baseKd")
         ax.set_title("增益（实线=当前，虚线=基线）")
         ax.legend(fontsize=8, loc="upper right")
         ax.grid(alpha=0.3)
@@ -232,8 +232,9 @@ class Monitor:
             def update(_):
                 self.draw(axes)
 
-            FuncAnimation(fig, update, interval=int(self.args.interval * 1000),
-                          cache_frame_data=False)
+            # 必须持有引用——否则动画对象被 GC，窗口空白（matplotlib 官方陷阱）
+            self._anim = FuncAnimation(fig, update, interval=int(self.args.interval * 1000),
+                                       cache_frame_data=False)
             plt.show()
             self.stop.set()
         self.link.close()
