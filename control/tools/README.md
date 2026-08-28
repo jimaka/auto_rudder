@@ -220,3 +220,36 @@ $ ./build/tools/ar_tuner_debug
 
 单元测试：`control/tests/test_tuner_debug_api.cpp`（11 个用例，含"force 确属旁路"
 与"经 API 的 tick 与直接 tick 逐位一致"两条关键保证）。
+
+# 调试参数实时监控（tuner_debug_monitor.py）
+
+`tuner_debug_monitor.py` 驱动 `ar_tuner_debug` 进程，按固定周期下发 `status` 命令并解析
+`key=value` 输出，用 matplotlib 实时绘制调参器内部状态：增益（当前/基线）、ESC 梯度、
+窗口代价 J、实测振荡与载波相位，共 4 个子图滚动显示。
+
+```bash
+# 交互监控（监控期间可直接在终端输入调试命令，原样转发、回显打印）
+python3 tools/tuner_debug_monitor.py
+
+# 内置激励演示：建基线 → 喂 ±2° 方波误差 → 每 6 s 一次 settle，无实船即可看到各参数动起来
+python3 tools/tuner_debug_monitor.py --demo
+
+# 调整轮询周期/滚动窗口/落盘 CSV
+python3 tools/tuner_debug_monitor.py --interval 0.2 --window 120 --log out/dbg.csv
+
+# 无 GUI 环境冒烟/归档：跑固定时长后保存图片退出
+PLOT_SIM_AGG=1 python3 tools/tuner_debug_monitor.py --demo --duration 15 --out out/monitor.png
+```
+
+| 选项 | 含义 | 默认 |
+|---|---|---|
+| `--exe PATH` | `ar_tuner_debug` 可执行文件路径 | `../build/tools/ar_tuner_debug` |
+| `--interval S` | `status` 轮询周期 (s) | 0.1 |
+| `--window S` | 曲线滚动时间窗 (s) | 60 |
+| `--demo` | 内置激励序列 | 关 |
+| `--log CSV` | status 快照追加写入 CSV | 关 |
+| `--duration S` / `--out PNG` | 固定时长后保存退出 | 关 |
+
+说明：监控器与被调试的调参器是同一进程内实例（经管道请求-响应），在船上使用时
+`--exe` 指向船上命令通道的封装即可；`--log` 落盘的 CSV 与调试文档 §6 的行协议字段一致。
+详细命令语义见 `docs/实船调试接口调用文档.md`。
