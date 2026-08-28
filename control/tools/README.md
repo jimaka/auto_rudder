@@ -210,7 +210,7 @@ $ ./build/tools/ar_tuner_debug
 
 | 组 | 命令 | 对应功能 |
 |---|---|---|
-| 观测 | `status` / `j` / `osc` / `params` | 快照 / 当前窗口 ITAE / 实测振荡 / 参数表 |
+| 观测 | `status` / `j` / `osc` / `params` / `setparam` | 快照 / 当前窗口 ITAE / 实测振荡 / 参数表读 / 单参数改写（复位状态） |
 | 层2 | `pole` / `check` / `baseline` / `eval` | 极点配置 / 稳定门 / 建基线 / 辨识评估原语 |
 | ESC | `dither` / `accum` / `step` / `settle` / `clamp` | 载波注入 / 样本累积+解调 / 窗末梯度结算 / 窗末裁决 / 限幅 |
 | 振荡 | `oscfeed` / `oscreset` | 只喂/清零振荡检测器 |

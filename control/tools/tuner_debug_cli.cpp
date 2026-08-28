@@ -35,6 +35,10 @@ void printHelp() {
         "  j                                   当前窗口 ITAE 代价\n"
         "  osc                                 实测振荡峰-峰幅值 (deg)\n"
         "  params                              当前调参参数表\n"
+        "  setparam <名称> <值>                修改单个调参参数（会复位调参器状态！）\n"
+        "                                      可选: zeta wn escAmp escFreq escStep hpfTau\n"
+        "                                      lpfTau wU wDu maxUpdateFrac absMinUpdate\n"
+        "                                      zetaMin wnMax oscMax highSpeedKn windowSec dt\n"
         "---- 层2 单功能 ----\n"
         "  pole <K> <T> [zeta wn]              极点配置解析解（默认 ζ=0.85 ωn=0.2）\n"
         "  check <K> <T> <Kp> <Kd> <osc>       稳定门四条件判定\n"
@@ -121,6 +125,35 @@ int main() {
         if (cmd == "j")      { std::printf("OK J=%.6f\n", api.currentJ()); continue; }
         if (cmd == "osc")    { std::printf("OK osc=%.4f\n", api.oscAmplitude()); continue; }
         if (cmd == "params") { printParams(api.params()); continue; }
+        if (cmd == "setparam") {
+            std::string name;
+            double val;
+            if (!(ss >> name >> val)) { std::printf("ERR 用法: setparam <名称> <值>\n"); continue; }
+            AutoTuner::Params p = api.params();
+            bool ok = true;
+            if      (name == "zeta")          p.zeta = val;
+            else if (name == "wn")            p.wn = val;
+            else if (name == "escAmp")        p.escAmp = val;
+            else if (name == "escFreq")       p.escFreq = val;
+            else if (name == "escStep")       p.escStep = val;
+            else if (name == "hpfTau")        p.escHPFtau = val;
+            else if (name == "lpfTau")        p.escLPFtau = val;
+            else if (name == "wU")            p.wU = val;
+            else if (name == "wDu")           p.wDu = val;
+            else if (name == "maxUpdateFrac") p.maxUpdateFrac = val;
+            else if (name == "absMinUpdate")  p.absMinUpdate = val;
+            else if (name == "zetaMin")       p.zetaMin = val;
+            else if (name == "wnMax")         p.wnMax = val;
+            else if (name == "oscMax")        p.oscMax = val;
+            else if (name == "highSpeedKn")   p.highSpeedDeactivateKn = val;
+            else if (name == "windowSec")     p.windowSec = val;
+            else if (name == "dt")            p.dt = val;
+            else ok = false;
+            if (!ok) { std::printf("ERR 未知参数名 '%s'，'help' 查看可选名称\n", name.c_str()); continue; }
+            api.setParams(p);
+            std::printf("OK 注意：setParams 已复位调参器状态（基线已清空）\n");
+            continue;
+        }
 
         // ---- 层2 单功能 ----
         if (cmd == "pole") {

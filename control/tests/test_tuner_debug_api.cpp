@@ -187,6 +187,20 @@ TEST(TunerDebugApi, SettleWindowOnceAcceptsOrReverts) {
     (void)kpBefore;
 }
 
+TEST(TunerDebugApi, SetParamsRoundTripAndResetsState) {
+    AutoTuner t;
+    TunerDebugApi api(t);
+    ASSERT_TRUE(api.establishBaseline(K_SHIP, T_SHIP));
+    AutoTuner::Params p = api.params();
+    p.escAmp = 0.08;
+    p.escFreq = 0.10;
+    api.setParams(p);
+    EXPECT_DOUBLE_EQ(api.params().escAmp, 0.08);
+    EXPECT_DOUBLE_EQ(api.params().escFreq, 0.10);
+    // setParams 语义：复位调参器（基线/测量全清）——调用方必须知情
+    EXPECT_FALSE(api.snapshot().baselineEstablished);
+}
+
 TEST(TunerDebugApi, TickThroughApiMatchesDirectTick) {
     AutoTuner t1, t2;
     TunerDebugApi api(t1);
