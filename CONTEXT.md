@@ -37,6 +37,18 @@
 | **自降频（self-decimation）** | `NomotoIdentifier::update(δ, r, dtNow)` 可任意频率调用，内部满 `beatSec`（1 s）才做 RLS 拍，Δt 自测 |
 | **增益所有权（gain ownership）** | 基线建立后增益归 AutoTuner 所有（ESC 微调+载波），不再每拍被调度表覆写；只读投影经 `currentGains()` 观测 |
 
+## 实船调试接口术语（2026-09）
+
+`TunerDebugApi` 把 `AutoTuner` 的公有动作与私有机制摊平为可单独调用的调试方法（经 `friend` 暴露，不改任何在线行为），配套命令行与脚本工具在船上/岸上驱动。安全红线：仅用于调试/标定，不得接入正常航行控制回路；`force*` 系列旁路稳定门。
+
+| 术语 | 含义 |
+|------|------|
+| **实船调试接口（TunerDebugApi）** | `AutoTuner` 的调试门面（facade）：每个方法恰对应一个功能，互不影响、可任意顺序做单环节激励-观测 |
+| **ar_tuner_debug** | 调试接口的逐行命令行封装：每行一条命令恰调一个功能，输出 `key=value`（成功 `OK`、失败 `ERR`），可经 ssh/串口在船上使用 |
+| **窗末裁决（settleWindow）** | 窗口结束时的裁决步：窗末梯度结算 → 稳定门 → 接受/回退，即 `tick()` 每窗自动执行的 `settleWindow_` |
+| **验收脚本（tuner_debug_accept.py）** | 驱动 `ar_tuner_debug` 的端到端验收：9 个功能组 49 项断言（数值经手工核算），全过退出码 0，可接 CI |
+| **监控脚本（tuner_debug_monitor.py）** | 周期下发 `status` 解析快照，实时绘制增益/梯度/J/振荡/载波相位曲线；`--demo` 内置激励，无实船即可演示 |
+
 ## 架构决策的落点
 
 - ADR 目录：`docs/adr/`（尚无条目；有分量的否决/权衡出现时按 `docs/agents/domain.md` 的规则惰性创建）
