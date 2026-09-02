@@ -24,7 +24,7 @@ static void printHelp() {
     std::printf("  --K <val>           覆盖船参数 K\n");
     std::printf("  --T <val>           覆盖船参数 T\n");
     std::printf("  --speed <val>       覆盖船速 (kn)\n");
-    std::printf("  --leg <val>         覆盖 Z 形参考翻转周期 (s，仅 --tune/--esc 激励相关；默认 15)\n");
+    std::printf("  --leg <val>         覆盖 Z 形参考翻转周期 (s，仅 --tune/--esc 激励相关；默认按 4T 与 4/(ζωn) 自适应)\n");
     std::printf("  --sea <val>         覆盖海况 (0-3)，缩放风/浪/噪声扰动强度（1=基准）\n");
     std::printf("  --dist              启用风/浪/噪声干扰\n");
     std::printf("  --seconds <val>     覆盖总时长 (s)\n");
@@ -189,9 +189,10 @@ int main(int argc, char** argv) {
         const double T = (Toverride > 0) ? Toverride : 8.0;
         const double sec = (secOverride > 0) ? secOverride : 1200.0;
         const double speedKn = (speedOverride > 0) ? speedOverride : 10.0;
-        const double leg = (legOverride > 0) ? legOverride : 15.0;
+        // --leg 覆盖，缺省按 4T 与 4/(ζωn) 自适应（让每段航向基本到达参考值）
+        const double leg = (legOverride > 0) ? legOverride : sim.autoLegSec(T);
         auto r = sim.runTuneConvergence(K, T, speedKn, sec, leg);
-        std::printf("调参收敛: K=%.2f/T=%.1f v=%.1fkn %ds\n", K, T, speedKn, (int)sec);
+        std::printf("调参收敛: K=%.2f/T=%.1f v=%.1fkn %ds leg=%.0fs\n", K, T, speedKn, (int)sec, leg);
         std::printf("  辨识: K̂=%.4f (%.1f%%), T̂=%.4f (%.1f%%), valid=%d\n",
                     r.Khat, (r.Khat - K) / K * 100.0, r.That, (r.That - T) / T * 100.0,
                     (int)r.identValid);
@@ -226,8 +227,8 @@ int main(int argc, char** argv) {
         double T = (Toverride > 0) ? Toverride : 8.0;
         // 默认 480 s：辨识收敛（约 1~2 min）+ 基线建立后再留数个 60 s ESC 评估窗口
         double sec = (secOverride > 0) ? secOverride : 480.0;
-        // Z 形参考翻转周期（每段参考航向维持时间），默认 15 s，--leg 覆盖
-        double leg = (legOverride > 0) ? legOverride : 15.0;
+        // Z 形参考翻转周期（每段参考航向维持时间）：--leg 覆盖，缺省按 4T 与 4/(ζωn) 自适应
+        double leg = (legOverride > 0) ? legOverride : sim.autoLegSec(T);
         auto r = sim.runEsc(K, T, 10.0, sec, leg);
         std::printf("ESC 长期: Kp %.4f→%.4f Kd %.4f→%.4f | 辨识 K=%.4f (真值 %.2f) T=%.4f (真值 %.2f) valid=%d | baseline=%d(t=%.0fs) moved=%d stable=%d | leg=%.0fs\n",
                     r.Kp0, r.KpFinal, r.Kd0, r.KdFinal,

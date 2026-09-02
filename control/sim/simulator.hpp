@@ -40,6 +40,15 @@ public:
     double wnTarget   = 0.25;
     bool   enableDisturbance = false;     // M1 纯阶跃验证关闭干扰；带干扰场景另开
 
+    // Z 形参考翻转周期的自适应缺省：每段参考航向维持时间需让航向基本到达参考值，
+    // 取开环调节时间 4T 与闭环调节时间 4/(ζωn) 的较大者（runEsc/runTuneConvergence
+    // 的 legSec ≤ 0 时启用）。固定小值会让 RLS 只观测到初始瞬态，K̂/T̂ 系统性偏大。
+    double autoLegSec(double T) const {
+        const double openLoop = 4.0 * T;
+        const double closedLoop = 4.0 / (zetaTarget * wnTarget);
+        return openLoop > closedLoop ? openLoop : closedLoop;
+    }
+
     // 最近一次运行的采样（所有 run* 模式均填充，供导出 CSV/可视化）
     std::vector<Sample> lastSamples;
 
@@ -221,7 +230,7 @@ public:
         bool   stable;                // 增益与船态有限且有界
     };
     EscResult runEsc(double K, double T, double speedKn, double totalSec,
-                     double legSec = 15.0) {
+                     double legSec = 0.0) {
         plant.K = K; plant.T = T; plant.reset(0.0);
         lastSamples.clear();
         ap.setMode(Mode::AUTO_HEADING);
@@ -235,7 +244,9 @@ public:
         ap.setTunerParams(tp);
 
         // Z 形（zigzag）航向参考：每 legSec 在 ±refAmp 间翻转，全程确定性激励
+        // legSec ≤ 0 时按 autoLegSec(T) 自适应，保证每段维持时间足够航向到达参考值
         const double refAmp = 40.0;  // deg
+        if (legSec <= 0.0) legSec = autoLegSec(T);
         const int legSteps  = static_cast<int>(legSec / dt);
         const int totalSteps = static_cast<int>(totalSec / dt);
         double curRef = refAmp;
@@ -327,10 +338,11 @@ public:
         bool   stable = false;      // 全程数值有限且有界
     };
 
-    // legSec：Z 形参考翻转周期 (s)。典型船 15 s 足够；慢船（T 大）需按 T 缩放
-    // （建议 ≥ 2T），否则 RLS 只观测到初始瞬态，K̂/T̂ 系统性偏大（收敛试验用例 8）。
+    // legSec：Z 形参考翻转周期 (s)。≤ 0 时按 autoLegSec(T) 自适应（推荐）：
+    // 每段维持时间需让航向基本到达参考值，否则 RLS 只观测到初始瞬态，
+    // K̂/T̂ 系统性偏大（收敛试验用例 8）；慢船（T 大）尤为明显。
     TuneResult runTuneConvergence(double K, double T, double speedKn, double totalSec,
-                                  double legSec = 15.0) {
+                                  double legSec = 0.0) {
         plant.K = K; plant.T = T; plant.reset(0.0);
         lastSamples.clear();
         ap.setMode(Mode::AUTO_HEADING);
@@ -342,6 +354,7 @@ public:
         ap.setTunerParams(tp);
 
         const double refAmp = 40.0;
+        if (legSec <= 0.0) legSec = autoLegSec(T);
         const int legSteps  = static_cast<int>(legSec / dt);
         const int totalSteps = static_cast<int>(totalSec / dt);
         const int recEvery  = static_cast<int>(1.0 / dt);  // 每 1 s 记录一行
