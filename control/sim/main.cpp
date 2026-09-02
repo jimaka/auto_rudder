@@ -226,12 +226,14 @@ int main(int argc, char** argv) {
         double T = (Toverride > 0) ? Toverride : 8.0;
         // 默认 480 s：辨识收敛（约 1~2 min）+ 基线建立后再留数个 60 s ESC 评估窗口
         double sec = (secOverride > 0) ? secOverride : 480.0;
-        auto r = sim.runEsc(K, T, 10.0, sec);
-        std::printf("ESC 长期: Kp %.4f→%.4f Kd %.4f→%.4f | 辨识 K=%.4f (真值 %.2f) T=%.4f (真值 %.2f) valid=%d | baseline=%d(t=%.0fs) moved=%d stable=%d\n",
+        // Z 形参考翻转周期（每段参考航向维持时间），默认 15 s，--leg 覆盖
+        double leg = (legOverride > 0) ? legOverride : 15.0;
+        auto r = sim.runEsc(K, T, 10.0, sec, leg);
+        std::printf("ESC 长期: Kp %.4f→%.4f Kd %.4f→%.4f | 辨识 K=%.4f (真值 %.2f) T=%.4f (真值 %.2f) valid=%d | baseline=%d(t=%.0fs) moved=%d stable=%d | leg=%.0fs\n",
                     r.Kp0, r.KpFinal, r.Kd0, r.KdFinal,
                     r.Khat, K, r.That, T, r.identValid ? 1 : 0,
                     r.baselineEstablished ? 1 : 0, r.baselineSec,
-                    r.gainsMoved ? 1 : 0, r.stable ? 1 : 0);
+                    r.gainsMoved ? 1 : 0, r.stable ? 1 : 0, leg);
         // PASS：辨识收敛且物理合理 + 基线建立（ESC 真正启动过）+ 增益确实移动 + 数值稳定有界
         // 任一不满足即 FAIL——ESC 从未启动时增益与初值逐位相同，moved=0，必然 FAIL
         bool ok = r.identValid && r.baselineEstablished && r.gainsMoved && r.stable;

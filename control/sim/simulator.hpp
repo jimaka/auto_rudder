@@ -220,7 +220,8 @@ public:
         bool   gainsMoved;            // 增益相对起点移动超过阈值
         bool   stable;                // 增益与船态有限且有界
     };
-    EscResult runEsc(double K, double T, double speedKn, double totalSec) {
+    EscResult runEsc(double K, double T, double speedKn, double totalSec,
+                     double legSec = 15.0) {
         plant.K = K; plant.T = T; plant.reset(0.0);
         lastSamples.clear();
         ap.setMode(Mode::AUTO_HEADING);
@@ -235,7 +236,6 @@ public:
 
         // Z 形（zigzag）航向参考：每 legSec 在 ±refAmp 间翻转，全程确定性激励
         const double refAmp = 40.0;  // deg
-        const double legSec = 15.0;  // s
         const int legSteps  = static_cast<int>(legSec / dt);
         const int totalSteps = static_cast<int>(totalSec / dt);
         double curRef = refAmp;
