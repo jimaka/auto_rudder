@@ -105,7 +105,8 @@ def fig_esc(samples, settles, out, Ktrue, Ttrue, title):
     ws = np.array([s["winIndex"] for s in settles])
     js = np.array([s["Jwindow"] for s in settles])
 
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8), sharex=True,
+    # 注意不能 sharex：ax1 横轴是时间(s)，ax2 横轴是窗口序号
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(11, 8),
                                    gridspec_kw={"height_ratios": [1.6, 1]})
     ax1.plot(t, kpc, "C0", lw=1.1, label="Kp（去载波持久增益）")
     ax1.plot(t, kdc, "C1", lw=1.1, label="Kd（去载波持久增益）")
