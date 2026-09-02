@@ -238,17 +238,39 @@ public:
         const double Kp0 = wnTarget * wnTarget * T / K;
         const double Kd0 = (2.0 * zetaTarget * wnTarget * T - 1.0) / K;
         ap.scheduleMut().setTable({{0.0, 100.0, 0, Kp0, Kd0}});
-        // 启用自动优化
-        auto tp = ap.tuner().params();
-        tp.highSpeedDeactivateKn = 100.0;
-        ap.setTunerParams(tp);
-
         // Z 形（zigzag）航向参考：每 legSec 在 ±refAmp 间翻转，全程确定性激励
         // legSec ≤ 0 时按 autoLegSec(T) 自适应，保证每段维持时间足够航向到达参考值
         const double refAmp = 40.0;  // deg
         if (legSec <= 0.0) legSec = autoLegSec(T);
+
+        // 启用自动优化
+        auto tp = ap.tuner().params();
+        tp.highSpeedDeactivateKn = 100.0;
+        // ESC 实验优化（仅本试验参数，不改算法缺省）：
+        //  1) 评估窗口取 2 个完整 zigzag 周期（=4 段）：每窗激励组成一致，
+        //     消除 J 拍频；zigzag 基频落在 2 周/窗（方波谐波在 6、10… 周/窗），
+        //     与 1 周/窗的载波正交——窗口若取 1 个 zigzag 周期，激励基频与
+        //     载波同频，解调梯度被激励污染（实测方向错误、沿梯度上坡）。
+        //  2) 载波每窗恰好一个整周期（ω=2π/windowSec），解调无频谱泄漏；
+        //     HPF 转角取载波频率的 1/3 以下（tau=0.5·windowSec），否则衰减
+        //     并旋转载波分量（缺省 tau=5s 对 0.049 rad/s 载波衰减 ~4 倍）；
+        //     LPF 取半窗长做梯度平滑。
+        //  3) 结构化激励下指令响应的误差摆动会被振荡检测器当作闭环振荡
+        //     （实测峰-峰 7~11° > 缺省 oscMax=5°），导致稳定门每窗回退、
+        //     增益冻结；无扰动仿真放宽 oscMax，由 ζ/ωn 代数条件把关。
+        //  4) 两阶段激励：基线建立前 ±refAmp 充分激励辨识；建基线后降为
+        //     ±refAmpCalm——大幅值 Z 形让舵饱和，ITAE 只奖励"更快"，ESC 会
+        //     把增益推到 ζ 安全边界并反复回退锯齿；小摆幅下代价对超调/振荡
+        //     敏感，才存在内部最优点。
+        tp.windowSec = 4.0 * legSec;
+        tp.escFreq   = 2.0 * 3.14159265358979323846 / tp.windowSec;
+        tp.escHPFtau = 0.5 * tp.windowSec;
+        tp.escLPFtau = 0.5 * tp.windowSec;
+        tp.oscMax    = 20.0;
+        ap.setTunerParams(tp);
         const int legSteps  = static_cast<int>(legSec / dt);
         const int totalSteps = static_cast<int>(totalSec / dt);
+        const double refAmpCalm = 15.0;  // deg，阶段 2（ESC 寻优）摆幅，见上注 4)
         double curRef = refAmp;
         ap.setHeadingRef(curRef);
 
@@ -258,7 +280,7 @@ public:
         for (int k = 0; k < totalSteps; ++k) {
             double t = k * dt;
             if (k > 0 && k % legSteps == 0) {
-                curRef = -curRef;
+                curRef = (curRef > 0.0 ? -1.0 : 1.0) * (baselineSeen ? refAmpCalm : refAmp);
                 ap.setHeadingRef(curRef);
             }
             SensorInput s;
@@ -349,12 +371,21 @@ public:
         const double Kp0 = wnTarget * wnTarget * T / K;
         const double Kd0 = (2.0 * zetaTarget * wnTarget * T - 1.0) / K;
         ap.scheduleMut().setTable({{0.0, 100.0, 0, Kp0, Kd0}});
+        const double refAmp = 40.0;
+        const double refAmpCalm = 15.0;  // deg，基线建立后的 ESC 寻优摆幅（runEsc 注 4）
+        if (legSec <= 0.0) legSec = autoLegSec(T);
+        // ESC 实验优化（仅本试验参数，不改算法缺省）：窗口对齐 zigzag 周期、
+        // 载波每窗一个整周期、结构化激励下放宽 oscMax 由 ζ/ωn 代数条件把关
+        // （依据见 runEsc 同名牌注）
         auto tp = ap.tuner().params();
         tp.highSpeedDeactivateKn = 100.0;   // 始终启用（速度门控不在本试验考察范围）
+        tp.windowSec = 4.0 * legSec;
+        tp.escFreq   = 2.0 * 3.14159265358979323846 / tp.windowSec;
+        tp.escHPFtau = 0.5 * tp.windowSec;
+        tp.escLPFtau = 0.5 * tp.windowSec;
+        tp.oscMax    = 20.0;
         ap.setTunerParams(tp);
 
-        const double refAmp = 40.0;
-        if (legSec <= 0.0) legSec = autoLegSec(T);
         const int legSteps  = static_cast<int>(legSec / dt);
         const int totalSteps = static_cast<int>(totalSec / dt);
         const int recEvery  = static_cast<int>(1.0 / dt);  // 每 1 s 记录一行
@@ -372,7 +403,7 @@ public:
         for (int k = 0; k < totalSteps; ++k) {
             const double t = k * dt;
             if (k > 0 && k % legSteps == 0) {
-                curRef = -curRef;
+                curRef = (curRef > 0.0 ? -1.0 : 1.0) * (baselineSeen ? refAmpCalm : refAmp);
                 ap.setHeadingRef(curRef);
             }
             SensorInput s;
