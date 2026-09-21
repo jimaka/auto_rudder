@@ -624,7 +624,7 @@ $$
 |---|---|---|
 | HPF 增益/相位（§4.3/§4.5） | 乘性因子 $\operatorname{Re}H(j\omega)=\dfrac{(\omega\tau_H)^2}{1+(\omega\tau_H)^2}$ | 默认 $0.059$（衰减 17 倍）；测试配置 $0.908$ |
 | 非整数窗口 $\sin^2$ 均值偏移（§4.7） | 乘性因子 $2m_{ss}$ | 默认 $1.047$（$\varphi_0=0$，逐窗轮转） |
-| 二倍频/基波泄漏（§4.7） | 加性项 $\propto \frac{a}{2}J''\bar\theta^2\cdot(\text{泄漏均值})$ | 默认参数下 $|\Delta\bar\theta|\lesssim4\%\,\bar\theta$ 时淹没信号 |
+| 二倍频/基波泄漏（§4.7） | 加性项 $\propto \frac{a}{2}J''\bar\theta^2\cdot(\text{泄漏均值})$ | 默认参数下 $\vert \Delta\bar\theta\vert \lesssim4\%\,\bar\theta$ 时淹没信号 |
 | 窗口内参考机动/海况突变 | 加性畸变（$J$ 的非平稳成分穿不过 HPF 但被部分泄漏） | 振荡检测有 30 s 参考稳定门控（:165-166, :505），**$J$ 累积本身无门控**——机动窗的梯度被污染 |
 | $J$ 慢漂（$K,T$ 变化、风压差） | HPF 阻不绝 $\nu\lesssim1/\tau_H$ 的漂移，残余以近直流形式泄漏进相关器 | $\tau_H=5\ \mathrm{s}$ 以下频段，靠窗间涨落抵消 |
 

@@ -1,0 +1,1099 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>自动舵项目架构与全函数调用说明</title>
+<style>*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f0f5f8;color:#243c4c;font:16px/1.85 system-ui,"Noto Sans CJK JP",sans-serif}aside{position:fixed;inset:0 auto 0 0;width:270px;padding:26px 18px;overflow:auto;background:#13334c;color:white}aside b{display:block;font-size:23px;margin-bottom:15px}aside a{display:block;color:#c5e1ee;padding:6px 8px;font-size:13px;text-decoration:none;border-radius:4px}aside a:hover{background:#2c526b;color:white}main{margin:0 24px 0 295px;max-width:1120px;background:white;padding:40px 44px;box-shadow:0 3px 24px #16324a0d}h1{font-size:32px;color:#123852;line-height:1.45}h2{font-size:24px;color:#185477;border-bottom:2px solid #dceaf2;padding:20px 0 10px;scroll-margin-top:10px}h3{font-size:19px;color:#2d566e;margin-top:30px}a{color:#0075a3}p{margin:14px 0}img{display:block;width:100%;height:auto;border:1px solid #e3ebf1;border-radius:8px;margin:22px 0}table{border-collapse:collapse;width:100%;font-size:14px;margin:20px 0}td,th{border:1px solid #d5e1e8;padding:9px 11px;text-align:left;vertical-align:top}th{background:#eaf3f8}tr:nth-child(even) td{background:#f9fbfc}code{background:#edf3f7;padding:2px 4px;border-radius:3px;font-size:.9em;overflow-wrap:anywhere}pre{overflow:auto;background:#132f45;color:#d6ebf5;padding:20px;border-radius:7px;font:13px/1.7 monospace}pre code{background:transparent;color:inherit;padding:0}blockquote{margin:20px 0;padding:5px 20px;border-left:4px solid #d9a148;background:#fff8e8}li{margin:8px 0}.toolbar{font-size:14px;background:#eaf5fa;padding:15px;border-radius:6px}@media(max-width:950px){aside{position:static;width:auto;max-height:260px}main{margin:0;padding:22px;max-width:none}table{font-size:12px}h1{font-size:26px}}@media print{body{background:white;font-size:10pt}aside,.toolbar{display:none}main{margin:0;max-width:none;padding:0;box-shadow:none}h2{break-after:avoid}h3{break-after:avoid}img{break-inside:avoid;max-height:230mm;object-fit:contain}tr{break-inside:avoid}pre{white-space:pre-wrap}a{color:inherit;text-decoration:none}@page{size:A4;margin:16mm}}
+</style></head><body><aside><b>自动舵 · 架构说明</b><a href="#section-1">阅读入口与覆盖范围</a><a href="#section-2">1. 总体架构与工程目录</a><a href="#section-3">2. 状态归属与模块接口</a><a href="#section-4">3. 主控制入口与模式生命周期</a><a href="#section-5">4. 一个航向控制周期怎样执行</a><a href="#section-6">5. PD、增益调度与角度工具</a><a href="#section-7">6. Nomoto 在线辨识</a><a href="#section-8">7. AutoTuner：基线与 ESC 的唯一编排者</a><a href="#section-9">8. 机动序列和自动辨识试验</a><a href="#section-10">9. 参数存储架构与实际数据格式</a><a href="#section-11">10. 仿真系统的入口、对象与输出</a><a href="#section-12">11. 调参调试 API、CLI 与 Python 监视器</a><a href="#section-13">12. 浏览器界面的独立事件架构</a><a href="#section-14">13. 测试、绘图、动画与文档工具</a><a href="#section-15">14. 集成边界与读图时常见误区</a><a href="#section-16">15. 图谱复现、验证与维护</a><a href="#section-17">16. 源码与已有设计资料</a></aside><main><p class="toolbar"><a href="../项目架构与全函数调用说明.md">Markdown 原文</a> · <a href="call_atlas.html">全函数调用图谱</a> · <a href="全函数索引.md">全函数索引</a> · 浏览器打印可保存 PDF</p><h1>自动舵项目架构与全函数调用说明</h1>
+<blockquote>
+<p>版本：2026-09-15，基于当前工作区源码，而非仅基于 Git 已提交版本。<br />
+定位：说明“工程由什么组成、一次调用如何执行、状态由谁维护、所有显式函数在哪里”。本次只新增文档、图表与生成工具，不修改控制算法。</p>
+</blockquote>
+<h2 id="section-1">阅读入口与覆盖范围</h2>
+<p>本项目的主体是 <strong>C++17、header-only 的自动舵控制库</strong>。它把 PD 控制、增益调度、Nomoto 在线辨识、ESC 自动优化和机动序列整合到 <code>AutopilotCore</code>；外围是主机仿真、调试 CLI、Python 工具、浏览器演示界面、单元测试及研究文档工具。</p>
+<p>文档采用“分层流程说明 + 每个函数一张关系图”的组织方式，既能看清控制顺序，也能查到小工具、测试辅助函数和匿名回调。</p>
+<table>
+<thead>
+<tr>
+<th>阅读材料</th>
+<th>内容</th>
+<th>适合用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>本文</td>
+<td>14 张分层架构/流程图及源码说明</td>
+<td>建立整体认识、理解执行顺序和状态边界</td>
+</tr>
+<tr>
+<td><a href="../architecture/%E9%A1%B9%E7%9B%AE%E6%9E%B6%E6%9E%84%E8%AF%B4%E6%98%8E.html">HTML 阅读版</a></td>
+<td>带目录导航的离线网页，可浏览器打印为 PDF</td>
+<td>完整阅读图文、分享及打印</td>
+</tr>
+<tr>
+<td><a href="../architecture/call_atlas.html">全函数交互图谱</a></td>
+<td>554 张独立 SVG 关系图，可离线搜索、跳转，附源码摘录</td>
+<td>按函数查调用者、被调用者和回调注册点</td>
+</tr>
+<tr>
+<td><a href="../architecture/%E5%85%A8%E5%87%BD%E6%95%B0%E7%B4%A2%E5%BC%95.md">全函数索引</a></td>
+<td>按文件列出每个定义、行号、图谱链接</td>
+<td>查漏、代码导航、审阅清单</td>
+</tr>
+<tr>
+<td><a href="../architecture/functions.json">函数清单与关系数据</a></td>
+<td>源文件 SHA-256、节点、边、调用点、解析证据</td>
+<td>后续自动化和差异比较</td>
+</tr>
+<tr>
+<td><a href="../architecture/figures.md">分层图集</a></td>
+<td>14 张 PNG + 可编辑 SVG</td>
+<td>单独阅读、复制进报告或演示文稿</td>
+</tr>
+</tbody>
+</table>
+<h3>“所有函数”的统计口径</h3>
+<p>本次扫描覆盖 56 个源码文件，共 <strong>520 个显式定义 + 34 个脚本入口节点</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>语言/类别</th>
+<th style="text-align:right">显式定义数</th>
+<th>范围</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C++</td>
+<td style="text-align:right">300</td>
+<td>控制头文件、仿真、CLI、110 个 <code>TEST(...)</code> 测试体、辅助函数、lambda、两个诊断探针</td>
+</tr>
+<tr>
+<td>Python</td>
+<td style="text-align:right">135</td>
+<td>调试、绘图、动画、研究图表、PPT/PDF/HTML 辅助工具；含嵌套函数和 lambda</td>
+</tr>
+<tr>
+<td>JavaScript</td>
+<td style="text-align:right">83</td>
+<td><code>debug_ui.html</code> 中的函数、箭头函数、DOM/WebSocket/滑块回调</td>
+</tr>
+<tr>
+<td>Shell</td>
+<td style="text-align:right">2</td>
+<td>两个批量生成脚本中的显式函数</td>
+</tr>
+<tr>
+<td>脚本入口，单独计数</td>
+<td style="text-align:right">34</td>
+<td>Python 模块顶层、Shell 顶层、HTML 中的 5 个脚本块</td>
+</tr>
+</tbody>
+</table>
+<p>CMake 的 4 个构建文件也纳入架构说明，但其中的 <code>add_executable</code>、<code>target_link_libraries</code> 等是 CMake 内建命令，不冒充项目自定义函数。第三方库、构建产物、缓存、编译器生成的隐式构造/析构及模板实例化不逐个列入。“全函数”指当前源码中显式定义的盘点，不是对所有可能运行时目标的穷尽证明。</p>
+<p>新建的 <code>docs/architecture/</code> 是这份报告的生成工具和产物，特意排除在自身扫描范围之外，以免生成器扫描生成器、生成页面再引入新的节点。</p>
+<h3>图例与可信度</h3>
+<ul>
+<li>主文档图中的编号/箭头按标题区分：总体架构图表示依赖与数据路径，具体流程图表示执行先后和条件。</li>
+<li>交互图谱中，实线是已解析的静态调用关系；虚线是匿名函数定义、回调注册或传递，不表示立即执行。各条边附解析证据。</li>
+<li>每张函数图都附全部已解析的项目内出边；未解析的表达式、库调用、宏、重载歧义单独列出。一个节点没有出边，不等于它“什么也没调用”。</li>
+<li>当前 CodeGraph 索引包含过期文件。生成器只复用源码 SHA-256 匹配文件的调用信息，并重新扫描当前 C++/JavaScript/Shell 定义及 Python AST；没有重建索引。未获源码解析佐证的低置信度猜测边会被过滤，例如把 <code>vector::size</code> 错配成 <code>RingBuffer::size</code>。</li>
+<li>图谱是保守的静态阅读辅助，不是编译器级完整调用分析，也不是实测运行轨迹。动态回调的最终目标、隐式调用和部分复杂接收者表达式仍需人工核对。</li>
+</ul>
+<h2 id="section-2">1. 总体架构与工程目录</h2>
+<p><img src="../architecture/figures/01_overview.png" alt="项目总体架构" /></p>
+<h3>1.1 目录职责</h3>
+<pre><code class="language-text">auto_rudder/
+├── CONTEXT.md                       领域术语、当前架构约定
+├── control/
+│   ├── CMakeLists.txt                C++17 构建与可选目标
+│   ├── include/                     9 个算法/接口头文件
+│   │   ├── autopilot_core.hpp       模式状态机与控制链编排
+│   │   ├── pd_controller.hpp        PD、限幅、量化
+│   │   ├── gain_schedule.hpp        船速/海况增益表
+│   │   ├── nomoto_identifier.hpp    自降频 RLS 辨识
+│   │   ├── auto_tuner.hpp           基线、ESC、稳定门、回退
+│   │   ├── maneuver_sequencer.hpp   航段序列与机动工厂
+│   │   ├── param_store.hpp          小端参数编码、CRC、I/O 回调
+│   │   ├── tuner_debug_api.hpp      调参内部状态的调试包装器
+│   │   └── angle_utils.hpp          角度归一化与最短角差
+│   ├── sim/                         仿真 CLI、船体模型、扰动、场景
+│   ├── tests/                       9 组 GoogleTest 源文件
+│   ├── tools/                       调试 CLI、Python、批处理脚本
+│   └── ui/debug_ui.html             独立的浏览器演示与调试界面
+├── docs/                            研究、设计、优化与图表辅助脚本
+└── md2pdf.py                        Markdown 转 HTML/PDF 工具
+</code></pre>
+<h3>1.2 构建关系</h3>
+<p><a href="../../control/CMakeLists.txt">control/CMakeLists.txt</a> 声明 <code>ar_headers</code> 为 <code>INTERFACE</code> 库：它传播头文件路径和编译选项，本身不生成 <code>.a/.so</code> 算法库。</p>
+<table>
+<thead>
+<tr>
+<th>目标/选项</th>
+<th>默认状态</th>
+<th>依赖和职责</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ar_headers</code></td>
+<td>始终存在</td>
+<td>C++17 算法头文件接口</td>
+</tr>
+<tr>
+<td><code>AR_BUILD_SIM</code> → <code>ar_sim</code></td>
+<td>ON</td>
+<td><code>sim/main.cpp</code>，链接 <code>ar_headers</code></td>
+</tr>
+<tr>
+<td><code>AR_BUILD_TOOLS</code> → <code>ar_tuner_debug</code></td>
+<td>ON</td>
+<td><code>tools/tuner_debug_cli.cpp</code>，链接 <code>ar_headers</code></td>
+</tr>
+<tr>
+<td><code>AR_BUILD_TESTS</code> → 9 个测试目标</td>
+<td>ON</td>
+<td>链接 <code>ar_headers</code> 与 <code>GTest::gtest_main</code></td>
+</tr>
+<tr>
+<td>仿真 CTest 项</td>
+<td>测试与仿真均启用时注册</td>
+<td><code>sim_all/validate/ident/esc/trial/maneuver_zigzag</code>，超时 120 s</td>
+</tr>
+</tbody>
+</table>
+<p>GoogleTest 通过 <code>FetchContent</code> 引入，仓库固定版本 <code>v1.14.0</code>。Python 脚本、网页和研究文档工具不是 C++ 链接目标。项目也没有在这些目标中提供 STM32/RH850 启动代码、定时器、CAN/UART 驱动或 Flash 后端。</p>
+<h2 id="section-3">2. 状态归属与模块接口</h2>
+<p>“谁保存状态”比“谁包含哪个头文件”更能解释工程行为。</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>持有的关键状态</th>
+<th>主要输入</th>
+<th>主要输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AutopilotCore</code></td>
+<td>当前模式、航向参考、上一舵令、保持舵角、试验状态；各控制组件实例</td>
+<td><code>SensorInput</code>、真实 <code>dt</code>、模式/机动命令</td>
+<td>目标舵角</td>
+</tr>
+<tr>
+<td><code>PdController</code></td>
+<td>参数、上一误差、滤波微分、上一输出、首拍标记</td>
+<td>航向参考/测量，或原始舵令</td>
+<td>限幅、限速、量化后的舵令</td>
+</tr>
+<tr>
+<td><code>GainSchedule</code></td>
+<td><code>vector&lt;GainPoint&gt;</code> 调度表</td>
+<td>船速、海况</td>
+<td>名义 <code>Kp/Kd</code></td>
+</tr>
+<tr>
+<td><code>NomotoIdentifier</code></td>
+<td>归一化参数 θ、协方差 P、上一角速度、自降频计时、激励标记</td>
+<td>实际舵角、角速度、真实间隔</td>
+<td><code>K/T</code>、<code>excited/valid</code></td>
+</tr>
+<tr>
+<td><code>AutoTuner</code></td>
+<td>基线、ESC 中心值、窗口、载波相位、滤波/解调状态、振荡检测器</td>
+<td><code>TunerInput</code>：参考、测量、船速、调度值、辨识快照等</td>
+<td><code>GainCommand</code>，含本拍实际增益</td>
+</tr>
+<tr>
+<td><code>ManeuverSequencer</code></td>
+<td>航段表、当前索引、累计转角/时间、完成标记</td>
+<td>航向、角速度、间隔</td>
+<td>当前航段的控制类型与目标</td>
+</tr>
+<tr>
+<td><code>ControlParams</code> / <code>ParamStore</code></td>
+<td>待保存参数；外部读写/时钟函数对象</td>
+<td>参数对象或原始字节</td>
+<td>二进制数据、CRC、读写结果</td>
+</tr>
+<tr>
+<td><code>Simulator</code></td>
+<td>船体、扰动、<code>AutopilotCore</code>、场景参数和样本</td>
+<td>命令行场景参数</td>
+<td>指标、轨迹、辨识/收敛结果</td>
+</tr>
+<tr>
+<td>网页 <code>State</code></td>
+<td>JavaScript 版参数、模型、历史、WebSocket、界面状态</td>
+<td>DOM 事件、计时器、消息</td>
+<td>页面图形、下载文件、JSON 消息</td>
+</tr>
+</tbody>
+</table>
+<p>控制库本身没有线程、主循环或全局硬件调度器。正常使用中，由调用方管理一个持续存活的 <code>AutopilotCore</code> 实例并周期性调用 <code>step</code>。<code>param_store.hpp</code> 虽被 Core 包含，但 Core 内并没有 <code>ParamStore</code> 成员或自动 <code>load/save</code> 流程；“包含关系”不能当成“调用关系”。</p>
+<h2 id="section-4">3. 主控制入口与模式生命周期</h2>
+<p>源码：<a href="../../control/include/autopilot_core.hpp">autopilot_core.hpp</a>。</p>
+<p><img src="../architecture/figures/02_core_modes.png" alt="Core 模式分派" /></p>
+<h3>3.1 <code>step(s, dt)</code> 的四种分支</h3>
+<table>
+<thead>
+<tr>
+<th>模式</th>
+<th>本周期执行</th>
+<th>不执行/需要注意</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>MANUAL</code></td>
+<td>直接返回 <code>s.rudderDeg</code></td>
+<td>这是当前舵角透传，不是零舵，也不是额外手动命令输入</td>
+</tr>
+<tr>
+<td><code>AUTO_HEADING</code></td>
+<td>调用 <code>headingControlStep</code></td>
+<td>包含 RLS 与调参主入口</td>
+</tr>
+<tr>
+<td><code>AUTO_MANEUVER</code></td>
+<td>更新航段；未完成时按航段运行 PD 或 <code>saturate</code></td>
+<td>仅辨识试验运行期间在该分支更新 RLS；未完成时不调用 <code>tuner.tick</code></td>
+</tr>
+<tr>
+<td><code>HOLD</code></td>
+<td>返回切入时保存的 <code>holdRudder_</code></td>
+<td>不更新 PD/RLS/ESC</td>
+</tr>
+</tbody>
+</table>
+<p>每个分支结束后，都把本次舵令写入 <code>lastRudderCmd_</code>，再返回给调用方。<code>AUTO_MANEUVER</code> 检测到序列完成时，若辨识试验正在运行，先收尾；随后直接设置航向模式和当前航向参考，并在<strong>同一周期</strong>调用航向控制链。</p>
+<h3>3.2 不同“切模式”入口并不等价</h3>
+<p><code>setMode(m)</code> 在目标模式与当前模式相同时直接返回；实际切换时执行 <code>pd.reset()</code>、取消试验。切入 <code>MANUAL/HOLD</code> 时调用 <code>tuner.suspend()</code>，切入 <code>AUTO_HEADING</code> 时设置 <code>pendingBaseline_</code>，让首个航向控制周期用真实舵角初始化限速基准。</p>
+<p><code>startManeuver()</code>、<code>startIdentifyTrial()</code> 和机动自然结束则直接赋值 <code>mode_</code>，<strong>没有转调 <code>setMode()</code></strong>。架构图中不能给这些路径自动补上 <code>reset/suspend/initBaseline</code> 的副作用。</p>
+<h3>3.3 Core 全部 17 个显式成员定义</h3>
+<table>
+<thead>
+<tr>
+<th>函数组</th>
+<th>职责/调用关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>AutopilotCore()</code></td>
+<td>显式 <code>= default</code>；组件初始化由各成员类型完成，图谱不展开编译器隐式调用</td>
+</tr>
+<tr>
+<td><code>setMode</code>、<code>setHeadingRef</code></td>
+<td>模式生命周期和参考更新</td>
+</tr>
+<tr>
+<td><code>startManeuver</code></td>
+<td><code>sequencer.setLegs</code>，进入机动模式</td>
+</tr>
+<tr>
+<td><code>startIdentifyTrial</code></td>
+<td><code>identifier.reset</code> → <code>zigzag(..., false)</code> → <code>setLegs</code>，试验置为 <code>RUNNING</code></td>
+</tr>
+<tr>
+<td><code>step</code>、<code>headingControlStep</code></td>
+<td>模式分派与完整航向控制链</td>
+</tr>
+<tr>
+<td><code>idSnapshot</code></td>
+<td>读取 <code>excited/valid/K/T</code>，形成快照</td>
+</tr>
+<tr>
+<td><code>finalizeIdentTrial</code></td>
+<td><code>idSnapshot</code> → <code>tuner.establishBaseline</code>，映射为 <code>OK/FAILED</code></td>
+</tr>
+<tr>
+<td><code>setTunerParams</code></td>
+<td><code>AutoTuner::setParams</code>，会触发调参器重置</td>
+</tr>
+<tr>
+<td><code>mode</code>、<code>identTrialState</code></td>
+<td>状态查询</td>
+</tr>
+<tr>
+<td><code>pd</code>、<code>identifier</code>、<code>tuner</code>、<code>sequencer</code></td>
+<td>组件只读访问器</td>
+</tr>
+<tr>
+<td><code>scheduleMut</code></td>
+<td>调度表可变访问器，供场景/标定替换整表</td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-5">4. 一个航向控制周期怎样执行</h2>
+<p><img src="../architecture/figures/03_heading_sequence.png" alt="航向控制调用顺序" /></p>
+<p>实际顺序如下，不能交换成“先 PD，后辨识调参”：</p>
+<pre><code class="language-text">AutopilotCore::headingControlStep(s, dt)
+  ① 若 pendingBaseline_：pd.initBaseline(s.rudderDeg)
+  ② schedule.query(s.speedKn, s.seaState, kp, kd)
+  ③ identifier.update(s.rudderDeg, s.rateDegS, dt)
+  ④ idSnapshot() → 构造 TunerInput
+  ⑤ tuner.tick(input) → GainCommand
+  ⑥ pd.setDt(dt) → pd.setGains(command.Kp, command.Kd)
+  ⑦ pd.update(headingRef_, s.headingDeg) → 舵角指令
+</code></pre>
+<p>注意：传给辨识和性能累计的是<strong>实际舵角反馈</strong>，不是刚计算出来的本拍新舵令；新舵令作用到对象后，其响应在后续采样周期才进入算法。</p>
+<h3>多个时间尺度</h3>
+<table>
+<thead>
+<tr>
+<th>时间尺度</th>
+<th>当前实现</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>控制周期</td>
+<td><code>step(s, dt)</code>；仿真通常 <code>dt=0.02 s</code></td>
+<td>名义 50 Hz，但函数本身不保证调度频率</td>
+</tr>
+<tr>
+<td>RLS 节拍</td>
+<td><code>NomotoIdentifier</code> 累加调用间隔，默认约 1 s 处理一次</td>
+<td>不是每次调用都进行参数递推</td>
+</tr>
+<tr>
+<td>ESC 逐样本通道</td>
+<td><code>accumulate</code>、<code>escDither</code></td>
+<td>成本高通、解调累积和载波</td>
+</tr>
+<tr>
+<td>ESC 窗口通道</td>
+<td><code>windowSec / Params::dt</code> 换算拍数</td>
+<td>窗口更新、稳定门和回退</td>
+</tr>
+<tr>
+<td>参考稳定资格</td>
+<td><code>refAgeSec_</code>，阈值 30 s</td>
+<td>控制是否向振荡检测器喂样本，不是整个 ESC 的总开关</td>
+</tr>
+</tbody>
+</table>
+<p><code>AutoTuner</code> 的参考稳定时间使用输入 <code>in.dt</code>，但 ESC 相位、积分、窗口拍数仍使用 <code>Params::dt</code>。Core 没有在每拍把传入 <code>dt</code> 自动同步到调参参数中，集成方需要维护一致的时间契约。</p>
+<h2 id="section-6">5. PD、增益调度与角度工具</h2>
+<p>源码：<a href="../../control/include/pd_controller.hpp">pd_controller.hpp</a>、<a href="../../control/include/gain_schedule.hpp">gain_schedule.hpp</a>、<a href="../../control/include/angle_utils.hpp">angle_utils.hpp</a>。</p>
+<p><img src="../architecture/figures/04_pd_schedule.png" alt="PD 与辅助模块" /></p>
+<h3>5.1 <code>PdController</code>：11 个定义</h3>
+<p><code>update(ref, heading)</code> 先通过最短角差计算误差。死区内更新必要误差状态并走 <code>saturate(0)</code>；否则先处理首拍/误差差分和微分低通，再计算 PD 输出。输出依次经过舵角幅值限制、舵速限制和量化，最后保存历史值。</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>调用或作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>默认构造、带参数构造</td>
+<td>后者调用 <code>setParams</code></td>
+</tr>
+<tr>
+<td><code>setParams</code></td>
+<td>保存参数、修正非正 <code>dt/quant</code> 后 <code>reset</code></td>
+</tr>
+<tr>
+<td><code>params</code>、<code>setGains</code>、<code>setDt</code></td>
+<td>读取参数、单独更新增益/周期；<code>setDt</code> 只接受正值</td>
+</tr>
+<tr>
+<td><code>initBaseline</code></td>
+<td>设置上一输出，避免自动接管时错误地从零舵爬升</td>
+</tr>
+<tr>
+<td><code>saturate</code></td>
+<td>原始舵令的限幅/限速/量化入口</td>
+</tr>
+<tr>
+<td><code>reset</code></td>
+<td>清历史误差、微分和输出，恢复首拍状态</td>
+</tr>
+<tr>
+<td><code>update</code></td>
+<td>航向误差到舵令的控制流程</td>
+</tr>
+<tr>
+<td><code>quantize</code></td>
+<td>使用 <code>std::round</code> 按分辨率量化</td>
+</tr>
+</tbody>
+</table>
+<p>这里的微分项来自航向误差差分，而不是简单直接拿 <code>SensorInput::rateDegS</code> 乘 <code>Kd</code>。单独的 <code>saturate</code> 路径供舵角机动和死区复用，不包含 PD 计算。</p>
+<h3>5.2 <code>GainSchedule</code>：4 个定义</h3>
+<p>构造函数安装默认表；<code>query</code> 将海况钳到 0～3，在对应海况的条目中按速度区间中点做线性插值。低速/高速超出中点范围时取端点，找不到该海况条目时使用 <code>Kp=1.0、Kd=0.5</code>。</p>
+<p><code>table()</code> 返回表的只读引用；<code>setTable()</code> 用外部表替换当前表。当前工作区的 <code>query</code> 为单次遍历，不在查询期间构造临时 <code>vector</code>。插值仍依赖传入条目的顺序；<code>setTable</code> 本身不承担排序与完整校验。</p>
+<h3>5.3 <code>angle_utils</code>：4 个定义</h3>
+<p><code>angleDiffDeg → normalizeAngleDeg</code>，<code>angleDiffRad → normalizeAngleRad</code>。这些工具处理跨角度边界的差值，被 PD、Core/调参、机动序列等复用。它们是纯计算辅助函数，不保存跨周期状态。</p>
+<h2 id="section-7">6. Nomoto 在线辨识</h2>
+<p>源码：<a href="../../control/include/nomoto_identifier.hpp">nomoto_identifier.hpp</a>。</p>
+<p><img src="../architecture/figures/05_rls.png" alt="RLS 更新流程" /></p>
+<h3>6.1 输入到估计的路径</h3>
+<p>辨识模型写成：</p>
+<pre><code class="language-text">r = K·δ − T·dr/dt
+φ = [δ/dScale, −dr/drScale]
+Khat = θ[0]/dScale；That = θ[1]/drScale
+</code></pre>
+<p><code>update(delta, r, dtNow)</code> 检查输入和节拍；达到辨识拍后，从历史角速度计算差分，要求舵角和角速度/角加速度满足激励门。通过后才构造归一化回归量、计算 RLS 增益、更新 θ/P，并为协方差对角线设置下界。</p>
+<p>未到节拍、激励不足或分母退化均可返回 <code>false</code>。<code>excited()</code> 表示保存的最近一次辨识拍激励状态，并不保证本次控制周期刚执行了递推。<code>valid()</code> 检查 <code>K/T</code> 有限及物理范围，不等于“已统计收敛”或“已通过全部控制稳定性检查”。</p>
+<h3>6.2 全部 10 个定义</h3>
+<p>两个构造函数均调用 <code>reset</code>；<code>setParams</code> 更新参数后重置；<code>params</code> 只读。<code>reset</code> 初始化 θ/P、角速度、计时和标记；<code>update</code> 是唯一在线递推主入口；<code>K</code>、<code>T</code> 反归一化；<code>excited</code> 读标记；<code>valid</code> 调用 <code>K/T</code> 后做物理范围检查。</p>
+<h2 id="section-8">7. AutoTuner：基线与 ESC 的唯一编排者</h2>
+<p>源码：<a href="../../control/include/auto_tuner.hpp">auto_tuner.hpp</a>。该头文件含 33 个显式定义：6 个 <code>RingBuffer</code> 成员、3 个振荡检测成员及 24 个 <code>AutoTuner</code> 成员/构造定义。</p>
+<p><img src="../architecture/figures/06_tuner_tick.png" alt="AutoTuner tick" /></p>
+<h3>7.1 <code>tick</code> 与四种增益角色</h3>
+<ol>
+<li>船速决定本拍 <code>enabled_</code>。</li>
+<li>尚无基线时，当前增益跟随调度名义值。</li>
+<li>启用且辨识快照有效、受激时，调用 <code>applyEstimate_</code>。</li>
+<li>检测参考变化，算最短角误差，调用 <code>accumulate</code>。</li>
+<li>到达窗口拍数时，调用 <code>settleWindow_</code>。</li>
+<li>复制当前中心增益；已建立基线时调用 <code>escDither</code>，返回 <code>GainCommand</code>。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>增益</th>
+<th>所属位置</th>
+<th>更新来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>调度名义值</td>
+<td><code>GainSchedule</code> / <code>TunerInput</code></td>
+<td>船速、海况、表标定</td>
+</tr>
+<tr>
+<td>基线值</td>
+<td><code>baselineKp_ / baselineKd_</code></td>
+<td>极点配置成功，供回退使用</td>
+</tr>
+<tr>
+<td>ESC 中心值</td>
+<td><code>curKp_ / curKd_</code></td>
+<td>首次接管、重基线、窗口接受或回退</td>
+</tr>
+<tr>
+<td>本拍实际值</td>
+<td>返回的 <code>GainCommand</code> / PD 参数</td>
+<td>中心值叠加乘性 sin/cos 扰动</td>
+</tr>
+</tbody>
+</table>
+<p>因此，“PD 中观测到增益变化”不必然等于 ESC 中心在收敛；也可能只是载波、调度变化或辨识重新建立基线。</p>
+<h3>7.2 建立基线与重基线</h3>
+<p><img src="../architecture/figures/07_baseline.png" alt="基线评估和接管" /></p>
+<p><code>tick → applyEstimate_(driftGate=true, forceRebase=false)</code> 是周期评估路径；<code>establishBaseline → applyEstimate_(false, true)</code> 是显式辨识试验/人工估计接管路径。后者先要求快照受激且有效，并以振荡幅度 0 进行代数稳定性检查。</p>
+<p><code>applyEstimate_</code> 先判断是否需要重估：已有基线且 <code>K/T</code> 漂移都在阈值内时，交给 ESC 自治，不重设增益。否则进行极点配置：</p>
+<pre><code class="language-text">Kp = ωn²·T/K
+Kd = max(0, (2·ζ·ωn·T − 1)/K)
+</code></pre>
+<p>随后 <code>stabilityCheck</code> 检查模型、候选增益、等效阻尼/自然频率和振荡幅度约束。成功才保存新基线、中心值、基线对应的 <code>K/T</code>；如果是重基线或强制接管，则 <code>rebaseEsc</code> 并重新对齐窗口计数。</p>
+<h3>7.3 ESC 逐拍和逐窗流程</h3>
+<p><img src="../architecture/figures/08_esc.png" alt="ESC 信号与窗口通道" /></p>
+<p><code>accumulate</code> 每拍把 <code>|e|、|δ|、|Δδ|</code> 写入三个 <code>RingBuffer</code>，按参考稳定资格更新振荡检测器。启用状态下，计算带时间权重的成本增量，通过高通去除慢变分量，再乘 sin/cos 载波进行解调累积。</p>
+<p><code>escDither</code> 为 <code>Kp/Kd</code> 分别乘上 <code>1+a·sin(phase)</code> 与 <code>1+a·cos(phase)</code> 并推进相位，不覆盖保存的中心值。</p>
+<p><code>settleWindow_</code> 内部要求已启用且已建立基线；它让 <code>escStep</code> 生成候选值，使用当前有效 <code>K/T</code> 和振荡测量检查候选，接受后写回中心，否则 <code>revert</code> 到基线。</p>
+<p><code>escStep</code> 的实际顺序是：</p>
+<pre><code class="language-text">computeJ
+ → 解调累积归一化
+ → 按窗口周期设计的梯度低通
+ → 梯度下降
+ → clampUpdate + 非负约束
+ → 清本窗口的样本、HPF 和解调累积
+</code></pre>
+<p><code>computeJ</code> 遍历当前保留的样本，并非 O(1) 查询；三个固定缓冲各有 3000 个 <code>double</code>，仅样本数据即为 72,000 字节。窗口容量和参数中的窗口时长不是两个自动联动的配置：超过容量后缓冲覆盖旧样本，阅读/移植时不能把无限长窗口当成无限历史存储。</p>
+<h3>7.4 重置操作不能混用</h3>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>主要作用</th>
+<th>不应误解为</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>reset</code></td>
+<td>初始化基线、中心、相位、窗口、检测器等调参内部状态</td>
+<td>仅清除一个窗口</td>
+</tr>
+<tr>
+<td><code>setParams</code></td>
+<td>保存新参数后调用 <code>reset</code></td>
+<td>无扰动的在线参数热更新</td>
+</tr>
+<tr>
+<td><code>rebaseEsc</code></td>
+<td>清梯度、HPF、解调累积、三个样本缓冲和上一舵角</td>
+<td>清相位、振荡检测器或参考稳定时间</td>
+</tr>
+<tr>
+<td><code>suspend</code></td>
+<td>禁用，调用 <code>rebaseEsc</code>，清窗口计数，保留基线/中心</td>
+<td>永久禁止后续 <code>tick</code> 依据速度再次启用</td>
+</tr>
+<tr>
+<td><code>revert(Kp,Kd)</code></td>
+<td>把传入引用赋为保存的基线</td>
+<td>自动重建整个调参器或自动清窗</td>
+</tr>
+</tbody>
+</table>
+<h3>7.5 其余函数的调用归类</h3>
+<table>
+<thead>
+<tr>
+<th>函数组</th>
+<th>包含的全部定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>生命周期/配置</td>
+<td>两个 <code>AutoTuner</code> 构造、<code>setParams</code>、<code>params</code>、<code>reset</code>、<code>suspend</code></td>
+</tr>
+<tr>
+<td>状态查询</td>
+<td><code>enabled</code>、<code>baselineEstablished</code>、<code>currentGains</code>、<code>oscDetector</code></td>
+</tr>
+<tr>
+<td>调参编排</td>
+<td><code>tick</code>、<code>establishBaseline</code>、<code>applyEstimate_</code>、<code>settleWindow_</code></td>
+</tr>
+<tr>
+<td>数值与基线</td>
+<td><code>polePlacement</code>、<code>stabilityCheck</code>、<code>setBaseline</code>、<code>revert</code></td>
+</tr>
+<tr>
+<td>ESC 实现</td>
+<td><code>computeJ</code>、<code>accumulate</code>、<code>escDither</code>、<code>escStep</code>、<code>rebaseEsc</code>、<code>clampUpdate</code></td>
+</tr>
+<tr>
+<td>振荡检测</td>
+<td><code>OscillationDetector::reset/update/amplitude</code></td>
+</tr>
+<tr>
+<td>缓冲容器</td>
+<td><code>RingBuffer::push/size/empty/full/clear/operator[]</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="section-9">8. 机动序列和自动辨识试验</h2>
+<p>源码：<a href="../../control/include/maneuver_sequencer.hpp">maneuver_sequencer.hpp</a>。</p>
+<p><img src="../architecture/figures/09_maneuver.png" alt="机动和试验调用链" /></p>
+<h3>8.1 航段更新</h3>
+<p><code>setLegs</code> 保存航段并重置进度；<code>update</code> 基于最短角差累计转角、累加时间，按当前 <code>Leg</code> 判断航向、时间或角速度触发条件。函数先构造<strong>当前段命令</strong>，再按条件推进索引，因此内部索引推进和返回新段命令不是同一件事。</p>
+<p>序列器只输出 <code>Cmd</code>，不直接操作执行器。Core 对航向段查询调度表并调用 PD，对舵角段调用 PD 的 <code>saturate</code>。<code>done/currentIndex/legs</code> 是三种只读观察入口。</p>
+<h3>8.2 六个机动工厂</h3>
+<table>
+<thead>
+<tr>
+<th>工厂函数</th>
+<th>生成内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>williamson</code></td>
+<td>Williamson 回转航段，末段保持反向航向</td>
+</tr>
+<tr>
+<td><code>uTurn</code></td>
+<td>U 形回转航段与后续航向保持</td>
+</tr>
+<tr>
+<td><code>zigzag</code></td>
+<td>多周期交替舵角/航向触发，可选择是否附加最终保持段</td>
+</tr>
+<tr>
+<td><code>circles</code></td>
+<td>按累计转角执行连续回转</td>
+</tr>
+<tr>
+<td><code>cloverleaf</code></td>
+<td>三叶草航段组合</td>
+</tr>
+<tr>
+<td><code>search</code></td>
+<td>分段延长的搜索航段组合</td>
+</tr>
+</tbody>
+</table>
+<p>工厂需要时调用角度归一化工具，返回 <code>vector&lt;Leg&gt;</code>。末段为 <code>Leg::Trigger::NONE</code> 时表示无限保持，不会自然 <code>done</code>；仿真 <code>runManeuver</code> 把进入最后保持段也纳入完成判据，不能把该指标解释成“全部航向误差已收敛”。</p>
+<h3>8.3 自动辨识试验的收尾</h3>
+<p><code>startIdentifyTrial</code> 重置 RLS，用 <code>zigzag(..., holdFinal=false)</code> 创建有限序列，试验置为 <code>RUNNING</code>。机动期间 Core 更新辨识器；序列结束调用 <code>finalizeIdentTrial → idSnapshot → establishBaseline</code>，根据接管结果变为 <code>OK/FAILED</code>，并继续航向控制。</p>
+<p>这里的成功表示当前估计通过快照条件和基线接管检查，不是长期 ESC 性能已经最优。</p>
+<h2 id="section-10">9. 参数存储架构与实际数据格式</h2>
+<p>源码：<a href="../../control/include/param_store.hpp">param_store.hpp</a>。</p>
+<p><img src="../architecture/figures/10_storage.png" alt="保存和读取流程" /></p>
+<h3>9.1 序列化布局</h3>
+<p><code>ControlParams::serialize</code> 使用显式小端字段编码，不直接保存 C++ 结构体内存，也不是 YAML：</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th style="text-align:right">字节数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8 个 <code>double</code>：舵角标定 3 项、最大舵速、<code>K/T/Kp/Kd</code></td>
+<td style="text-align:right">64</td>
+</tr>
+<tr>
+<td><code>version</code>、<code>timestamp</code>、<code>schedCount</code>，各 u32</td>
+<td style="text-align:right">12</td>
+</tr>
+<tr>
+<td>每条调度记录：速度上下界、海况、<code>Kp/Kd</code></td>
+<td style="text-align:right">36 × N</td>
+</tr>
+<tr>
+<td><code>save</code> 追加的 CRC32</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td>合计</td>
+<td style="text-align:right"><strong>80 + 36 × N</strong></td>
+</tr>
+</tbody>
+</table>
+<p><code>version</code> 在 <code>save</code> 中自增；当前代码没有单独的格式版本迁移分派。保存的字段也不是所有 <code>AutoTuner::Params</code> 或完整运行状态快照。</p>
+<h3>9.2 全部 14 个函数定义与实际调用</h3>
+<table>
+<thead>
+<tr>
+<th>函数组</th>
+<th>调用关系</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字节工具</td>
+<td><code>writeLEu32/writeLEf64/readLEu32/readLEf64</code>；浮点通过 <code>memcpy</code> 转换位模式</td>
+</tr>
+<tr>
+<td>CRC</td>
+<td><code>crc32</code>，IEEE 反射多项式 <code>0xEDB88320</code></td>
+</tr>
+<tr>
+<td>序列化</td>
+<td><code>serialize</code> 调用写入工具</td>
+</tr>
+<tr>
+<td>校验</td>
+<td><code>updateCrc/verifyCrc</code> 均调用 <code>serialize → crc32</code></td>
+</tr>
+<tr>
+<td>反序列化</td>
+<td><code>deserialize → deserializeFrom → readLE*</code></td>
+</tr>
+<tr>
+<td>范围校验</td>
+<td><code>validateRange</code>，独立接口</td>
+</tr>
+<tr>
+<td>存储抽象</td>
+<td><code>ParamStore</code> 构造保存 <code>ReadFn/WriteFn/ClockFn</code>；<code>save/load</code> 调用外部回调</td>
+</tr>
+</tbody>
+</table>
+<p><code>save</code> 先可选地更新时间戳、增加版本号，再计算 CRC、序列化并调用写入回调。<code>load</code> 通过回调读取固定 4096 字节缓冲，解析字段、读取尾部 CRC，返回 <code>verifyCrc</code> 结果；各失败分支提前返回。</p>
+<h3>9.3 已实现与尚未接通</h3>
+<p>已实现的是字节格式、CRC 和可注入存储 I/O。尚未接通的是具体 Flash/EEPROM 地址、硬件驱动、启动加载后向各算法应用参数、掉电双槽、写入失败回滚。</p>
+<p>尤其要以函数体为准：虽然文件头注释提到加载后范围检查，<strong>当前 <code>load</code> 实际没有调用 <code>validateRange</code></strong>。反序列化还会直接修改目标对象，因此不能把失败描述为“完全不影响原参数”。图中将独立校验与集成工作画成未接通的边界，而不是已经存在的调用链。</p>
+<h2 id="section-11">10. 仿真系统的入口、对象与输出</h2>
+<p>源码：<a href="../../control/sim/main.cpp">main.cpp</a>、<a href="../../control/sim/simulator.hpp">simulator.hpp</a>、<a href="../../control/sim/nomoto_plant.hpp">nomoto_plant.hpp</a>、<a href="../../control/sim/disturbances.hpp">disturbances.hpp</a>、<a href="../../control/sim/scenarios.hpp">scenarios.hpp</a>。</p>
+<p><img src="../architecture/figures/11_sim.png" alt="仿真调用链" /></p>
+<h3>10.1 命令行入口</h3>
+<p><code>main</code> 通过 <code>parseDouble/parseInt</code> 和局部 <code>takeVal</code> lambda 处理选项。<code>printHelp</code> 显示用法；<code>defaultManeuverSec</code> 提供默认机动时长；另一个局部 lambda 计算显示用的 J 散布。</p>
+<p>现有分派是按代码顺序判定，不是并行执行全部实验。<code>--list</code> 后，主要场景的优先顺序是 <code>ident → trial → tune → esc → validate → maneuver → step/--all</code>。多个实验标志同时存在时，不应自行假定它们互斥或都会运行。</p>
+<h3>10.2 <code>Simulator</code> 的全部 13 个定义</h3>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>工作流与输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>autoLegSec</code></td>
+<td>根据模型与目标动态特性计算激励航段时长</td>
+</tr>
+<tr>
+<td><code>runStep</code></td>
+<td>配置模式/调度 → 航向阶跃闭环 → <code>computeMetrics</code></td>
+</tr>
+<tr>
+<td><code>runIdent</code></td>
+<td>使用 <code>AUTO_HEADING</code> 大幅参考阶跃形成激励 → 返回 <code>Khat/That/valid/excited</code></td>
+</tr>
+<tr>
+<td><code>runEsc</code></td>
+<td>长期交替参考激励 → RLS/基线/ESC → 有界性与增益变化等结果</td>
+</tr>
+<tr>
+<td><code>runTuneConvergence</code></td>
+<td>记录中心增益、实际增益、估计、窗口指标 → 收敛判据</td>
+</tr>
+<tr>
+<td><code>runManeuver</code></td>
+<td>安装机动航段 → Core/Plant 循环 → 机动完成和边界检查</td>
+</tr>
+<tr>
+<td><code>runIdentTrial</code></td>
+<td><code>startIdentifyTrial</code> → 循环至试验结束/超时 → 接管结果</td>
+</tr>
+<tr>
+<td><code>runValidation</code></td>
+<td>可选扰动的闭环验收，主机计时 → 控制指标</td>
+</tr>
+<tr>
+<td><code>computeMetrics</code></td>
+<td>超调、调节时间、稳态偏差/标准差、舵令反转频率等</td>
+</tr>
+<tr>
+<td><code>exportCsv</code> 两个重载、<code>exportLastCsv</code></td>
+<td>输出一般轨迹 CSV</td>
+</tr>
+<tr>
+<td><code>exportTuneCsv</code></td>
+<td>输出调参收敛轨迹与窗口信息</td>
+</tr>
+</tbody>
+</table>
+<p><code>runIdent</code> 的旧注释提到手动注舵，但实际代码在循环中设置 <code>AUTO_HEADING</code> 和大航向阶跃，再调用 <code>ap.step</code>。因此它不是直接绕过 Core 的开环 RLS 实验。</p>
+<p><code>runTuneConvergence</code> 不只看最终增益是否变化，还要求基线建立、辨识有效、至少 4 个窗口、末 3 窗 J 散布不超过 10%、末窗不劣于首窗超过 2%、模型估计相对误差不超过 25% 以及全程有界。窗口事件当前通过 <code>Jpre&gt;0 &amp;&amp; Jpost==0</code> 推断，不能当成调参器提供的独立事件接口。</p>
+<h3>10.3 模型与扰动的其余函数</h3>
+<p><code>NomotoPlant::reset</code> 初始化船态；<code>step</code> 对执行器施加滞后、舵速和舵角约束，再积分一阶 Nomoto 角速度与航向。它是软件被控对象，不是生产控制器。</p>
+<p>扰动模块含 <code>lcg</code>、<code>seaFactor</code>、<code>setSeaState</code>、<code>disturbAngle</code>、<code>noisyHeading</code>、<code>noisyRate</code>：海况决定扰动尺度，周期分量构造外扰，传感器噪声由伪随机数构造。当前噪声不是高斯采样，不能仅凭参数名中的 <code>Sigma</code> 就画成高斯噪声源。</p>
+<p><code>defaultMatrix</code> 提供默认船型/场景集合。<code>runValidation</code> 中的执行耗时来自主机 <code>steady_clock</code>，并不证明 STM32/RH850 上满足同样的实时预算。</p>
+<h2 id="section-12">11. 调参调试 API、CLI 与 Python 监视器</h2>
+<p>源码：<a href="../../control/include/tuner_debug_api.hpp">tuner_debug_api.hpp</a>、<a href="../../control/tools/tuner_debug_cli.cpp">tuner_debug_cli.cpp</a>、<a href="../../control/tools/tuner_debug_monitor.py">tuner_debug_monitor.py</a>、<a href="../../control/tools/tuner_debug_accept.py">tuner_debug_accept.py</a>。</p>
+<p><img src="../architecture/figures/12_debug.png" alt="调试调用链" /></p>
+<h3>11.1 <code>TunerDebugApi</code> 的全部 27 个定义</h3>
+<table>
+<thead>
+<tr>
+<th>分组</th>
+<th>接口</th>
+<th>实际目的</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>构造</td>
+<td><code>TunerDebugApi</code></td>
+<td>持有外部 <code>AutoTuner&amp;</code>，不创建另一个调参算法</td>
+</tr>
+<tr>
+<td>只读</td>
+<td><code>snapshot/currentJ/oscAmplitude/params</code></td>
+<td>观察内部状态、J、振荡与参数</td>
+</tr>
+<tr>
+<td>数值检查</td>
+<td><code>polePlacement/stabilityCheck/clampUpdate</code></td>
+<td>包装对应算法函数</td>
+</tr>
+<tr>
+<td>基线</td>
+<td><code>establishBaseline/evaluateEstimate</code></td>
+<td>显式接管或调用内部估计评估路径</td>
+</tr>
+<tr>
+<td>单步执行</td>
+<td><code>ditherOnce/accumulateOnce/escStepOnce/settleWindowOnce</code></td>
+<td>拆开正常 <code>tick</code> 做实验</td>
+</tr>
+<tr>
+<td>振荡检测</td>
+<td><code>oscFeed/oscReset</code></td>
+<td>调用嵌套检测器的更新/重置</td>
+</tr>
+<tr>
+<td>生命周期</td>
+<td><code>tick/suspend/reset/setParams</code></td>
+<td>转发到调参器</td>
+</tr>
+<tr>
+<td>恢复</td>
+<td><code>revertToBaseline/rebaseEsc</code></td>
+<td>读取回退增益或清理 ESC 测量状态</td>
+</tr>
+<tr>
+<td>强制状态</td>
+<td><code>forceGains/forceBaseline/forceEscPhase/forceGradient/forceEnabled</code></td>
+<td>直接设置内部字段，绕过正常准入条件</td>
+</tr>
+</tbody>
+</table>
+<p><code>revertToBaseline</code> 把基线填到传入引用，不自动改当前中心；<code>forceBaseline</code> 也不能视为完整的 <code>establishBaseline</code>，因为它没有走估计、稳定门和全部基线元信息维护路径。</p>
+<h3>11.2 CLI 的 5 个定义</h3>
+<p><code>main</code> 构造 <code>AutoTuner</code> 和调试包装器，逐行读取命令并进入相应分支；<code>readN</code> 读取数值参数；<code>printHelp/printSnapshot/printParams</code> 负责输出。</p>
+<p>典型映射：<code>status → snapshot</code>，<code>j → currentJ</code>，<code>pole/check → polePlacement/stabilityCheck</code>，<code>baseline/eval → establishBaseline/evaluateEstimate</code>，<code>accum/dither/step/settle → 单步接口</code>，<code>tick → tick</code>。<code>setparam</code> 经 <code>params → 修改副本 → setParams</code>，因此会重置调参状态。</p>
+<p>CLI 是本机标准输入/输出协议，没有在仓库中实现网络服务器或 ECU 串口驱动。</p>
+<h3>11.3 Python 跨进程关系</h3>
+<p><code>tuner_debug_accept.py</code> 的 <code>main</code> 经 <code>Cli.__init__</code> 启动 CLI；<code>cmd</code> 写命令/读回复，<code>fields</code> 解析键值，<code>check</code> 记录断言，<code>close</code> 收尾。其函数图中“子进程启动”与“C++ 普通函数调用”是不同边界。</p>
+<p>监视器使用 <code>DebugLink.__init__/cmd/status/close</code> 封装带锁通信。<code>Monitor.run</code> 创建轮询、控制台及可选演示线程：</p>
+<ul>
+<li><code>poll_loop → link.status</code>，记录历史及可选 CSV。</li>
+<li><code>console_loop → link.cmd</code>，转发用户命令。</li>
+<li><code>demo_loop</code> 注入人工误差/舵角序列并调用单步调参命令，不连接 <code>NomotoPlant</code>，不是完整闭环验收。</li>
+<li><code>build_fig → draw → snapshot</code> 构造图形；动画 <code>update</code> 回调或无界面输出触发绘图，局部 <code>g</code> 辅助函数抽取历史字段。</li>
+<li>顶层 <code>main</code> 解析参数并执行 <code>Monitor(args).run()</code>。</li>
+</ul>
+<h2 id="section-13">12. 浏览器界面的独立事件架构</h2>
+<p>源码：<a href="../../control/ui/debug_ui.html">debug_ui.html</a>。</p>
+<p><img src="../architecture/figures/13_ui.png" alt="网页事件流程" /></p>
+<h3>12.1 不是 C++ 控制库的前端绑定</h3>
+<p>网页定义了独立的 <code>pdUpdate/schedQuery/idUpdate/polePlacement/stabilityCheck/escStep</code> 等 JavaScript 算法。名称相似不代表直接调用 C++；仓库未提供 WASM 绑定，也未提供 WebSocket ECU 服务端。</p>
+<p>网页调度是区间选择，与 C++ 中点插值不同；网页辨识没有照搬 C++ 的归一化与自降频；网页 ESC 仍使用窗口差值相关的简化算法。架构说明必须把它们画成两个实现域，不应混合解释为同一套实时控制路径。</p>
+<h3>12.2 控制、显示和消息分离</h3>
+<p>开始仿真按钮注册 <code>setInterval(controlStep, ...)</code>。<code>controlStep</code> 在仿真启用时先调用 <code>simStep</code>，再按当前模式执行网页算法，更新命令/历史，然后 <code>updateStatusUI → drawPlots</code>。有 WebSocket 连接时还可能发送 <code>cmd</code> JSON。</p>
+<p>WebSocket 的 <code>onmessage</code> 对 <code>sensor</code> 消息合并 <code>State.sensor</code>，对确认/状态消息记录日志，<strong>没有调用 <code>controlStep</code></strong>。所以不能画成“收到一个硬件样本就运行一次 C++ 控制”。浏览器计时器也不提供 MCU 实时保证。</p>
+<h3>12.3 网页全部函数的分组导航</h3>
+<table>
+<thead>
+<tr>
+<th>分组</th>
+<th>命名函数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>基础/界面</td>
+<td><code>$</code>、<code>normDeg</code>、<code>diffDeg</code>、<code>clamp</code>、<code>log</code>、<code>setStatus</code></td>
+</tr>
+<tr>
+<td>参数消息与下载</td>
+<td><code>sendParamsToEcu</code>、<code>buildCsv</code>、<code>buildJson</code>、<code>downloadFile</code></td>
+</tr>
+<tr>
+<td>控制与调参</td>
+<td><code>pdUpdate</code>、<code>schedQuery</code>、<code>idUpdate</code>、<code>polePlacement</code>、<code>stabilityCheck</code>、<code>escStep</code>、<code>clampUpdate</code>、<code>accumulateJ</code>、<code>computeJ</code></td>
+</tr>
+<tr>
+<td>机动</td>
+<td><code>mvSetLegs</code>、<code>mvUpdate</code>、<code>mvWilliamson</code>、<code>mvUTurn</code>、<code>mvZigzag</code>、<code>mvCircles</code>、<code>mvCloverleaf</code>、<code>mvSearch</code></td>
+</tr>
+<tr>
+<td>周期与绘图</td>
+<td><code>simStep</code>、<code>controlStep</code>、<code>updateStatusUI</code>、<code>setupCanvas</code>、<code>drawSeries</code>、<code>drawPlots</code></td>
+</tr>
+<tr>
+<td>表单辅助</td>
+<td><code>renderSchedTable</code>、<code>bindSlider</code></td>
+</tr>
+<tr>
+<td>匿名函数/回调</td>
+<td>页签、模式、仿真启停、参数应用、调度行编辑/删除、机动、保存/加载、WebSocket、滑块、导出等箭头函数；逐项见图谱</td>
+</tr>
+</tbody>
+</table>
+<p>网页的 <code>psSave/psLoad</code> 按钮读写的是内存 <code>State</code>，不是文件系统/Flash 的持久化实现。网页所显示/计算的 CRC 也不能当成 C++ <code>crc32</code> 的一致性验证。</p>
+<h2 id="section-14">13. 测试、绘图、动画与文档工具</h2>
+<p><img src="../architecture/figures/14_tools_tests.png" alt="测试与辅助工具" /></p>
+<h3>13.1 测试是另一组调用入口</h3>
+<p>当前源码包含 <strong>110 个 <code>TEST(...)</code> 测试体</strong>，分布在 9 个文件。图谱把每个宏测试体显示为 <code>TEST(套件,用例)</code>，而不是把所有测试挤成同名 <code>TEST</code> 节点；测试辅助函数、存储 lambda 也单列。</p>
+<table>
+<thead>
+<tr>
+<th>测试文件</th>
+<th>调用的主要模块</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_angle_utils.cpp</code></td>
+<td>归一化、最短角差</td>
+</tr>
+<tr>
+<td><code>test_pd_controller.cpp</code></td>
+<td>PD 更新、限幅、限速、量化与初始化</td>
+</tr>
+<tr>
+<td><code>test_gain_schedule.cpp</code></td>
+<td>默认表、插值、边界、缺海况/替换表等当前测试</td>
+</tr>
+<tr>
+<td><code>test_nomoto_identifier.cpp</code></td>
+<td>RLS、激励条件、输入处理与估计</td>
+</tr>
+<tr>
+<td><code>test_auto_tuner.cpp</code></td>
+<td>tick、基线、门控、重基线与状态维护</td>
+</tr>
+<tr>
+<td><code>test_maneuver_sequencer.cpp</code></td>
+<td>航段推进与机动工厂</td>
+</tr>
+<tr>
+<td><code>test_param_store.cpp</code></td>
+<td>序列化、CRC、注入读写/时钟</td>
+</tr>
+<tr>
+<td><code>test_autopilot_core.cpp</code></td>
+<td>模式、机动、辨识试验及集成链</td>
+</tr>
+<tr>
+<td><code>test_tuner_debug_api.cpp</code></td>
+<td>调试包装器与单步/强制状态接口</td>
+</tr>
+</tbody>
+</table>
+<p>另有 6 个仿真 CTest 注册项。上述数字来自源码盘点，<strong>不是本次执行测试后的通过数量</strong>。本次验证对象是文档、图谱和链接，未重新运行算法测试。</p>
+<h3>13.2 离线结果处理</h3>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>主要调用流程</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>plot_sim.py</code></td>
+<td><code>main → load_csv → compute_metrics/print_metrics_table → plot_multipane/plot_multipane_overlay/plot_polar</code>；复用 <code>_annotate_mode_changes/_polar_path</code></td>
+</tr>
+<tr>
+<td><code>plot_convergence.py</code></td>
+<td>读取收敛 CSV、推断/读取真值、绘制参数和性能曲线；辅助函数与 lambda 见索引</td>
+</tr>
+<tr>
+<td><code>animate_sim.py</code></td>
+<td><code>main → load_csv → animate → init/update</code> 动画回调；<code>pick_writer</code> 选择输出后端</td>
+</tr>
+<tr>
+<td><code>gen_all_videos.sh</code></td>
+<td>顶层调用 <code>gen</code>，启动 <code>ar_sim</code> 生成 CSV，再启动动画脚本</td>
+</tr>
+<tr>
+<td><code>gen_maneuver_matrix.sh</code></td>
+<td>三类船 × 六类机动 × 两种扰动；<code>duration_for</code> 决定时长，启动仿真/动画子进程</td>
+</tr>
+</tbody>
+</table>
+<p>Shell 图中的 <code>$SIM/$ANIM</code> 是外部进程，不是与 C++ 算法同栈的函数调用。视频生成脚本有写入/覆盖输出的副作用，阅读架构无需运行它们。</p>
+<h3>13.3 研究与文档脚本也纳入全函数清单</h3>
+<table>
+<thead>
+<tr>
+<th>目录/入口</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docs/auto_tuning/*.py</code></td>
+<td>调参与辨识流程图</td>
+</tr>
+<tr>
+<td><code>docs/adaptive_autopilot_research/figs/*.py</code></td>
+<td>自适应控制、残差、频谱等研究插图</td>
+</tr>
+<tr>
+<td><code>docs/esc_paper_zh/*.py</code></td>
+<td>论文插图提取和阅读引导图</td>
+</tr>
+<tr>
+<td><code>docs/esc_parameter_reduction/generate_figures.py</code></td>
+<td>ESC 减参方案图</td>
+</tr>
+<tr>
+<td><code>docs/project_overview/*.py</code></td>
+<td>工程概览图及 HTML 排版</td>
+</tr>
+<tr>
+<td><code>docs/ship_energy_research/*.py</code></td>
+<td>研究图表、PPTX 和 PDF 渲染</td>
+</tr>
+<tr>
+<td><code>md2pdf.py</code></td>
+<td><code>main → md_to_html → html_to_pdf</code>，含 Markdown/数学/链接/资源处理辅助函数</td>
+</tr>
+<tr>
+<td><code>docs/optimization_assets/*probe.cpp</code></td>
+<td>两个独立诊断入口及辅助函数；不是 <code>control/CMakeLists</code> 默认构建目标</td>
+</tr>
+</tbody>
+</table>
+<p>部分研究脚本只有顶层代码、没有命名函数；仍以 <code>&lt;module entry&gt;</code> 收录其执行入口。图谱生成过程不会导入/执行这些项目脚本，避免分析时意外生成文档、启动浏览器或覆盖实验结果。</p>
+<h2 id="section-15">14. 集成边界与读图时常见误区</h2>
+<table>
+<thead>
+<tr>
+<th>容易误读的连线</th>
+<th>当前源码事实</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>include param_store.hpp</code> → 自动从 Flash 恢复全部参数</td>
+<td>只有编译依赖，没有 Core 的加载/应用调用</td>
+</tr>
+<tr>
+<td>网页按钮 → 同名 C++ 函数</td>
+<td>是独立 JS 实现；没有直接绑定</td>
+</tr>
+<tr>
+<td>WebSocket 传感器消息 → 执行一次控制</td>
+<td>仅更新 <code>State.sensor</code>，没有触发 <code>controlStep</code></td>
+</tr>
+<tr>
+<td>任何模式切换 → <code>setMode</code> 的清理逻辑</td>
+<td>启动机动、启动试验和机动结束有直接赋值路径</td>
+</tr>
+<tr>
+<td>任意自动模式 → RLS 与 ESC 每拍执行</td>
+<td>完整链主要在航向模式；机动试验有单独的辨识支路</td>
+</tr>
+<tr>
+<td><code>valid()==true</code> → 辨识充分收敛</td>
+<td>只说明当前模型估计通过物理范围检查</td>
+</tr>
+<tr>
+<td>增益变化 → ESC 中心更新成功</td>
+<td>还可能来自载波、调度或极点配置接管</td>
+</tr>
+<tr>
+<td><code>load()==true</code> → 已通过完整参数范围检查</td>
+<td>当前 load 只完成解析与 CRC 路径，范围校验独立</td>
+</tr>
+<tr>
+<td>Linux 仿真通过 → MCU 实时/存储集成完成</td>
+<td>芯片启动、I/O、调度、内存和时序仍属外部集成职责</td>
+</tr>
+</tbody>
+</table>
+<p>正常硬件集成的边界可以概括为：<strong>调用方采集并校验传感器 → 保证时间契约 → 调用持久存在的 Core → 校验/下发舵令</strong>；配置加载、通信和非易失写入位于外围。这里说明职责边界，不宣称仓库已有这些 BSP 实现。</p>
+<h2 id="section-16">15. 图谱复现、验证与维护</h2>
+<h3>15.1 重新生成</h3>
+<p>在仓库根目录运行：</p>
+<pre><code class="language-bash">python3 docs/architecture/generate_call_atlas.py
+python3 docs/architecture/generate_diagrams.py
+python3 docs/architecture/render_document.py
+python3 docs/architecture/validate_artifacts.py
+</code></pre>
+<p>第一条仅依赖 Python 标准库与 <code>rg</code>；可读取现有 CodeGraph SQLite 数据库，但不要求网络或重新索引。没有数据库时会保留词法/AST 路径，并减少可解析边。</p>
+<p>第二条依赖 Matplotlib 与 Noto Sans CJK 字体，输出 PNG 和保留文字的 SVG。分层图是人工按源码编排的说明图，算法变更后应同步审阅图中的条件/顺序，不是运行生成器就会自动适应任何控制逻辑变动。</p>
+<p>第三条依赖 <code>markdown-it-py</code>，把主文档渲染为带目录的离线 HTML；没有外部字体、脚本或 CDN 请求。</p>
+<p>第四条使用 <code>markdown-it-py</code> 与 Pillow 校验源码哈希、节点/边、HTML ID、全部本地链接/锚点和图像文件，并检查存储、调试和网页的关键调用边界。</p>
+<h3>15.2 本次验证口径</h3>
+<ul>
+<li>重新扫描当前源码定义；Python 以 AST 对照全部函数/异步函数/lambda，C++ 测试以当前 <code>TEST(...)</code> 宏对照。</li>
+<li>对源码哈希匹配文件，用 CodeGraph 定义交叉检查 C++ 清单，过期文件不复用调用位置。</li>
+<li>检查所有函数节点有唯一 ID、一张 SVG 卡片，所有内部调用边目标存在。</li>
+<li>人工核对 Core、RLS、调参、机动、参数存储、仿真和网页的关键条件与执行顺序。</li>
+<li>检查主文档及附录链接、PNG/SVG 产物，并抽查图形可读性。</li>
+</ul>
+<p>后续修改代码时，先重新生成索引/图谱，比较 <code>functions.json</code> 中的文件哈希和定义数量，再审阅受影响的分层图和文字。保留未解析项的可见性，比把动态/外部调用强行画成确定直连更有利于维护。</p>
+<h2 id="section-17">16. 源码与已有设计资料</h2>
+<p>本说明以当前函数体为依据。领域术语与 R1 职责边界参照 <a href="../../CONTEXT.md">CONTEXT.md</a>；此前的 <a href="../%E5%B7%A5%E7%A8%8B%E4%BC%98%E5%8C%96%E5%88%86%E6%9E%90%E6%8A%A5%E5%91%8A.md">工程优化分析报告</a>、<a href="../ESC%E5%87%8F%E5%8F%82%E6%96%B9%E6%A1%88%E8%AE%BE%E8%AE%A1%E6%96%87%E6%A1%A3.md">ESC 减参方案设计文档</a> 可作为优化方向补充，不能替代当前实现事实。</p>
+<p>查某一个函数时，从 <a href="../architecture/%E5%85%A8%E5%87%BD%E6%95%B0%E7%B4%A2%E5%BC%95.md">全函数索引</a> 跳转到 <a href="../architecture/call_atlas.html">交互图谱</a>，即可看到当前行号、源码摘录、调用者、全部已解析的项目内被调用者及尚未解析的调用表达式。</p>
+</main></body></html>

@@ -43,35 +43,35 @@ public:
     void query(double speedKn, int seaState, double& Kp, double& Kd) const {
         seaState = std::max(0, std::min(3, seaState));
 
-        const GainPoint* seg[8] = {};
-        int n = 0;
+        const GainPoint* prev = nullptr;
+        double prevMid = 0.0;
         for (const auto& pt : table_) {
             if (pt.seaState != seaState) continue;
-            if (n < 8) seg[n++] = &pt;
-        }
-        if (n == 0) { Kp = 1.0; Kd = 0.5; return; }
+            const double mid = 0.5 * (pt.speedMin + pt.speedMax);
 
-        // 计算各段中点
-        double mid[8];
-        for (int i = 0; i < n; ++i) mid[i] = 0.5 * (seg[i]->speedMin + seg[i]->speedMax);
+            // 低于最低段中点 → 取首段名义值
+            if (prev == nullptr) {
+                if (speedKn <= mid) { Kp = pt.Kp; Kd = pt.Kd; return; }
+                prev = &pt;
+                prevMid = mid;
+                continue;
+            }
 
-        // 低于最低段中点 → 取首段名义值
-        if (speedKn <= mid[0]) { Kp = seg[0]->Kp; Kd = seg[0]->Kd; return; }
-        // 高于最高段中点 → 取末段名义值
-        if (speedKn >= mid[n-1]) { Kp = seg[n-1]->Kp; Kd = seg[n-1]->Kd; return; }
-
-        // 在 [mid[i], mid[i+1]] 间插值
-        for (int i = 0; i < n - 1; ++i) {
-            if (speedKn >= mid[i] && speedKn <= mid[i+1]) {
-                const double span = mid[i+1] - mid[i];
-                const double f = (span > 1e-9) ? (speedKn - mid[i]) / span : 0.0;
-                Kp = seg[i]->Kp + f * (seg[i+1]->Kp - seg[i]->Kp);
-                Kd = seg[i]->Kd + f * (seg[i+1]->Kd - seg[i]->Kd);
+            // 在相邻中点间插值；单次遍历避免控制周期内额外分配内存。
+            if (speedKn <= mid) {
+                const double span = mid - prevMid;
+                const double f = (span > 1e-9) ? (speedKn - prevMid) / span : 0.0;
+                Kp = prev->Kp + f * (pt.Kp - prev->Kp);
+                Kd = prev->Kd + f * (pt.Kd - prev->Kd);
                 return;
             }
+            prev = &pt;
+            prevMid = mid;
         }
-        // 兜底
-        Kp = seg[n-1]->Kp; Kd = seg[n-1]->Kd;
+
+        if (prev == nullptr) { Kp = 1.0; Kd = 0.5; return; }
+        // 高于最高段中点（NaN 也落入兜底）→ 取末段名义值
+        Kp = prev->Kp; Kd = prev->Kd;
     }
 
     const std::vector<GainPoint>& table() const { return table_; }

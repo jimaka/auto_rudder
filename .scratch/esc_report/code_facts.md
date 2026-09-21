@@ -36,6 +36,7 @@
 **`GainCommand`**（tick() 每拍输出，已含 ESC 扰动载波）— `auto_tuner.hpp:51-54`：`double Kp; double Kd;`
 
 **`RingBuffer<T,N>`**（固定容量环形数组，无堆分配，P2 整改）— `auto_tuner.hpp:57-78`
+
 - `push` 覆写最旧元素（`:60-64`）；`size/empty/full/clear`（`:65-68`）；`operator[]` 按写入顺序（最旧→最新）遍历（`:70-73`）。
 - 私有：`buf_[N]={}`、`head_=0`、`size_=0`（`:75-77`）。
 
@@ -253,6 +254,7 @@ if (!isfinite(wn) || !isfinite(zeta)) return false;
 ### 2.10 `OscillationDetector` 振荡检测 — `auto_tuner.hpp:257-292`
 
 基于航向误差**峰-峰幅值**估计（跨完整周期）：
+
 - `update(e, dt)`（`:265-285`）：跟踪误差符号；过零时结算——刚结束正半周则保存 `lastPosPeak_=maxPos_` 并重置 `maxPos_`；刚结束负半周则保存 `lastNegPeak_=minNeg_`、重置 `minNeg_`，并计算 `pp = lastPosPeak_ - lastNegPeak_`：若 `pp > amp_` 直接取大者（保守），否则 `amp_ = 0.9·amp_ + 0.1·pp` 平滑衰减。
 - 非过零拍持续刷新当前半周极值（`:282-283`）。
 - `reset()`（`:260-264`）清空含历史峰在内的全部状态（P11：防止上一窗口峰值泄漏）。
@@ -275,6 +277,7 @@ return true;
 ```
 
 两条调用路径：
+
 - tick 周期路径（`:159-160`）：`driftGate=true, forceRebase=false`，osc 取 `oscDetector_.amplitude()`。
 - establishBaseline 一次性路径（`:192-193`）：`driftGate=false, forceRebase=true`，osc 恒传 0（机动刚结束振荡测量无效，由 ζ/ωn 代数条件把关）。
 
@@ -363,6 +366,7 @@ Kd = max(kdRaw, 0)                                   // :235 负 Kd 会反向放
 ```
 
 公式推导对应（PD + Nomoto 一阶模型闭环）：
+
 - 对象 `T·ṙ + r = K·δ`，PD 律 `δ = Kp·e + Kd·ė`（e = ref − ψ，r = ψ̇），闭环特征多项式 `T·s² + (1 + K·Kd)·s + K·Kp`。
 - 与标准二阶 `s² + 2ζωn·s + ωn²` 对比得：`ωn² = Kp·K/T`，`2ζωn = (1 + K·Kd)/T`。
 - 反解即代码两式：`Kp = ωn²·T/K`，`Kd = (2ζωn·T − 1)/K`。

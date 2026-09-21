@@ -3,6 +3,7 @@
 #include "nomoto_plant.hpp"
 #include "disturbances.hpp"
 #include <autopilot_core.hpp>  // include 路径由 ar_headers INTERFACE 目标提供
+#include <tuner_debug_api.hpp> // 仿真遥测只读快照，不调用调试写接口
 #include <vector>
 #include <string>
 #include <cstdio>
@@ -343,6 +344,8 @@ public:
         bool   baseline = false;
         double Jwindow = 0.0;                  // 本拍结算的窗口 J（非结算拍为 0）
         int    winIndex = 0;                   // 已结算窗口序号（自基线建立后计数）
+        double currentJ = 0.0;                // 本拍结束后尚未结算的窗口代价
+        TunerDebugApi::Snapshot esc{};         // 实际梯度/上窗代价；不是由增益差分反推
     };
 
     struct TuneResult {
@@ -439,6 +442,8 @@ public:
                 se.That = ap.identifier().T();
                 se.identValid = ap.identifier().valid();
                 se.baseline = true;
+                se.currentJ = Jpost;
+                se.esc = TunerDebugApi::snapshotOf(ap.tuner());
                 r.settles.push_back(se);
                 if (winIndex == 1) { r.Jfirst = Jpre; }
                 r.Jlast = Jpre;
@@ -455,6 +460,8 @@ public:
                 sm.Khat = ap.identifier().K(); sm.That = ap.identifier().T();
                 sm.identValid = ap.identifier().valid();
                 sm.baseline = ap.tuner().baselineEstablished();
+                sm.currentJ = Jpost;
+                sm.esc = TunerDebugApi::snapshotOf(ap.tuner());
                 if (Jpost == 0.0 && Jpre > 0.0) {  // 结算拍：行内携带窗口 J
                     sm.Jwindow = Jpre;
                     sm.winIndex = winIndex;
@@ -505,24 +512,31 @@ public:
             return;
         }
         std::fprintf(f, "index,t,psi,psiRef,rudderCmd,rudderAct,rate,error,Kp,Kd,"
-                        "KpCenter,KdCenter,Khat,That,identValid,baseline,Jwindow,winIndex,settle\n");
+                        "KpCenter,KdCenter,Khat,That,identValid,baseline,Jwindow,winIndex,settle,"
+                        "currentJ,lastJ,gradKp,gradKd,hpfY,escPhase,enabled\n");
         for (size_t i = 0; i < r.samples.size(); ++i) {
             const auto& s = r.samples[i];
             std::fprintf(f, "%zu,%.3f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.6f,%.6f,"
-                            "%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%d,%d\n",
+                            "%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%d,%d,"
+                            "%.10g,%.10g,%.10g,%.10g,%.10g,%.10g,%d\n",
                          i, s.t, s.psi, s.psiRef, s.rudderCmd, s.rudderAct,
                          s.rate, s.err, s.Kp, s.Kd, s.KpCenter, s.KdCenter,
                          s.Khat, s.That, (int)s.identValid, (int)s.baseline,
-                         s.Jwindow, s.winIndex, 0);
+                         s.Jwindow, s.winIndex, 0, s.currentJ, s.esc.lastJ,
+                         s.esc.gradKp, s.esc.gradKd, s.esc.hpfY, s.esc.escPhase,
+                         (int)s.esc.enabled);
         }
         size_t idx = r.samples.size();
         for (const auto& s : r.settles) {
             std::fprintf(f, "%zu,%.3f,%.4f,%.4f,%.4f,%.4f,%.4f,%.4f,%.6f,%.6f,"
-                            "%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%d,%d\n",
+                            "%.6f,%.6f,%.6f,%.6f,%d,%d,%.6f,%d,%d,"
+                            "%.10g,%.10g,%.10g,%.10g,%.10g,%.10g,%d\n",
                          idx++, s.t, s.psi, s.psiRef, s.rudderCmd, s.rudderAct,
                          s.rate, s.err, s.Kp, s.Kd, s.KpCenter, s.KdCenter,
                          s.Khat, s.That, (int)s.identValid, (int)s.baseline,
-                         s.Jwindow, s.winIndex, 1);
+                         s.Jwindow, s.winIndex, 1, s.currentJ, s.esc.lastJ,
+                         s.esc.gradKp, s.esc.gradKd, s.esc.hpfY, s.esc.escPhase,
+                         (int)s.esc.enabled);
         }
         std::fclose(f);
     }

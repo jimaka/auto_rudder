@@ -29,6 +29,7 @@
 - **历史谱系的看点**：从 Sperry 1957–1978 的 weather adjustment 与 J 寻优专利，到东京计器 1967 年"海况恶劣自动降灵敏度"，再到 YDK 的 BNAAC（自校正思想的产品化）与 Garmin 2026 年的路径级自适应——专利谱系与本文第 1–3 章的学术谱系（MRAC→STR→增益调度+自适应 PID）完全同构，互相印证。
 
 以下按专利域分节列出明细。
+
 ### 欧美老牌厂商专利（Sperry Marine / Raytheon Anschütz / Kongsberg-Simrad / Garmin）
 
 本节覆盖欧美老牌厂商——Sperry Marine（Sperry Rand → Sperry Corp → Litton Marine → Northrop Grumman Sperry Marine 谱系，NAVIPILOT 系列）、Raytheon Anschütz（NautoPilot / PilotStar 系列，含 Anschütz & Co 的历史专利）、Kongsberg（原 Simrad / Robertson 自动舵线，K-Bridge Autopilot）、Garmin（GHP / Reactor 系列，Shadow Drive）——在船舶自动舵/操舵自适应控制方向的已公开专利。核实方式：逐条打开 Google Patents 专利页核实（公开号、申请人、申请/公开日期、摘要、法律状态以页面为准）；检索期间 Google Patents 对直接访问持续限流（HTTP 503），部分条目经 r.jina.ai 阅读代理打开同一 Google Patents 页面核实；US12632049 因授权时间很新、Google Patents 尚未收录，改用 Justia 专利页与 USPTO 官方公报（Official Gazette）交叉核实。
@@ -83,6 +84,7 @@
 - [Simrad AP70/AP80 产品样本（AP1 1951 年首台渔船自动舵）](https://www.mackaycomm.com/wp-content/uploads/2021/08/SimradPro_AP70-80_Brochure_0911_Mackayv01MR.pdf)
 - [Garmin 10-K 年报（patented Shadow Drive 表述）— SEC](https://www.sec.gov/Archives/edgar/data/1121788/000095017024047315/grmn-ars-20231230.pdf)
 - [Navico 与 Garmin 专利纠纷和解（2018）— Sail World](https://www.sailworldcruising.com/news/201863/Navico-and-Garmin-resolve-patent-disputes)
+
 ### 日本厂商专利（Tokyo Keiki / YOKOGAWA / Furuno / JRC）
 
 本节覆盖日本厂商——东京计器（Tokyo Keiki，PR 系列自动舵）、横河（YOKOGAWA，原横河电机/横河北辰电机，现 YDK Technologies，PT 系列自动舵与 BNAAC 自适应操舵）、古野电气（Furuno，NavPilot 系列）、日本无线（JRC）——在船舶自动舵/操舵自适应控制方向的已公开专利。核实方式：US/EP 条目逐页打开 Google Patents 核实（公开号、申请人、日期、法律状态以页面为准）；JP 条目因检索期间 Google Patents 持续限流（HTTP 503），改为逐页打开 FreePatentsOnline 的 JPO 著录页核实申请人、申请/公开日期与摘要。
@@ -135,6 +137,7 @@
 - [川崎汽船新闻稿：YDK BNAAC 最新航向控制系统扩大装船（约 1% CO₂ 减排）](https://www.kline.co.jp/en/news/other/other1641459226107681229.html)
 - [Furuno USA NavPilot 700 官方产品页（self-learning adaptive algorithm / Fantum Feedback）](https://www.furunousa.com/en/products/navpilot_700)
 - [Arie et al., "An adaptive steering system for a ship"（NKK+横河北辰，IEEE CSM 1986）— NASA/ADS](https://ui.adsabs.harvard.edu/abs/1986ICSyM...6....3A/abstract)
+
 ### 波浪滤波与海况自适应相关专利（Sperry / Honeywell / ABB-Fossen / Siemens / Kongsberg / Furuno / 三菱重工）
 
 本节覆盖"波浪滤波（wave filtering）"与"海况自适应（sea-state / weather adaptation）"两条技术线上的已公开专利：含 DP 动力定位波浪滤波谱系（Honeywell → Siemens → Kongsberg）、Sperry 系自适应气象调节自动舵谱系、Fossen/NTNU 的气象最优定位（WOPC）专利，以及商用自动舵的恶劣天气操舵逻辑。核实方式：检索期间 Google Patents 对本机 IP 持续限流（HTTP 503 反滥用页），US/JP 条目改为逐页打开 FreePatentsOnline 著录页与全文页核实标题、受让人、申请/公开日期与说明书正文；EP 条目直接打开 EPO publication-server 官方公布文本 PDF 核实；NO 条目打开 patentimages.storage.googleapis.com 上挪威专利局（Patentstyret）官方扫描扉页核实。无法打开页面核实的候选条目（如 Tokimec JPH0443840B2、Sperry US2796576A）已按要求丢弃，未列入。
@@ -187,6 +190,7 @@
 - [Riviera：Raytheon Anschütz 发布 NautoPilot 5000NX（economy mode 按载荷与海况监测艏摇）](https://www.rivieramm.com/news-content-hub/news-content-hub/raytheon-anschutz-launches-fuel-saving-autopilot-system-74553)
 - [Kongsberg K-Pos DP (OS) 操作手册镜像（EKF 自适应噪声/波浪滤波章节）](https://pdfcoffee.com/kongsberg-k-pos-dp-os-dynamic-positioning-system-operator-manual-pdf-free.html)
 - [NauticExpo：Kongsberg K-Pos Dynamic Positioning 官方样本目录页](https://pdf.nauticexpo.com/pdf/kongsberg-maritime/kongsberg-k-pos-dynamic-positioning/31233-38087.html)
+
 ### 舵减摇与联合控制专利（RRS：美国海军 / 荷兰 van Amerongen 谱系 / 德国 B+V 谱系 / 商用 RRS）
 
 本节覆盖"舵减摇（Rudder Roll Stabilization, RRS）与操舵-减摇联合控制"专利域：van Amerongen / van der Klugt 荷兰（代尔夫特理工 → Van Rietschoten & Houwens → Imtech）谱系、Blanke 丹麦谱系、美国海军 DTNSRDC 谱系（Baitis/Woolaver）、德国 Blohm+Voss 液压舵机谱系，以及商用 RRS 功能（Imtech ASSA、B+V Industries SIMPLEX-COMPACT、Becker Marine Systems RRS）对应的专利。核实方式：US 条目逐页打开 Google Patents 或 FreePatentsOnline 核实（公开号、申请人、日期以页面为准）；EP 条目经 EPO publication server 打开授权文本 PDF 核实；CN 条目打开授权公告文本首页（图像页）核实著录项目。**检索期间 Google Patents 多次持续限流（HTTP 503），部分条目改用 FPO / EPO / CNIPA 文本核实。**日本厂商的舵减摇专利（横河 YDK JP3751239B2）见 `02_japan.md`，本节不重复。
@@ -233,6 +237,7 @@
 - [Q-Tagg 官网产品页（DEGO 调速器/推进控制，节油宣称）](https://qtagg.com/products/)
 - [van der Klugt, "Rudder Roll Stabilization in Hr.Ms. Karel Doorman"（参考文献第 13 条即 European Patent no. 0129287）— IMarEST](https://library.imarest.org/record/8529/files/v33b2p12a.pdf)
 - [Blanke, Haals & Andreasen, "Rudder Roll Damping Autopilot Experience in Denmark"（CAMS'89，丹麦谱系学术公开）— Aalborg University VBN](https://vbn.aau.dk/ws/files/72604842/P93_4026_v11c.pdf)
+
 ### 节能/生态操舵与 AI 操舵专利
 
 本节覆盖"节能/生态操舵（ECO autopilot）"与"AI/机器学习操舵"两个方向的已公开专利，申请人横跨日、中、欧（含一件美国授权的早期经典专利）。所有条目均已在 Google Patents 逐页打开核实（标题、申请人、日期、法律事件以页面信息为准；个别日本授权文本的著录项取自 Google Patents 检索元数据并与全文内容交叉确认）。需要说明：检索中未找到 Anschütz（Raytheon Anschütz）针对 ECOnomy 模式的授权专利（其公开专利仅见 1970 年代早期电气自动舵），也未找到 Yokogawa（横河）的船舶节能自动舵专利——横河并不生产商船自动舵，日本节能自动舵的代表厂商为东京计器（Tokyo Keiki）。因此这两家以"产品-功能对照"形式呈现。
@@ -291,6 +296,7 @@
 - [Mackay：Tokyo Keiki A.C.E. Route Tracking Course-Control for PR-9000（节油 1–1.5% 宣称）](https://www.mackaycomm.com/products/navigation/autopilot/tokyo-keiki-a-c-e-route-track-control-for-pr-6000-autopilots-copy/)
 - [HD Hyundai：Avikus HiNAS 2.0 跨洋自主航行（节油约 7% 宣称）](https://esg.hd.com/en/news/601)
 - [Korea JoongAng Daily：Avikus HiNAS Control 获 DNV 型式认可](https://www.koreajoongangdaily.com/business/hd-hyundais-avikus-wins-global-certification-for-autonomous-navigation/12567791)
+
 ### 中国专利与厂商
 
 本节覆盖中国申请人（高校、研究所、厂商）在船舶自动舵/操舵自适应控制方向的已公开专利。所有条目均已在 Google Patents 逐页核实（公开号、申请人、日期、法律状态以页面信息为准）。

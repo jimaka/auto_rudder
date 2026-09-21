@@ -250,6 +250,7 @@ $$J = \sum_{k=0}^{N-1} \left( x_k^\top Q_k x_k + u_k^\top R_k u_k \right), \tag{
 其中 $A_k$、$B_k$ 以及 $J$ 的解析形式均未知 (Frihauf, Krstić, & Başar, 2013)。在该方法中，系统反复从固定初始条件重新初始化，多变量 ES 调节一系列控制步骤以最小化 $J$。
 
 还针对非完整移动机器人导航的三维环境源搜索发展了一种创新的基于 ES 的方法 (Matveev, Hoy, & Savkin, 2014)。
+
 ## 3. 博弈中的 ES
 
 对于上述 ES 方法，将方法扩展到多参数系统很容易处理：只需为每个参数施加不同频率的抖动，即可在高维空间中实现梯度下降，且对所得分析只需做很小的改动。除了这种高维 ES 方法之外，大量工作致力于研究多参数 ES，其中以更复杂的结构研究各调节参数之间的关系，例如合作博弈，或在博弈信息有限的非合作博弈中进行纳什均衡搜索。
@@ -367,6 +368,7 @@ $$\frac{d\beta}{dt} = -k\sum_{i=1}^{m}\frac{\partial \lambda_i(\beta)}{\partial 
 图 9：二维系统经由基于牛顿的 ES 方法实现收敛的示例，与标准 ES 方法的对比。
 
 来源：图改编自 Ghaffari, Krstić, and Nešić (2012) 的仿真结果部分。
+
 ## 4. 基于牛顿的 ES
 
 ES 的另一项重要扩展是基于牛顿的方法的提出。平均化分析表明，极值搜索方法通过持续跟随被最大化或被最小化函数的未知梯度而收敛。这使得算法的收敛速度在局部依赖于函数的曲率。收敛速度与曲率成正比这一点，可由 Moase, Manzie, and Brear (2009) 的下述例子清楚地展示：一个带有调谐参数 $\theta$ 的 ES 装置被不断调节，以最小化输出函数 $y$，其平均化 ES 动力学为
@@ -889,7 +891,6 @@ $$\varphi = 2 \alpha \sqrt{2\omega} \sin(\omega t - z + \pi/4), \tag{155}$$
 
 在 Scheinker 和 Krstić (2014b) 中，李括号平均化理论被推广到不可微系统，并应用于如下一般类别的 ES 控制器
 
-
 $$u_r = \alpha \sqrt{\omega} \cos(\omega t) |x|^r - \frac{k}{1 - r} \sqrt{\omega} \sin(\omega t) |x|^{2 - r}, \tag{156}$$
 
 其中 $x \in \mathbb{R}^n$。对这些不可微控制器的分析需要把李括号平均化与实用稳定性结果推广到在整个集合上不可微的函数。这类非 $C^2$ 控制器的主要优点在于：当 $r \neq 0, 2$ 时，整个高频振荡控制反馈在到达平衡点时完全消失。形如
@@ -919,7 +920,6 @@ $$\dot{\bar{x}} = -\beta_{2,1} \nabla J(\bar{x}) F_0(J(\bar{x})), \tag{161}$$
 $$\beta_{2,1} = \int_0^T \int_0^\sigma u_1(\sigma) u_2(\theta)\, d\theta\, d\sigma. \tag{162}$$
 
 这一一般 ES 控制器族可用于生成具有良好性质的反馈，例如超调最小，以及控制作用逐渐消失、从而使系统得以稳定在平衡点，如图 22 所示。
-
 
 ![图 22](images/fig22_p19.png)
 图 22：根据控制器参数的选择，可以设计出控制作用逐渐消失的控制器，使轨迹得以稳定在原点。来源：图改编自 Grushkovskaya et al. (2018a)。
@@ -1556,6 +1556,7 @@ $$\dot{x} = f(x, u, t), \qquad u = \alpha(x, \theta_{\mathrm{ES}}, t). \tag{276}
 | 有界 ES (Scheinker, 2013a) | **否** | 否 | **是** | 否 |
 | PI ES (Guay & Dochain, 2017) | **否** | 否 | **是** | **是** |
 | 自适应隐空间 ES (Scheinker, 2021b) | **否** | 否 | **是** | 否 |
+
 ## 18. 专利
 
 如上所述，ES 的各种版本仍在不断增长，因为它是一个活跃的研究领域，它们适用于极其广泛的动力系统。此外，由于 ES 在设计上就适用于不确定系统，它已被广泛应用于学术研究之外的现实世界问题，包括科学研究与工业场景。值得注意的是，ES 对工业界产生了显著影响，这可以从 ES 相关专利的庞大数量与多样性中得到某种程度的量化。首先，当然还有 Leblanc 1922 年的原始论文，它读起来更像一份专利/设计方案而非典型的学术文章，目前已有 277 次引用 (Leblanc, 1922)。进而，在美国专利商标局（US Patent and Trademark Office）中以 "extremum" 和 "seeking" 两个词进行简单的公开检索，会返回 1919 条记录。为给出几个具体例子，在 Google Scholar 中检索 "extremum seeking patent" 会返回 9750 条结果（其中许多是文章而非专利）。这些结果按 Google 算法确定的"相关性"排序。如果逐一浏览这些专利，可以发现其中包括：用于调节建筑物进风量的 ES 应用 (Seem, 2010)；一种预测并稳定压缩机喘振的方法 (Krener & Krstić, 2000)；用于冷冻水机组控制 (Salsbury & House, 2019)；用于蒸汽压缩（制冷）(Burns, Guay, & Weiss, 2017)；用于射频（RF）阻抗匹配 (Burry, Radomski, Aung, & Klein, 2020)；以及用于编队飞行 (Ryan, 2018)。在下面的几节中，我们将详细介绍若干 ES 应用。
@@ -1761,6 +1762,7 @@ $$s_i(z) = \exp\left[-\frac{(z - \varphi_i)^T(z - \varphi_i)}{\sigma_i^2}\right]
 ![图 49](images/fig49_p36.png)
 图 49：用于生物反应器优化的 ES，分别对应加入与不加入高斯测量噪声的情形。
 来源：改绘自 Guay, Dochain, and Perrier (2004)。
+
 ## 25. 结论
 
 上述一般性的 ES 方法已被证明对许多现实应用十分有效，还有许多方法与应用超出了本综述的范围，这里仅简要提及其中一部分。除已介绍的内容之外，ES 还被应用于：冷却系统 (Li, Li, & Seem, 2009; Li, Rotea, Chiu, Mongeau, & Paek, 2005)、风能 (Creaby, Li, & Seem, 2009)、光伏 (Lei, Li, Chen, & Seem, 2010)、人体健身器械 (Zhang, Dawson, Dixon, & Xian, 2006)、非等温连续搅拌釜反应器的控制优化 (Guay, Dochain, & Perrier, 2005)、降低机电气门执行器的撞击速度 (Peterson & Stefanopoulou, 2004)、用于热声不稳定性控制的类牛顿 ES (Moase et al., 2010)、电机转矩最大化 (Antonello, Carraro, & Zigliotto, 2013)、可变凸轮轴正时（CAM timing）发动机运行的优化 (Popovic, Jankovic, Magner, & Teel, 2006)、用于级联拉曼光学放大器 (Dower, Farrell, & Nesic, 2008)、用于交通拥堵控制的 ES (Yu, Koga, Oliveira, & Krstić, 2021)、GPS 拒止环境下的源定位 (Ghadiri-Modarres et al., 2016a)、用于最大化射频（RF）加热的 ES (Carnevale et al., 2009)、电磁执行器控制 (Benosman & Atınç, 2015)、高压变换器调制器优化 (Scheinker, Bland, Krstić, & Audia, 2013) 等；多目标 ES 已被用于矿物磨矿 (Lu, Krstić, Chai, & Fu, 2020)，采样数据 ES 已被用于约束优化 (Hazeleger, Nešić, & van de Wouw, 2022)。ES 研究领域十分活跃且正在持续壮大。

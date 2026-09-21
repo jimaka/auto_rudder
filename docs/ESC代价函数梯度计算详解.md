@@ -596,7 +596,7 @@ $$
 
 | 公式 | 含义 | 代码位置 |
 |---|---|---|
-| $c_k=(t_k|e_k|+w_U|\delta_k|+w_{Du}|\Delta\delta_k|)\,dt$ | 每拍成本增量 | `auto_tuner.hpp:366-367`（被积函数同口径 :220） |
+| $c_k=(t_k\vert e_k\vert +w_U\vert \delta_k\vert +w_{Du}\vert \Delta\delta_k\vert )\,dt$ | 每拍成本增量 | `auto_tuner.hpp:366-367`（被积函数同口径 :220） |
 | $\alpha_H=\tau_H/(\tau_H+dt)$ | HPF 系数（后向欧拉） | `auto_tuner.hpp:369` |
 | $y_k=\alpha_H(y_{k-1}+c_k-c_{k-1})$ | 一阶 HPF 递推 | `auto_tuner.hpp:370-371` |
 | $S_{K_p}\mathrel{+}=y_k\sin\varphi_k$ | $K_p$ 路同相相关累积 | `auto_tuner.hpp:373` |
@@ -608,7 +608,7 @@ $$
 | $\alpha_L=T_w/(\tau_L+T_w)$ | LPF 系数（时基 $T_w$） | `auto_tuner.hpp:407` |
 | $g_w=(1-\alpha_L)g_{w-1}+\alpha_L\hat g_w$ | 梯度 LPF 递推 | `auto_tuner.hpp:408-409` |
 | $\theta\leftarrow\theta-\eta\,g_w$ | 梯度下降（$\eta=0.02$） | `auto_tuner.hpp:411-412`（$\eta$ 定义 :89） |
-| $|\Delta\theta|\le\max(|\theta|\cdot10\%,\,10^{-3})$ | 更新限幅 | `auto_tuner.hpp:452-461`（参数 :96-97） |
+| $\vert \Delta\theta\vert \le\max(\vert \theta\vert \cdot10\%,\,10^{-3})$ | 更新限幅 | `auto_tuner.hpp:452-461`（参数 :96-97） |
 | $\theta\leftarrow\max(\theta,0)$ | 非负钳位 | `auto_tuner.hpp:415-416` |
 | $N_{win}=T_w/dt=3000$ | 窗口拍数 | `auto_tuner.hpp:171-173`（缓冲容量 :479） |
 | 非重叠窗清窗 | 窗口/解调状态清零 | `auto_tuner.hpp:418-425` |
@@ -656,7 +656,7 @@ $$
 | 窗口 $T_w$ / 拍数 $N$ / 控制周期 $dt$ | $60\ \mathrm{s}$ / $3000$ / $0.02\ \mathrm{s}$ | `:104-105` |
 | LPF 时间常数 $\tau_L$ | $10\ \mathrm{s}$ | `:91` |
 | 积分步长 $\eta$ | $0.02$ | `:89` |
-| 单次更新限幅 | $\max(|\bar K_p|\cdot 10\%,\ 10^{-3})$ | `:96-97` |
+| 单次更新限幅 | $\max(\vert \bar K_p\vert \cdot 10\%,\ 10^{-3})$ | `:96-97` |
 | 载波频率 $\omega$ | $\mathbf{2\pi/60=0.10472\ \mathrm{rad/s}}$（周期恰 $60$ s） | 见下 |
 | HPF 时间常数 $\tau_H$ | $\mathbf{30\ s}$ | 见下 |
 

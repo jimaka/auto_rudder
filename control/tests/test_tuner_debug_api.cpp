@@ -66,6 +66,32 @@ TEST(TunerDebugApi, EvaluateEstimateDriftGateSemantics) {
     EXPECT_DOUBLE_EQ(s.baseK, K_SHIP * 1.40);
 }
 
+TEST(TunerDebugApi, ConstSnapshotPreservesCostGradientAndWindowState) {
+    AutoTuner t;
+    TunerDebugApi api(t);
+    ASSERT_TRUE(api.establishBaseline(K_SHIP, T_SHIP));
+    api.forceEnabled(true);
+    api.forceGradient(1e-9, -2e-9);
+    for (int i = 0; i < 10; ++i) api.accumulateOnce(1.0, 2.0, true);
+    const double cost = api.currentJ();
+    ASSERT_GT(cost, 0.0);
+    const AutoTuner& view = t;
+    const auto first = TunerDebugApi::snapshotOf(view);
+    const auto second = TunerDebugApi::snapshotOf(view);
+    EXPECT_TRUE(first.baselineEstablished);
+    EXPECT_TRUE(first.enabled);
+    EXPECT_DOUBLE_EQ(first.gradKp, 1e-9);
+    EXPECT_DOUBLE_EQ(first.gradKd, -2e-9);
+    EXPECT_EQ(first.windowSamples, 10u);
+    EXPECT_EQ(first.demodCount, 10u);
+    EXPECT_EQ(second.windowSamples, first.windowSamples);
+    EXPECT_EQ(second.demodCount, first.demodCount);
+    EXPECT_DOUBLE_EQ(second.demodKpSum, first.demodKpSum);
+    EXPECT_DOUBLE_EQ(second.demodKdSum, first.demodKdSum);
+    EXPECT_DOUBLE_EQ(second.hpfY, first.hpfY);
+    EXPECT_DOUBLE_EQ(api.currentJ(), cost);
+}
+
 TEST(TunerDebugApi, DitherOnceRequiresEnabledAndAdvancesPhase) {
     AutoTuner t;
     TunerDebugApi api(t);

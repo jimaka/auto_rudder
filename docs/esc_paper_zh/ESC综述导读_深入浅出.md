@@ -181,7 +181,7 @@ flowchart TD
 | 经典 ESC | 本项目实现（代码位置） | 为什么改 |
 |---|---|---|
 | 单参数 + 正弦载波 | $K_p$、$K_d$ **同时**调：$K_p$ 乘 $\sin\omega t$、$K_d$ 乘 $\cos\omega t$（`escDither()` L382） | 正交载波互不相关，一次试探测两个梯度，时间减半 |
-| 瞬时输出 $h(x)$ | 60 s 窗口 ITAE 代价 $c_k = (t|e| + w_u|\delta| + w_{\dot u}|\dot\delta|)\,dt$ 累积（`accumulate()` L354） | 航向保持的真实目标是误差与操舵代价的积分，不是瞬时 map |
+| 瞬时输出 $h(x)$ | 60 s 窗口 ITAE 代价 $c_k = (t\vert e\vert  + w_u\vert \delta\vert  + w_{\dot u}\vert \dot\delta\vert )\,dt$ 累积（`accumulate()` L354） | 航向保持的真实目标是误差与操舵代价的积分，不是瞬时 map |
 | 连续积分器 | 窗口末结算 + LPF 平滑 + **±10% 限幅**（`escStep()` L395、`clampUpdate()` L452） | 防止单窗噪声把增益推飞 |
 | 无安全机制 | **稳定门**：$K_p>0$、$\zeta\ge0.6$、$\omega_n\le0.5$、振荡 $\le5°$，不过则回退基线（`stabilityCheck()` L241、`revert()` L429） | 辨识误差可能把闭环拖离设计点，必须有兜底 |
 | 独立运行 | 三层架构的层 3：RLS 辨识 + 极点配置先建基线，ESC 只在基线邻域微调 | 平均化稳定性结论是**局部**的，全局粗调交给层 1/层 2 |

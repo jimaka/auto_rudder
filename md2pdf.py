@@ -6,7 +6,9 @@ import sys
 import os
 import re
 import html as html_mod
-from urllib.parse import urljoin
+import tempfile
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
 from markdown_it import MarkdownIt
 
 # ============ 常量 ============
@@ -128,6 +130,7 @@ th, td {{
     padding: 7px 11px;
     text-align: left;
     vertical-align: top;
+    overflow-wrap: anywhere;
 }}
 th {{ background: #e8f0fe; font-weight: bold; }}
 tr:nth-child(even) {{ background: #fafafa; }}
@@ -161,6 +164,7 @@ pre.mermaid-block {{
     white-space: normal;
 }}
 pre.mermaid-block svg {{ max-width: 100%; height: auto; }}
+pre.mermaid-block p {{ text-align: center; }}
 
 /* 页面设置 */
 @page {{
@@ -171,17 +175,21 @@ pre.mermaid-block svg {{ max-width: 100%; height: auto; }}
 h2 {{ page-break-after: avoid; }}
 h3, h4, h5, h6 {{ page-break-after: avoid; }}
 tr, img {{ page-break-inside: avoid; }}
+thead {{ display: table-header-group; }}
+@media print {{
+    pre {{ page-break-inside: auto; }}
+    .katex-display {{ overflow: visible; }}
+}}
 """
 
 
 def github_slug(text: str) -> str:
     """生成 GitHub 风格锚点 id：转小写、去标点、空格转横线（保留中文）。"""
-    text = re.sub(r'<[^>]+>', '', text)
+    children = MarkdownIt("commonmark").parseInline(text)[0].children or []
+    text = "".join(t.content for t in children if t.type in ("text", "code_inline", "image"))
     text = text.lower()
     text = re.sub(r"[^\w\u4e00-\u9fff\s-]", "", text, flags=re.UNICODE)
-    text = re.sub(r"[\s_]+", "-", text)
-    text = re.sub(r"-+", "-", text)
-    return text.strip("-")
+    return re.sub(r"\s", "-", text)
 
 
 def build_md_parser() -> MarkdownIt:
@@ -192,7 +200,15 @@ def build_md_parser() -> MarkdownIt:
         token = tokens[idx]
         inline = tokens[idx + 1] if idx + 1 < len(tokens) and tokens[idx + 1].type == "inline" else None
         text = inline.content if inline else ""
-        slug = github_slug(text)
+        for placeholder, original in env.get("math_placeholders", {}).items():
+            text = text.replace(placeholder, original)
+        base = github_slug(text)
+        used = env.setdefault("heading_ids", set())
+        slug, count = base, 0
+        while slug in used:
+            count += 1
+            slug = f"{base}-{count}"
+        used.add(slug)
         return f'<{token.tag} id="{slug}">'
 
     md.renderer.rules["heading_open"] = heading_open
@@ -206,91 +222,60 @@ def protect_math(md_text: str):
     `\,`→`,`），导致 KaTeX 公式被破坏。这里先按原样取出数学内容、用占位符渲染
     Markdown，渲染后再还原，保证 KaTeX 收到未经转义的原始公式。
     """
-    lines = md_text.split("\n")
-    out_lines = []
-    placeholders = {}
-    in_fence = False
-    i = 0
-    while i < len(lines):
-        line = lines[i]
-        stripped = line.strip()
+    lines = md_text.splitlines(keepends=True)
+    masked_code, placeholders = {}, {}
+    prefix = "@@DOCMATH"
+    while prefix in md_text:
+        prefix += "X"
 
-        # 围栏代码块（```...```）原样保留，不扫描数学
-        if stripped.startswith("```"):
-            in_fence = not in_fence
-            out_lines.append(line)
-            i += 1
-            continue
-        if in_fence:
-            out_lines.append(line)
-            i += 1
-            continue
+    def save_code(value):
+        token = f"{prefix}CODE{len(masked_code)}@@"
+        masked_code[token] = value
+        return token
 
-        # 显示公式 $$...$$（可跨行）
-        if stripped.startswith("$$"):
-            if line.count("$$") >= 2:  # 单行 $$...$$
-                content = line[line.index("$$") + 2: line.rindex("$$")]
-                token = f"@@MATH{len(placeholders)}@@"
-                placeholders[token] = "$$" + content + "$$"
-                out_lines.append(token)
-                i += 1
-                continue
-            buf = [line[line.index("$$") + 2:]]
-            j = i + 1
-            closed = False
-            while j < len(lines):
-                ls = lines[j].strip()
-                if ls.startswith("$$"):
-                    buf.append(ls[2:].rstrip())
-                    closed = True
-                    break
-                buf.append(lines[j])
-                j += 1
-            if closed:
-                token = f"@@MATH{len(placeholders)}@@"
-                placeholders[token] = "$$\n" + "\n".join(buf).strip() + "\n$$"
-                out_lines.append(token)
-                i = j + 1
-                continue
-            out_lines.append(line)  # 未闭合：按普通行处理
-            i += 1
-            continue
+    # Parser maps handle tilde fences, longer fences and nested code blocks.
+    for token in reversed(MarkdownIt("commonmark").parse(md_text)):
+        if token.type in ("fence", "code_block") and token.map:
+            start, end = token.map
+            lines[start:end] = [save_code("".join(lines[start:end]))]
+    masked = "".join(lines)
+    masked = re.sub(r"(`+)([\s\S]*?)\1(?!`)", lambda m: save_code(m[0]), masked)
 
-        # 行内公式 $...$（跳过行内代码 `...`）
-        code_tokens = []
+    def save_math(match):
+        token = f"{prefix}{len(placeholders)}@@"
+        placeholders[token] = match[0]
+        return token
 
-        def repl_code(m):
-            token = f"@@CODE{len(code_tokens)}@@"
-            code_tokens.append(m.group(0))
-            return token
+    pattern = (r"(?<!\\)\$\$[\s\S]+?(?<!\\)\$\$"
+               r"|(?<![\\$])\$(?![$\s])(?:\\.|[^$\\\n])+?(?<![\\\s])\$(?!\$)"
+               r"|(?<!\\)\\\([\s\S]+?\\\)"
+               r"|(?<!\\)\\\[[\s\S]+?\\\]")
+    masked = re.sub(pattern, save_math, masked)
+    for token, original in masked_code.items():
+        masked = masked.replace(token, original)
+    return masked, placeholders
 
-        line_masked = re.sub(r"`[^`]*`", repl_code, line)
 
-        def repl_math(m):
-            token = f"@@MATH{len(placeholders)}@@"
-            placeholders[token] = m.group(0)
-            return token
-
-        line_masked = re.sub(
-            r"(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)", repl_math, line_masked)
-        for k, v in enumerate(code_tokens):
-            line_masked = line_masked.replace(f"@@CODE{k}@@", v)
-        out_lines.append(line_masked)
-        i += 1
-
-    return "\n".join(out_lines), placeholders
+def restore_math(html_body: str, placeholders: dict) -> str:
+    """Restore TeX as HTML text, never as markup (notably <, > and &)."""
+    for token, original in placeholders.items():
+        html_body = html_body.replace(token, html_mod.escape(original, quote=False))
+    return html_body
 
 
 def fix_relative_links(html_body: str, md_dir: str) -> str:
-    """将相对路径的图片/链接转换为 file:// 绝对路径。"""
+    """将相对路径图片转换为 file:// 绝对路径，保留中文和 URL 编码。"""
     def repl_img(m):
         attrs = m.group(1)
         def repl_src(sm):
-            url = sm.group(1)
-            if url.startswith(("http://", "https://", "data:", "file://")):
+            url = html_mod.unescape(sm.group(1))
+            parsed = urlsplit(url)
+            if parsed.scheme or url.startswith("//"):
                 return sm.group(0)
-            abs_path = os.path.abspath(os.path.join(md_dir, url.split("#")[0]))
-            return f'src="file://{abs_path}"'
+            uri = (Path(md_dir) / unquote(parsed.path)).resolve().as_uri()
+            if parsed.fragment:
+                uri += "#" + parsed.fragment
+            return f'src="{html_mod.escape(uri, quote=True)}"'
         attrs = re.sub(r'src="([^"]*)"', repl_src, attrs)
         return "<img " + attrs + ">"
 
@@ -304,18 +289,18 @@ def md_to_html(md_path: str) -> str:
 
     md_content, math_placeholders = protect_math(md_content)
     md = build_md_parser()
-    body = md.render(md_content)
-    for token, original in math_placeholders.items():
-        body = body.replace(token, original)
+    body = md.render(md_content, {"math_placeholders": math_placeholders})
+    body = restore_math(body, math_placeholders)
     md_dir = os.path.dirname(md_path)
     body = fix_relative_links(body, md_dir)
 
     title = os.path.splitext(os.path.basename(md_path))[0]
 
     html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-render-status="pending">
 <head>
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html_mod.escape(title)}</title>
 <link rel="stylesheet" href="{KATEX_CSS}">
 <style>{CSS}</style>
@@ -328,7 +313,10 @@ def md_to_html(md_path: str) -> str:
 <script>
 async function renderAll() {{
     try {{
-        // 渲染数学公式（忽略代码块/表格中的美元符号）
+        // 数学公式包括表格单元格；代码块中的美元符号不作为公式。
+        if ({str(bool(math_placeholders)).lower()} && !window.renderMathInElement) {{
+            throw new Error('KaTeX resources unavailable');
+        }}
         if (window.renderMathInElement) {{
             renderMathInElement(document.body, {{
                 delimiters: [
@@ -337,11 +325,14 @@ async function renderAll() {{
                     {{ left: '\\\\(', right: '\\\\)', display: false }},
                     {{ left: '\\\\[', right: '\\\\]', display: true }}
                 ],
-                throwOnError: false
+                throwOnError: false,
+                strict: 'ignore'
             }});
         }}
         // 渲染 mermaid 图
-        if (window.mermaid) {{
+        const diagrams = document.querySelectorAll('pre code.language-mermaid');
+        if (diagrams.length && !window.mermaid) throw new Error('Mermaid resources unavailable');
+        if (diagrams.length) {{
             document.querySelectorAll('pre code.language-mermaid').forEach(function (el) {{
                 var pre = el.closest('pre');
                 if (pre) pre.classList.add('mermaid-block');
@@ -354,7 +345,24 @@ async function renderAll() {{
             }});
             await mermaid.run({{ querySelector: 'pre code.language-mermaid' }});
         }}
+        await document.fonts.ready;
+        await Promise.all(Array.from(document.images, img => img.complete ? Promise.resolve() :
+            new Promise(resolve => {{ img.onload = resolve; img.onerror = resolve; }})));
+        if (document.querySelector('.katex-error') ||
+            Array.from(document.images).some(img => !img.naturalWidth)) {{
+            throw new Error('Invalid formula or missing image');
+        }}
+        // Shrink only oversized display equations, preserving complete expressions.
+        document.querySelectorAll('.katex-display').forEach(el => {{
+            const equation = el.querySelector('.katex');
+            if (equation && equation.scrollWidth > el.clientWidth) {{
+                equation.style.fontSize = (100 * el.clientWidth / equation.scrollWidth) + '%';
+            }}
+        }});
+        document.documentElement.dataset.renderStatus = 'ready';
     }} catch (e) {{
+        document.documentElement.dataset.renderStatus = 'error';
+        document.documentElement.dataset.renderError = String(e);
         console.error('render error:', e);
     }}
 }}
@@ -366,34 +374,35 @@ renderAll();
 
 
 def html_to_pdf(html_content: str, pdf_path: str):
-    tmp_html = pdf_path + ".tmp.html"
-    with open(tmp_html, "w", encoding="utf-8") as f:
-        f.write(html_content)
-
-    cmd = [
-        "google-chrome",
-        "--headless=new",
-        "--disable-gpu",
-        "--no-sandbox",
-        "--disable-software-rasterizer",
-        "--user-data-dir=/tmp/md2pdf-chrome-profile",
-        "--print-to-pdf=" + os.path.abspath(pdf_path),
-        "--print-to-pdf-no-header",
-        "--no-pdf-header-footer",
-        "--virtual-time-budget=60000",
-        "file://" + os.path.abspath(tmp_html),
-    ]
-    try:
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
-        if result.returncode != 0:
-            print(f"  Chrome 错误: {result.stderr[:500]}")
+    """Only replace the previous PDF after resources and diagrams finish rendering."""
+    destination = Path(pdf_path).resolve()
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".md2pdf-", dir=destination.parent) as temp:
+        tmp_html, tmp_pdf = Path(temp) / "document.html", Path(temp) / "document.pdf"
+        tmp_html.write_text(html_content, encoding="utf-8")
+        cmd = [
+            "google-chrome", "--headless=new", "--disable-gpu", "--no-sandbox",
+            "--disable-dev-shm-usage", "--no-first-run", "--no-default-browser-check",
+            "--allow-file-access-from-files", f"--user-data-dir={temp}/profile",
+            f"--print-to-pdf={tmp_pdf}", "--no-pdf-header-footer",
+            "--virtual-time-budget=60000", "--dump-dom", tmp_html.as_uri(),
+        ]
+        try:
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+        except subprocess.TimeoutExpired:
+            print("  Chrome 转换超时；保留原 PDF")
             return False
-    except subprocess.TimeoutExpired:
-        print("  Chrome 转换超时")
-        return False
-    finally:
-        if os.path.exists(tmp_html):
-            os.remove(tmp_html)
+        if result.returncode != 0 or not tmp_pdf.exists():
+            print(f"  Chrome 错误；保留原 PDF: {result.stderr[:500]}")
+            return False
+        if 'data-render-status="ready"' not in result.stdout:
+            error = re.search(r'data-render-error="([^"]*)"', result.stdout)
+            print("  渲染未完成；保留原 PDF:", html_mod.unescape(error[1]) if error else "pending")
+            return False
+        if not tmp_pdf.read_bytes().startswith(b"%PDF-"):
+            print("  PDF 输出无效；保留原 PDF")
+            return False
+        os.replace(tmp_pdf, destination)
     return True
 
 
@@ -410,7 +419,13 @@ def main():
 
     # 支持命令行传入指定 md 文件（相对 BASE_DIR 的路径或绝对路径）
     args = sys.argv[1:]
-    if args:
+    if args == ["--existing"]:
+        # Refresh matching Markdown exports only; never rewrite source papers.
+        candidates = subprocess.run(["rg", "--files", "-g", "*.md"], cwd=BASE_DIR,
+                                    capture_output=True, text=True, check=True)
+        md_files = [name for name in sorted(candidates.stdout.splitlines())
+                    if (Path(PDF_DIR) / (name[:-3].replace("/", "_") + ".pdf")).exists()]
+    elif args:
         md_files = args
 
     os.makedirs(PDF_DIR, exist_ok=True)
@@ -421,9 +436,11 @@ def main():
         md_path = os.path.join(BASE_DIR, md_file)
         if not os.path.exists(md_path):
             print(f"[跳过] 文件不存在: {md_file}")
+            fail += 1
             continue
 
-        pdf_stem = md_file.replace("/", "_").replace("\\", "_")
+        relative = os.path.relpath(md_path, BASE_DIR)
+        pdf_stem = relative.replace("/", "_").replace("\\", "_")
         pdf_name = os.path.splitext(pdf_stem)[0] + ".pdf"
         pdf_path = os.path.join(PDF_DIR, pdf_name)
 
@@ -443,7 +460,8 @@ def main():
 
     print(f"\n完成: 成功 {success} 个, 失败 {fail} 个")
     print(f"PDF 输出目录: {PDF_DIR}")
+    return bool(fail)
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

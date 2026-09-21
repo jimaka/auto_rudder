@@ -48,22 +48,26 @@ public:
         double oscAmplitude;             // 峰-峰幅值估计 (deg)
     };
     Snapshot snapshot() const {
+        return snapshotOf(t_);
+    }
+    // 只读仿真/遥测可以接受 const 调参器，不必获取可写调试门面。
+    static Snapshot snapshotOf(const AutoTuner& tuner) {
         Snapshot s;
-        s.curKp = t_.curKp_;  s.curKd = t_.curKd_;
-        s.baselineKp = t_.baselineKp_;  s.baselineKd = t_.baselineKd_;
-        s.baseK = t_.baseK_;  s.baseT = t_.baseT_;
-        s.baselineEstablished = t_.baselineEstablished_;
-        s.enabled = t_.enabled_;
-        s.escPhase = t_.escPhase_;
-        s.gradKp = t_.gradKp_;  s.gradKd = t_.gradKd_;
-        s.lastJ = t_.lastJ_;
-        s.hpfY = t_.hpfY_;
-        s.demodKpSum = t_.demodKpSum_;  s.demodKdSum = t_.demodKdSum_;
-        s.demodCount = t_.demodCount_;
-        s.winCounter = t_.winCounter_;
-        s.windowSamples = t_.windowErr_.size();
-        s.refAgeSec = t_.refAgeSec_;
-        s.oscAmplitude = t_.oscDetector_.amplitude();
+        s.curKp = tuner.curKp_;  s.curKd = tuner.curKd_;
+        s.baselineKp = tuner.baselineKp_;  s.baselineKd = tuner.baselineKd_;
+        s.baseK = tuner.baseK_;  s.baseT = tuner.baseT_;
+        s.baselineEstablished = tuner.baselineEstablished_;
+        s.enabled = tuner.enabled_;
+        s.escPhase = tuner.escPhase_;
+        s.gradKp = tuner.gradKp_;  s.gradKd = tuner.gradKd_;
+        s.lastJ = tuner.lastJ_;
+        s.hpfY = tuner.hpfY_;
+        s.demodKpSum = tuner.demodKpSum_;  s.demodKdSum = tuner.demodKdSum_;
+        s.demodCount = tuner.demodCount_;
+        s.winCounter = tuner.winCounter_;
+        s.windowSamples = tuner.windowErr_.size();
+        s.refAgeSec = tuner.refAgeSec_;
+        s.oscAmplitude = tuner.oscDetector_.amplitude();
         return s;
     }
     double currentJ() const { return t_.computeJ(); }        // 当前窗口 ITAE 代价

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # tuner_debug_monitor.py
-# 实船调试参数实时查看器：驱动 ar_tuner_debug 进程，按固定周期下发 status 命令，
+# 本地调试参数实时查看器：启动独立 ar_tuner_debug 进程（并非连接实船），按固定周期下发 status 命令，
 # 解析 key=value 输出，用 matplotlib 实时绘制调参器内部状态曲线。
 #
 # 功能：
 #   1. 实时曲线：增益（当前/基线）、ESC 梯度、代价 J、振荡幅值与载波相位；
 #   2. 命令转发：监控期间在终端输入的任何命令原样转发给 ar_tuner_debug（回显打印），
 #      即"一面看曲线、一面做单环节调试"；
-#   3. --demo：内置激励序列（建基线 → 喂正弦误差 → 周期 settle），无实船/仿真
+#   3. --demo：内置激励序列（建基线 → 喂方波误差 → 周期 settle），无实船/仿真
 #      也能立刻看到各参数动起来，用于验证监控链路本身；
 #   4. --log：把每次 status 快照追加写入 CSV，事后可用 plot_sim.py 风格工具复查；
 #   5. --duration + --out：无 GUI 环境跑固定时长后保存图片退出（冒烟/归档用）。
@@ -39,7 +39,7 @@ for _p in (os.path.join(_here, "..", "..", ".scratch", "fonts", "NotoSansCJKsc-R
            os.path.join(_here, "..", "..", ".scratch", "fonts", "NotoSansCJKsc-Bold.otf")):
     if os.path.isfile(_p):
         font_manager.fontManager.addfont(_p)
-for cand in ["Noto Sans CJK SC", "WenQuanYi Zen Hei", "SimHei", "Microsoft YaHei"]:
+for cand in ["Noto Sans CJK SC", "Noto Sans CJK JP", "WenQuanYi Zen Hei", "SimHei", "Microsoft YaHei"]:
     if any(f.name == cand for f in font_manager.fontManager.ttflist):
         plt.rcParams["font.sans-serif"] = [cand, "DejaVu Sans"]
         break
@@ -48,7 +48,9 @@ plt.rcParams["axes.unicode_minus"] = False
 # status 输出中被监控的字段（分组到 4 个子图）
 FIELDS = ["curKp", "curKd", "baseKp", "baseKd", "gradKp", "gradKd",
           "lastJ", "osc", "escPhase", "winCounter", "demodCount", "refAgeSec",
-          "established", "enabled"]
+          "established", "enabled", "currentJ", "hpfY"]
+STATUS_ALIASES = {"escPhase": "phase", "winCounter": "win",
+                  "demodCount": "demodN", "refAgeSec": "refAge"}
 
 
 class DebugLink:
@@ -82,6 +84,9 @@ class DebugLink:
                     out[k] = float(v)
                 except ValueError:
                     pass
+        for field, key in STATUS_ALIASES.items():
+            if key in out:
+                out[field] = out[key]
         return out
 
     def close(self):
@@ -95,6 +100,11 @@ class DebugLink:
 class Monitor:
     def __init__(self, args):
         self.args = args
+        # 扩展遥测列后不能向旧表头追加不同宽度的行；每次采集建议使用新文件。
+        if args.log and os.path.isfile(args.log) and os.path.getsize(args.log):
+            with open(args.log, newline="", encoding="utf-8") as fp:
+                if next(csv.reader(fp), []) != ["t"] + FIELDS:
+                    raise SystemExit("日志表头不兼容，请通过 --log 指定一个新的 CSV 文件")
         self.link = DebugLink(args.exe)
         self.t0 = time.time()
         self.hist = {f: deque() for f in FIELDS}
@@ -114,10 +124,10 @@ class Monitor:
                 with self.lock:
                     self.hist["t"].append(t)
                     for f in FIELDS:
-                        self.hist[f].append(s.get(f, 0.0))
+                        self.hist[f].append(s.get(f, float("nan")))
                 if self.log_fp:
                     csv.writer(self.log_fp).writerow(
-                        [f"{t:.3f}"] + [s.get(f, 0.0) for f in FIELDS])
+                        [f"{t:.3f}"] + [s.get(f, float("nan")) for f in FIELDS])
                     self.log_fp.flush()
             self.stop.wait(self.args.interval)
 
@@ -134,7 +144,7 @@ class Monitor:
             print(f"  <- {resp}")
 
     def demo_loop(self):
-        """内置激励：建基线 → 喂 ±2° 正弦误差 → 每 6 s 一次 settle。"""
+        """内置激励：建基线 → 喂 ±2° 方波误差 → 每 6 s 一次 settle。"""
         time.sleep(0.3)
         print("[demo] baseline 0.2 8 ->", self.link.cmd("baseline 0.2 8"))
         print("[demo] forceenabled 1 ->", self.link.cmd("forceenabled 1"))

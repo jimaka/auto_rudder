@@ -2,7 +2,7 @@
 
 本节对照 `control/include/auto_tuner.hpp`（510 行）逐行讲解 ESC 梯度估计的落地实现：每控制拍（`dt = 0.02 s`）完成的"成本增量 → HPF → 同相相关累积"链路，与每评估窗口（`Tw = 60 s`，3000 拍）结算一次的"归一化 → LPF → 梯度下降 → 限幅 → 清窗"链路。所有行号均指 `auto_tuner.hpp`。
 
-![ESC 梯度估计链路总览](../assets/esc_chain.png)
+![ESC 梯度估计链路总览](../../assets/esc_chain.png)
 
 ## 1. 梯度数据流总览
 
@@ -222,7 +222,7 @@ demodCount_ = 0;
 
 原则可以一句话概括：**ESC 各环节运行在不同时间尺度——扰动注入、HPF、相关解调在每拍（$dt$），归一化、LPF、梯度积分在窗末（$T_w$）——每个滤波器的系数必须用该环节输入样本的真实到达周期计算。** 写滤波器时先问一句"输入多久来一个样本"，就不会犯这个错误。
 
-![ESC 载波注入仿真：增益相对摄动与窗口节律](../assets/esc_sim_dither.png)
+![ESC 载波注入仿真：增益相对摄动与窗口节律](../../assets/esc_sim_dither.png)
 
 ## 5. 双参数 sin/cos 载波的代码配对
 
@@ -255,7 +255,7 @@ $$
 
 | 公式 | 含义 | 代码位置 |
 |---|---|---|
-| $c_k=(t_k|e_k|+w_U|\delta_k|+w_{Du}|\Delta\delta_k|)\,dt$ | 每拍成本增量 | `auto_tuner.hpp:366-367`（被积函数同口径 :220） |
+| $c_k=(t_k\vert e_k\vert +w_U\vert \delta_k\vert +w_{Du}\vert \Delta\delta_k\vert )\,dt$ | 每拍成本增量 | `auto_tuner.hpp:366-367`（被积函数同口径 :220） |
 | $\alpha_H=\tau_H/(\tau_H+dt)$ | HPF 系数（后向欧拉） | `auto_tuner.hpp:369` |
 | $y_k=\alpha_H(y_{k-1}+c_k-c_{k-1})$ | 一阶 HPF 递推 | `auto_tuner.hpp:370-371` |
 | $S_{K_p}\mathrel{+}=y_k\sin\varphi_k$ | $K_p$ 路同相相关累积 | `auto_tuner.hpp:373` |
@@ -267,7 +267,7 @@ $$
 | $\alpha_L=T_w/(\tau_L+T_w)$ | LPF 系数（时基 $T_w$） | `auto_tuner.hpp:407` |
 | $g_w=(1-\alpha_L)g_{w-1}+\alpha_L\hat g_w$ | 梯度 LPF 递推 | `auto_tuner.hpp:408-409` |
 | $\theta\leftarrow\theta-\eta\,g_w$ | 梯度下降（$\eta=0.02$） | `auto_tuner.hpp:411-412`（$\eta$ 定义 :89） |
-| $|\Delta\theta|\le\max(|\theta|\cdot10\%,\,10^{-3})$ | 更新限幅 | `auto_tuner.hpp:452-461`（参数 :96-97） |
+| $\vert \Delta\theta\vert \le\max(\vert \theta\vert \cdot10\%,\,10^{-3})$ | 更新限幅 | `auto_tuner.hpp:452-461`（参数 :96-97） |
 | $\theta\leftarrow\max(\theta,0)$ | 非负钳位 | `auto_tuner.hpp:415-416` |
 | $N_{win}=T_w/dt=3000$ | 窗口拍数 | `auto_tuner.hpp:171-173`（缓冲容量 :479） |
 | 非重叠窗清窗 | 窗口/解调状态清零 | `auto_tuner.hpp:418-425` |

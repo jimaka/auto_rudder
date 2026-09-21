@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "vector": "cpp",
+        "cmath": "cpp",
+        "functional": "cpp",
+        "algorithm": "cpp",
+        "chrono": "cpp",
+        "string": "cpp",
+        "cstdio": "cpp",
+        "iostream": "cpp"
+    },
+    "cmake.sourceDirectory": "/home/jim/Desktop/auto_rudder/control"
+}

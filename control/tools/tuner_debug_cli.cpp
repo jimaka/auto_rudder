@@ -72,15 +72,15 @@ void printHelp() {
         "  quit                                退出\n";
 }
 
-void printSnapshot(const TunerDebugApi::Snapshot& s) {
+void printSnapshot(const TunerDebugApi::Snapshot& s, double currentJ) {
     std::printf("OK curKp=%.6f curKd=%.6f baseKp=%.6f baseKd=%.6f baseK=%.4f baseT=%.4f "
-                "established=%d enabled=%d phase=%.4f gradKp=%.6f gradKd=%.6f lastJ=%.4f "
-                "hpfY=%.6f demodKp=%.4f demodKd=%.4f demodN=%u win=%u samples=%zu "
-                "refAge=%.1f osc=%.4f\n",
+                "established=%d enabled=%d phase=%.4f gradKp=%.10g gradKd=%.10g lastJ=%.10g "
+                "hpfY=%.10g demodKp=%.4f demodKd=%.4f demodN=%u win=%u samples=%zu "
+                "refAge=%.1f osc=%.4f currentJ=%.10g\n",
                 s.curKp, s.curKd, s.baselineKp, s.baselineKd, s.baseK, s.baseT,
                 s.baselineEstablished, s.enabled, s.escPhase, s.gradKp, s.gradKd,
                 s.lastJ, s.hpfY, s.demodKpSum, s.demodKdSum, s.demodCount,
-                s.winCounter, s.windowSamples, s.refAgeSec, s.oscAmplitude);
+                s.winCounter, s.windowSamples, s.refAgeSec, s.oscAmplitude, currentJ);
 }
 
 void printParams(const AutoTuner::Params& p) {
@@ -121,7 +121,7 @@ int main() {
         if (cmd == "help") { printHelp(); continue; }
 
         // ---- 观测 ----
-        if (cmd == "status") { printSnapshot(api.snapshot()); continue; }
+        if (cmd == "status") { printSnapshot(api.snapshot(), api.currentJ()); continue; }
         if (cmd == "j")      { std::printf("OK J=%.6f\n", api.currentJ()); continue; }
         if (cmd == "osc")    { std::printf("OK osc=%.4f\n", api.oscAmplitude()); continue; }
         if (cmd == "params") { printParams(api.params()); continue; }

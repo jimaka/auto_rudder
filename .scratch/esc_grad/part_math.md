@@ -79,7 +79,7 @@ $$\frac{\partial J}{\partial u}=\bar\theta\,\frac{\partial J}{\partial\theta}$$
 
 下图给出几何直观：最优点左侧的摄动引起反相的 $J$ 响应（负相关），右侧引起同相响应（正相关），相关性的符号与大小即梯度信息。
 
-![ESC 梯度估计原理：J 响应与载波的相关性给出梯度符号与大小](../assets/esc_math_gradient.png)
+![ESC 梯度估计原理：J 响应与载波的相关性给出梯度符号与大小](../../assets/esc_math_gradient.png)
 
 ## 3. 高通滤波：把直流挡在相关器之外
 
@@ -190,7 +190,7 @@ $$\hat g=\frac{2}{a}\operatorname{avg}\bigl[J(t)\sin\omega t\bigr]\approx\frac{\
 
 下图用合成代价 $J(\theta)=(\theta-\theta^*)^2$ 对这条链路做数值验证：原始 $J(t)$ 的直流 + 基波 + 二倍频结构、HPF 后的幅值衰减与相移、乘以同相载波后均值恒正（$\bar\theta$ 在最优点右侧，梯度为正），以及滑动平均收敛到梯度估计值。
 
-![ESC 解调链路时域验证（合成代价函数）](../assets/esc_math_demod.png)
+![ESC 解调链路时域验证（合成代价函数）](../../assets/esc_math_demod.png)
 
 ## 5. 双参数同时估计：sin/cos 正交解调
 
@@ -230,7 +230,7 @@ $$\hat g_{K_p}=\frac{2}{a}\big\langle y\sin\omega t\big\rangle=\bar K_p\,\frac{\
 
 下图在合成二维二次 Bowl $J(K_p,K_d)$ 上复现双参数搜索（算法参数与代码一致：$a=0.05$、$\omega=0.05$ rad/s、$\eta=0.02$、±10% 限幅）：正交 sin/cos 摄动下，增益轨迹从偏离初值螺旋收敛到最优点附近。
 
-![双参数 ESC 收敛轨迹（合成二次 Bowl）](../assets/esc_math_2param.png)
+![双参数 ESC 收敛轨迹（合成二次 Bowl）](../../assets/esc_math_2param.png)
 
 ## 6. 离散化：从连续相关器到每拍累积
 
@@ -280,7 +280,7 @@ $$\underbrace{dt=0.02\ \text{s}}_{\text{控制/解调节拍}}\;\ll\;\underbrace{
 - **载波 ≪ 适应**：一个载波周期内 $\bar\theta$ 几乎不动，"中心值 + 摄动"的分解才有意义，窗口平均才是在固定工作点上测梯度；
 - 窗口 $T_w=60$ s 本身是噪声方差（§7.3）与更新速率（每窗才能更新一次）之间的折中；注意它与默认载波周期 125.7 s 存在张力——单窗装不满半个载波周期，§4.3 的均值事实不再严格成立（§7.1）。
 
-![ESC 时间尺度三分离](../assets/esc_math_timescale.png)
+![ESC 时间尺度三分离](../../assets/esc_math_timescale.png)
 
 ## 7. 误差来源小结
 

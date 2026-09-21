@@ -43,7 +43,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 
 | 研究 | 场景 | 关键结果（均已与原文核对） | 验证方式 |
 |------|------|----------|----------|
-| Jannaty et al., 2023（[PDF](https://pdfs.semanticscholar.org/d822/3e9163b9d78bbae541b1e9820cbe36d81daf.pdf)，Kadikma 14(3)） | SIGMA 级轻型护卫舰航向控制（Nomoto 模型，0°→30° 阶跃，Np=40，离散步长 0.1 s） | 原文："using PID, system reach reference angle in **15 seconds**, while using MPC, in **4 seconds**"；约束 |δ|≤35°、|r|≤0.0932 rad/s；摘要："MPC can compensate the disturbance better than PID"（注：扰动为人工正弦形式 w(k)=[0.00001+0.1cos t; 0.001+0.1sin t]，非真实海浪谱） | 仿真 |
+| Jannaty et al., 2023（[PDF](https://pdfs.semanticscholar.org/d822/3e9163b9d78bbae541b1e9820cbe36d81daf.pdf)，Kadikma 14(3)） | SIGMA 级轻型护卫舰航向控制（Nomoto 模型，0°→30° 阶跃，Np=40，离散步长 0.1 s） | 原文："using PID, system reach reference angle in **15 seconds**, while using MPC, in **4 seconds**"；约束 \|δ\|≤35°、\|r\|≤0.0932 rad/s；摘要："MPC can compensate the disturbance better than PID"（注：扰动为人工正弦形式 w(k)=[0.00001+0.1cos t; 0.001+0.1sin t]，非真实海浪谱） | 仿真 |
 | Zhang et al., 2025, *Ocean Engineering* 334:121592（[全文](https://repository.tudelft.nl/file/File_4dca60ee-8635-4954-bee2-d55ab94a6f2c?preview=1)） | 内河船 NMPC 路径跟踪，浅水/岸壁效应/流干扰 | 摘要："NMPC effectively reduces course deviations and cross-track errors… while also requiring fewer rudder deflections"。全文无百分比，定量在 Table 5：T 型交汇下游平均横偏误差 AAXTE **PID 9.497 m vs NMPC 1.731 m（≈降 82%）**，直道 1.244 vs 0.292 m；正文："NMPC 的 XTE 稳定在 5 m 以内，PID 几乎为其两倍"。**边界**：控制投入指标 AACE 在直道与弯道工况下 PID 反而更优，"舵角更少"主要体现在 T 型交汇工况与舵角振荡幅度 | 仿真 |
 | MDPI Applied Sciences, 2026, 16(9):4477（[全文](https://www.mdpi.com/2076-3417/16/9/4477)） | 桥区受限水域 FFRLS-MPC（前馈+递推最小二乘自适应） | 工况：6.5 m/s 航速，180° 方向持续干扰（10 m/s 风 + 3 m 有义波高 + 1.2 m/s 流）；45° 阶跃调节时间 **ts≈120–160 s**（改进 MPC），固定参数 MPC 280–340 s，PID **超过 600 s** | 仿真 |
 | 《基于DMPC的船舶航向控制算法研究》，《舰船科学技术》2024 年第 7 期（DOI:10.3404/j.issn.1672-7649.2024.07.009，[全文](https://html.rhhz.net/jckxjsgw/html/74000.htm)） | 舵角 ±30°、舵速 ±3°/s 硬约束 | DMPC（Laguerre 参数化 + Hildreth QP，采样 0.1 s）；海浪频段辅助滤波"达到减小无效操舵的目的"；引言引用刘程的对比仿真表明约束下 MPC 优于 LQR 与 PID（二手引用，已标注） | 仿真 |
@@ -101,11 +101,13 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 ### 2.6 优缺点小结
 
 **MPC 上船的优点**：
+
 - 响应快、超调小、抗风浪干扰能力强（前视预测机理）；
 - 舵角/舵速约束显式满足，舵机动作更少（特定工况下）→ 舵机磨损低、舵致附加阻力小（间接节能）；
 - 代价函数可直接编码多目标（跟踪精度 + 操舵能量 + 舒适性），与上层节能优化天然衔接。
 
 **MPC 上船的缺点**：
+
 - 模型辨识是硬门槛（原文 "a big handicap"），且模型随工况漂移，需配套自适应/再辨识机制；
 - 整定参数多、缺系统化规则，调试依赖控制工程师而非船员（trial-and-error 权重整定有原文佐证）；
 - 需要嵌入式优化求解器与实时性保障工程，认证（船级社型式认可）路径不如 PID 成熟；
@@ -203,6 +205,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 | **Orca AI**（补充） | AI 态势感知 + 航行决策辅助（减少避碰机动与无谓变速） | 2024 年船队数据：告警使近距遭遇事件减少 **54%**，平均每船年省燃油 **约 10 万美元**、全年合计减排约 **19.5 万吨 CO₂**；Seaspan 已部署 **267+ 船**（单船年省约 $100k / 减 500 t CO₂）。注意：节油路径是"减少机动损失"而非直接优化推进，口径与上表其他产品不同 | [Riviera, 2025-05](https://www.rivieramm.com/news-content-hub/us725m-investment-drives-further-autonomous-navigation-development-84755)；[Riviera, 2025-08](https://www.rivieramm.com/news-content-hub/seaspan-cuts-fuel-navigation-incidents-using-ai-85840) |
 
 **部署格局观察**：
+
 - 工业界节能产品的主战场在**决策/操作层**（航线、航速、纵倾、推进功率），第三方实测节油集中在 **3–10%**；厂商宣传值普遍高于第三方实测，引用时应以船级社/试航数据为准。
 - **自动舵层面没有公开的 MPC 实船部署案例**——节能自动舵（Anschütz ECO 模式等）走的是"自适应 + 海浪滤波抑制高频操舵"路线，这从工程上印证了第 2.3 节的判断：MPC 上船的门槛不在算力而在**模型获取与整定**。
 
@@ -232,6 +235,7 @@ MPC 相对 PD 的本质增量有三点：**前视预测**（对未来参考轨�
 > **链接有效性核查（2026-08-12）**：全部 57 条链接逐一探测，无失效链接。MDPI、ScienceDirect、ResearchGate、academia.edu、ship-technology 等站点对脚本访问返回 403（反爬机制，浏览器访问正常）；为此对期刊论文条目补充了 DOI 永久链接（doi.org 解析已逐条验证与原文 PII/页面一一对应）。en.wikipedia.org 从本机网络不可达（连接超时，站点本身正常）；morgan.edu 结题报告 PDF 服务器响应慢（约 1.1 MB，需耐心等待）但链接有效。
 
 **MPC vs PID 控制对比**
+
 1. [Jannaty et al., 2023, Kadikma 14(3)](https://www.researchgate.net/publication/377637467)（[PDF](https://pdfs.semanticscholar.org/d822/3e9163b9d78bbae541b1e9820cbe36d81daf.pdf)）— MPC 与 PID 护卫舰航向控制对比
 2. [Zhang et al., 2025, Ocean Engineering 334:121592](https://repository.tudelft.nl/file/File_4dca60ee-8635-4954-bee2-d55ab94a6f2c?preview=1) — 内河船 NMPC 路径跟踪 vs PID
 3. [MDPI Applied Sciences, 2026, 16(9):4477](https://www.mdpi.com/2076-3417/16/9/4477)（DOI：[10.3390/app16094477](https://doi.org/10.3390/app16094477)）— 桥区受限水域 FFRLS-MPC 航向控制

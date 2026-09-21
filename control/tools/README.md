@@ -4,6 +4,8 @@
 `animate_sim.py` 读取 CSV，生成时间演化的动画视频（MP4/GIF）。
 `plot_convergence.py` 读取 `ar_sim --tune` 导出的收敛轨迹 CSV，生成 RLS 辨识收敛、
 ESC 增益/J 收敛与全链路概览三张效果图（见 `docs/auto_tuning/自动调参测试用例.md` §6.4）。
+`esc_monitor.py` 专门监测 ESC 当前窗口代价、上窗代价、Kp/Kd 梯度及增益，支持 CSV 离线回放、
+实时跟随追加日志和无 GUI 图片导出；它只读数据，不发送调参或执行器命令。
 
 ## 依赖
 
@@ -13,6 +15,126 @@ ESC 增益/J 收敛与全链路概览三张效果图（见 `docs/auto_tuning/自
 # 若缺失，可一键安装
 sudo apt-get install -y python3-matplotlib python3-numpy ffmpeg
 ```
+
+## ESC 代价与梯度监测
+
+### 先跑真实闭环仿真，再查看曲线
+
+以下命令从仓库根目录执行；新遥测字段需要重新编译。依赖仍使用本目录的 `requirements.txt`，
+单独使用此监测脚本不需要 FFmpeg。
+
+```bash
+cmake -S control -B control/build
+cmake --build control/build -j 4
+mkdir -p control/out/esc_monitor
+
+control/build/sim/ar_sim --tune --K 0.2 --T 8 --seconds 1200 \
+    --out control/out/esc_monitor/tune.csv
+
+# 导出六联图，无需桌面环境
+python3 control/tools/esc_monitor.py --csv control/out/esc_monitor/tune.csv \
+    --out control/out/esc_monitor/dashboard.png
+
+# 桌面交互查看：省略 --out；可缩放、平移和保存
+python3 control/tools/esc_monitor.py --csv control/out/esc_monitor/tune.csv
+```
+
+必须使用 `--tune`：普通 `ar_sim --esc` 输出只有船态和增益，不能恢复实际 ESC 梯度。
+仿真在运行结束后一次性导出 CSV，因此对该文件使用 `--follow` 不等于实时观察仿真内部。
+
+| 图的位置 | 显示内容 | 读图注意事项 |
+|---|---|---|
+| 左上 | `currentJ`：当前尚未结算的窗口代价 | 累积后清零通常是清窗，不代表优化完成 |
+| 右上 | `lastJ`：调参器保存的上次结算代价 | 阶梯线；未结算时可能为初始化值，重锚时也可能清零 |
+| 左中 | `gradKp`：Kp 通道解调并低通后的梯度估计 | 零线辅助观察方向；不是增益差分 |
+| 右中 | `gradKd`：Kd 通道解调并低通后的梯度估计 | 单独纵轴，避免两路幅值差异遮住小信号 |
+| 左下 | Kp 中心值与实际施加值（若有） | 仿真实际值含扰动载波；调试日志只提供中心值 |
+| 右下 | Kd 中心值与实际施加值（若有） | 可观察中心更新、增益停留及扰动是否存在 |
+
+图顶显示最新采样的 `enabled`、`baseline` 和 `hpfY`；实时模式还显示距上次收到有效行的时间。
+图底提示缺失字段、无效值、丢弃行、时间倒退和内存保留上限。图中文字使用英文字段名，避免无中文字体时乱码。
+
+### 实时跟随调试日志
+
+终端 A 启动本地采集演示；请为每次采集使用新的日志文件名，避免相对时间从零重启后混入上次会话：
+
+```bash
+mkdir -p control/out/esc_monitor
+PLOT_SIM_AGG=1 python3 control/tools/tuner_debug_monitor.py \
+    --demo --duration 30 --log control/out/esc_monitor/debug_session_01.csv \
+    --out control/out/esc_monitor/debug_overview.png
+```
+
+终端 B 跟随该 CSV，文件尚未创建时会等待：
+
+```bash
+python3 control/tools/esc_monitor.py --csv control/out/esc_monitor/debug_session_01.csv \
+    --follow --window 120 --interval 0.5
+
+# 无 GUI：跟随 30 秒，退出时保存图；未收到有效行则返回非零状态
+python3 control/tools/esc_monitor.py --csv control/out/esc_monitor/debug_session_01.csv \
+    --follow --duration 30 --out control/out/esc_monitor/live_capture.png
+```
+
+`tuner_debug_monitor.py` 启动的是一个独立的 `ar_tuner_debug` 本地进程，不会自动连接正在运行的
+自动舵或 MCU。它的 `--demo` 使用强制启用、方波误差和手动结算，只验证采集/显示链路；
+墙钟时间与算法累计时间不同，不能把该曲线当作闭环性能或实船安全依据。
+真实闭环效果应查看前述 `ar_sim --tune` 数据。新脚本本身不包含这些强制操作。
+
+### 遥测格式与兼容性
+
+推荐的最小 CSV 为以下格式。时间单位为秒，数值一律使用点作为小数分隔符；
+每条记录独占一行，生产端应在写完换行后及时刷新文件：
+
+```csv
+t,currentJ,lastJ,gradKp,gradKd,curKp,curKd,enabled,established,hpfY
+0.0,0.012,0,0,0,1.6,8.6,1,1,0.0003
+0.1,0.027,0,0,0,1.6,8.6,1,1,0.0004
+```
+
+以上是格式示例，不是实测结果。STM32/RH850 等设备可由现有上位机接收程序把实际遥测落盘，
+再用 `--follow` 读取；本次未实现串口/CAN/网络协议或 MCU 端采集驱动。
+快照必须由控制线程在一致的周期边界采集，再交给非实时线程输出，不能并发无锁读取正在更新的调参器。
+不要在控制实时线程中执行 CSV 文件写入；`currentJ` 的计算还会遍历窗口缓冲，应评估采样频率和耗时。
+
+兼容字段如下：
+
+| 统一含义 | 接受的列名（从左到右优先） |
+|---|---|
+| 时间，单位秒 | `t`、`time`、`timestamp` |
+| 当前窗口代价 | `currentJ`、`J` |
+| 上次结算代价 | `lastJ` |
+| 两路实际梯度估计 | `gradKp`、`gradKd` |
+| 持久增益中心 | `KpCenter` / `KdCenter`、`curKp` / `curKd` |
+| 实际施加增益 | `Kp`、`Kd`，仅使用普通采样行 |
+| 启用/基线状态 | `enabled`；`baseline`、`established` |
+| 高通输出 | `hpfY` |
+
+旧版 `tune.csv` 可显示 `settle=1` 行中的 `Jwindow`，但没有梯度时会明确显示缺失，
+不会补零，也不会使用 `ΔJ/ΔK` 冒充梯度。旧 `Jwindow` 是清窗前一拍读到的近似值；
+旧 `settle` 标记根据代价缓冲清空推断，也可能包含重锚清窗，不能当作精确的接受/回退事件。
+新导出的 `lastJ`、`gradKp` 和 `gradKd` 则直接取自调参器快照，保留旧 CSV 前 19 列以兼容其他绘图工具。
+本脚本按时间排序追加在文件末尾的事件行；事件行中的旧增益含义不同，不会混入实际增益曲线。
+
+当前展示的是现有双通道 ESC 的原始代价和乘性扰动坐标下的梯度估计，不是减参设计中的
+归一化代价或单变量 `q` 梯度，也不声称等于物理增益坐标下精确的偏导数。
+梯度为零可能是尚未结算、没有有效解调、冻结或重锚；`enabled=1` 只反映现有速度门，
+不表示所有安全条件成立。应在相近参考激励、窗口设置和工况下比较代价，图表不自动判定收敛或触发回退。
+
+实时模式支持不完整行等待、文件替换及观察到的文件截短；更换日志会清空上一会话的曲线。
+同一路径在两次刷新间被截短又快速长回原尺寸时可能无法识别，建议轮换文件而不是原地覆写。
+默认最多保留最后 50000 行（按文件读取顺序），超出时图底提示；`--max-points` 可调整，
+`--window` 只限制显示的时间范围。空白或非法数值显示为缺口，合法的零值保留。
+
+### 验证
+
+```bash
+MPLBACKEND=Agg python3 -m unittest discover -s control/tools/tests -v
+ctest --test-dir control/build --output-on-failure
+```
+
+Python 测试覆盖解析、零值/缺失值、历史事件、半行追加、截短/轮换、图片输出和参数校验；
+构建 C++ 工具后还会验证真实仿真 CSV 与调试 CLI 遥测，没有对应二进制时这两项集成测试会跳过。
 
 ## 一键流程：跑场景 → 导出 CSV → 生成图
 

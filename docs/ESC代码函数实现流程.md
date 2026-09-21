@@ -61,7 +61,7 @@ ESC 自动调参由单个类 `AutoTuner`（`auto_tuner.hpp:80-508`）承载，�
 
 ```mermaid
 flowchart LR
-    subgraph 每拍路径（50 Hz）
+    subgraph per_tick["每拍路径（50 Hz）"]
         IN[TunerInput<br/>ref/heading/rudder/speed/dt<br/>schedKp/schedKd/IdSnapshot]
         GATE[速度门控<br/>enabled_ 判定]
         BASE{基线已建立?}

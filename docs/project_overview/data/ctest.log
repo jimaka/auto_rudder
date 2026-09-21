@@ -1,0 +1,2893 @@
+Start testing: Sep 09 09:11 CST
+----------------------------------------------------------
+1/109 Testing: AngleUtils.NormalizePositiveBoundary
+1/109 Test: AngleUtils.NormalizePositiveBoundary
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.NormalizePositiveBoundary" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.NormalizePositiveBoundary" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.NormalizePositiveBoundary
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.NormalizePositiveBoundary
+[       OK ] AngleUtils.NormalizePositiveBoundary (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.NormalizePositiveBoundary" end time: Sep 09 09:11 CST
+"AngleUtils.NormalizePositiveBoundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/109 Testing: AngleUtils.NormalizeNegativeBoundary
+2/109 Test: AngleUtils.NormalizeNegativeBoundary
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.NormalizeNegativeBoundary" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.NormalizeNegativeBoundary" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.NormalizeNegativeBoundary
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.NormalizeNegativeBoundary
+[       OK ] AngleUtils.NormalizeNegativeBoundary (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.NormalizeNegativeBoundary" end time: Sep 09 09:11 CST
+"AngleUtils.NormalizeNegativeBoundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+3/109 Testing: AngleUtils.NormalizePositiveFold
+3/109 Test: AngleUtils.NormalizePositiveFold
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.NormalizePositiveFold" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.NormalizePositiveFold" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.NormalizePositiveFold
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.NormalizePositiveFold
+[       OK ] AngleUtils.NormalizePositiveFold (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.NormalizePositiveFold" end time: Sep 09 09:11 CST
+"AngleUtils.NormalizePositiveFold" time elapsed: 00:00:00
+----------------------------------------------------------
+
+4/109 Testing: AngleUtils.NormalizeNegativeFold
+4/109 Test: AngleUtils.NormalizeNegativeFold
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.NormalizeNegativeFold" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.NormalizeNegativeFold" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.NormalizeNegativeFold
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.NormalizeNegativeFold
+[       OK ] AngleUtils.NormalizeNegativeFold (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.NormalizeNegativeFold" end time: Sep 09 09:11 CST
+"AngleUtils.NormalizeNegativeFold" time elapsed: 00:00:00
+----------------------------------------------------------
+
+5/109 Testing: AngleUtils.DiffAcrossZeroPositive
+5/109 Test: AngleUtils.DiffAcrossZeroPositive
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.DiffAcrossZeroPositive" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.DiffAcrossZeroPositive" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.DiffAcrossZeroPositive
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.DiffAcrossZeroPositive
+[       OK ] AngleUtils.DiffAcrossZeroPositive (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.DiffAcrossZeroPositive" end time: Sep 09 09:11 CST
+"AngleUtils.DiffAcrossZeroPositive" time elapsed: 00:00:00
+----------------------------------------------------------
+
+6/109 Testing: AngleUtils.DiffAcrossZeroNegative
+6/109 Test: AngleUtils.DiffAcrossZeroNegative
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.DiffAcrossZeroNegative" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.DiffAcrossZeroNegative" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.DiffAcrossZeroNegative
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.DiffAcrossZeroNegative
+[       OK ] AngleUtils.DiffAcrossZeroNegative (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.DiffAcrossZeroNegative" end time: Sep 09 09:11 CST
+"AngleUtils.DiffAcrossZeroNegative" time elapsed: 00:00:00
+----------------------------------------------------------
+
+7/109 Testing: AngleUtils.RadDegConsistency
+7/109 Test: AngleUtils.RadDegConsistency
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_angle_utils" "--gtest_filter=AngleUtils.RadDegConsistency" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AngleUtils.RadDegConsistency" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AngleUtils.RadDegConsistency
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AngleUtils
+[ RUN      ] AngleUtils.RadDegConsistency
+[       OK ] AngleUtils.RadDegConsistency (0 ms)
+[----------] 1 test from AngleUtils (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AngleUtils.RadDegConsistency" end time: Sep 09 09:11 CST
+"AngleUtils.RadDegConsistency" time elapsed: 00:00:00
+----------------------------------------------------------
+
+8/109 Testing: PdController.CrossZeroError
+8/109 Test: PdController.CrossZeroError
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.CrossZeroError" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.CrossZeroError" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.CrossZeroError
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.CrossZeroError
+[       OK ] PdController.CrossZeroError (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.CrossZeroError" end time: Sep 09 09:11 CST
+"PdController.CrossZeroError" time elapsed: 00:00:00
+----------------------------------------------------------
+
+9/109 Testing: PdController.DeadzoneOutputsZero
+9/109 Test: PdController.DeadzoneOutputsZero
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.DeadzoneOutputsZero" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.DeadzoneOutputsZero" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.DeadzoneOutputsZero
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.DeadzoneOutputsZero
+[       OK ] PdController.DeadzoneOutputsZero (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.DeadzoneOutputsZero" end time: Sep 09 09:11 CST
+"PdController.DeadzoneOutputsZero" time elapsed: 00:00:00
+----------------------------------------------------------
+
+10/109 Testing: PdController.RudderSaturation
+10/109 Test: PdController.RudderSaturation
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.RudderSaturation" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.RudderSaturation" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.RudderSaturation
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.RudderSaturation
+[       OK ] PdController.RudderSaturation (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.RudderSaturation" end time: Sep 09 09:11 CST
+"PdController.RudderSaturation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+11/109 Testing: PdController.RateLimit
+11/109 Test: PdController.RateLimit
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.RateLimit" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.RateLimit" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.RateLimit
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.RateLimit
+[       OK ] PdController.RateLimit (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.RateLimit" end time: Sep 09 09:11 CST
+"PdController.RateLimit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+12/109 Testing: PdController.FirstBeatNoDerivativeKick
+12/109 Test: PdController.FirstBeatNoDerivativeKick
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.FirstBeatNoDerivativeKick" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.FirstBeatNoDerivativeKick" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.FirstBeatNoDerivativeKick
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.FirstBeatNoDerivativeKick
+[       OK ] PdController.FirstBeatNoDerivativeKick (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.FirstBeatNoDerivativeKick" end time: Sep 09 09:11 CST
+"PdController.FirstBeatNoDerivativeKick" time elapsed: 00:00:00
+----------------------------------------------------------
+
+13/109 Testing: PdController.Quantization
+13/109 Test: PdController.Quantization
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.Quantization" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.Quantization" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.Quantization
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.Quantization
+[       OK ] PdController.Quantization (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.Quantization" end time: Sep 09 09:11 CST
+"PdController.Quantization" time elapsed: 00:00:00
+----------------------------------------------------------
+
+14/109 Testing: PdController.LowpassAttenuation
+14/109 Test: PdController.LowpassAttenuation
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.LowpassAttenuation" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.LowpassAttenuation" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.LowpassAttenuation
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.LowpassAttenuation
+[       OK ] PdController.LowpassAttenuation (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.LowpassAttenuation" end time: Sep 09 09:11 CST
+"PdController.LowpassAttenuation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+15/109 Testing: PdController.SetGainsPreservesState
+15/109 Test: PdController.SetGainsPreservesState
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.SetGainsPreservesState" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.SetGainsPreservesState" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.SetGainsPreservesState
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.SetGainsPreservesState
+[       OK ] PdController.SetGainsPreservesState (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.SetGainsPreservesState" end time: Sep 09 09:11 CST
+"PdController.SetGainsPreservesState" time elapsed: 00:00:00
+----------------------------------------------------------
+
+16/109 Testing: PdController.InitBaselinePreventsJump
+16/109 Test: PdController.InitBaselinePreventsJump
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.InitBaselinePreventsJump" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.InitBaselinePreventsJump" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.InitBaselinePreventsJump
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.InitBaselinePreventsJump
+[       OK ] PdController.InitBaselinePreventsJump (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.InitBaselinePreventsJump" end time: Sep 09 09:11 CST
+"PdController.InitBaselinePreventsJump" time elapsed: 00:00:00
+----------------------------------------------------------
+
+17/109 Testing: PdController.DeadzoneExitRespectsRateLimit
+17/109 Test: PdController.DeadzoneExitRespectsRateLimit
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.DeadzoneExitRespectsRateLimit" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.DeadzoneExitRespectsRateLimit" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.DeadzoneExitRespectsRateLimit
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.DeadzoneExitRespectsRateLimit
+[       OK ] PdController.DeadzoneExitRespectsRateLimit (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.DeadzoneExitRespectsRateLimit" end time: Sep 09 09:11 CST
+"PdController.DeadzoneExitRespectsRateLimit" time elapsed: 00:00:00
+----------------------------------------------------------
+
+18/109 Testing: PdController.SetDtRejectsNonPositive
+18/109 Test: PdController.SetDtRejectsNonPositive
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.SetDtRejectsNonPositive" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.SetDtRejectsNonPositive" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.SetDtRejectsNonPositive
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.SetDtRejectsNonPositive
+[       OK ] PdController.SetDtRejectsNonPositive (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.SetDtRejectsNonPositive" end time: Sep 09 09:11 CST
+"PdController.SetDtRejectsNonPositive" time elapsed: 00:00:00
+----------------------------------------------------------
+
+19/109 Testing: PdController.SetParamsClampsInvalidDtQuant
+19/109 Test: PdController.SetParamsClampsInvalidDtQuant
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_pd_controller" "--gtest_filter=PdController.SetParamsClampsInvalidDtQuant" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PdController.SetParamsClampsInvalidDtQuant" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PdController.SetParamsClampsInvalidDtQuant
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PdController
+[ RUN      ] PdController.SetParamsClampsInvalidDtQuant
+[       OK ] PdController.SetParamsClampsInvalidDtQuant (0 ms)
+[----------] 1 test from PdController (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PdController.SetParamsClampsInvalidDtQuant" end time: Sep 09 09:11 CST
+"PdController.SetParamsClampsInvalidDtQuant" time elapsed: 00:00:00
+----------------------------------------------------------
+
+20/109 Testing: GainSchedule.NominalAtMidpoint
+20/109 Test: GainSchedule.NominalAtMidpoint
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.NominalAtMidpoint" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.NominalAtMidpoint" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.NominalAtMidpoint
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.NominalAtMidpoint
+[       OK ] GainSchedule.NominalAtMidpoint (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.NominalAtMidpoint" end time: Sep 09 09:11 CST
+"GainSchedule.NominalAtMidpoint" time elapsed: 00:00:00
+----------------------------------------------------------
+
+21/109 Testing: GainSchedule.InterpolationContinuityAtBoundary
+21/109 Test: GainSchedule.InterpolationContinuityAtBoundary
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.InterpolationContinuityAtBoundary" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.InterpolationContinuityAtBoundary" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.InterpolationContinuityAtBoundary
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.InterpolationContinuityAtBoundary
+[       OK ] GainSchedule.InterpolationContinuityAtBoundary (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.InterpolationContinuityAtBoundary" end time: Sep 09 09:11 CST
+"GainSchedule.InterpolationContinuityAtBoundary" time elapsed: 00:00:00
+----------------------------------------------------------
+
+22/109 Testing: GainSchedule.HighSeaState
+22/109 Test: GainSchedule.HighSeaState
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.HighSeaState" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.HighSeaState" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.HighSeaState
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.HighSeaState
+[       OK ] GainSchedule.HighSeaState (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.HighSeaState" end time: Sep 09 09:11 CST
+"GainSchedule.HighSeaState" time elapsed: 00:00:00
+----------------------------------------------------------
+
+23/109 Testing: GainSchedule.SeaStateClamp
+23/109 Test: GainSchedule.SeaStateClamp
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.SeaStateClamp" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.SeaStateClamp" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.SeaStateClamp
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.SeaStateClamp
+[       OK ] GainSchedule.SeaStateClamp (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.SeaStateClamp" end time: Sep 09 09:11 CST
+"GainSchedule.SeaStateClamp" time elapsed: 00:00:00
+----------------------------------------------------------
+
+24/109 Testing: GainSchedule.SpeedAboveMax
+24/109 Test: GainSchedule.SpeedAboveMax
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.SpeedAboveMax" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.SpeedAboveMax" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.SpeedAboveMax
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.SpeedAboveMax
+[       OK ] GainSchedule.SpeedAboveMax (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.SpeedAboveMax" end time: Sep 09 09:11 CST
+"GainSchedule.SpeedAboveMax" time elapsed: 00:00:00
+----------------------------------------------------------
+
+25/109 Testing: GainSchedule.SpeedBelowMin
+25/109 Test: GainSchedule.SpeedBelowMin
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.SpeedBelowMin" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.SpeedBelowMin" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.SpeedBelowMin
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.SpeedBelowMin
+[       OK ] GainSchedule.SpeedBelowMin (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.SpeedBelowMin" end time: Sep 09 09:11 CST
+"GainSchedule.SpeedBelowMin" time elapsed: 00:00:00
+----------------------------------------------------------
+
+26/109 Testing: GainSchedule.NoCrashOnNegativeSpeed
+26/109 Test: GainSchedule.NoCrashOnNegativeSpeed
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_gain_schedule" "--gtest_filter=GainSchedule.NoCrashOnNegativeSpeed" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"GainSchedule.NoCrashOnNegativeSpeed" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = GainSchedule.NoCrashOnNegativeSpeed
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from GainSchedule
+[ RUN      ] GainSchedule.NoCrashOnNegativeSpeed
+[       OK ] GainSchedule.NoCrashOnNegativeSpeed (0 ms)
+[----------] 1 test from GainSchedule (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"GainSchedule.NoCrashOnNegativeSpeed" end time: Sep 09 09:11 CST
+"GainSchedule.NoCrashOnNegativeSpeed" time elapsed: 00:00:00
+----------------------------------------------------------
+
+27/109 Testing: NomotoIdentifier.ConvergesOnNomotoData
+27/109 Test: NomotoIdentifier.ConvergesOnNomotoData
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=NomotoIdentifier.ConvergesOnNomotoData" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"NomotoIdentifier.ConvergesOnNomotoData" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = NomotoIdentifier.ConvergesOnNomotoData
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from NomotoIdentifier
+[ RUN      ] NomotoIdentifier.ConvergesOnNomotoData
+[       OK ] NomotoIdentifier.ConvergesOnNomotoData (0 ms)
+[----------] 1 test from NomotoIdentifier (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"NomotoIdentifier.ConvergesOnNomotoData" end time: Sep 09 09:11 CST
+"NomotoIdentifier.ConvergesOnNomotoData" time elapsed: 00:00:00
+----------------------------------------------------------
+
+28/109 Testing: NomotoIdentifier.SelfDecimatesAtAnyCallRate
+28/109 Test: NomotoIdentifier.SelfDecimatesAtAnyCallRate
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=NomotoIdentifier.SelfDecimatesAtAnyCallRate" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"NomotoIdentifier.SelfDecimatesAtAnyCallRate" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = NomotoIdentifier.SelfDecimatesAtAnyCallRate
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from NomotoIdentifier
+[ RUN      ] NomotoIdentifier.SelfDecimatesAtAnyCallRate
+[       OK ] NomotoIdentifier.SelfDecimatesAtAnyCallRate (0 ms)
+[----------] 1 test from NomotoIdentifier (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"NomotoIdentifier.SelfDecimatesAtAnyCallRate" end time: Sep 09 09:11 CST
+"NomotoIdentifier.SelfDecimatesAtAnyCallRate" time elapsed: 00:00:00
+----------------------------------------------------------
+
+29/109 Testing: NomotoIdentifier.NotExcitedWhenIdle
+29/109 Test: NomotoIdentifier.NotExcitedWhenIdle
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=NomotoIdentifier.NotExcitedWhenIdle" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"NomotoIdentifier.NotExcitedWhenIdle" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = NomotoIdentifier.NotExcitedWhenIdle
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from NomotoIdentifier
+[ RUN      ] NomotoIdentifier.NotExcitedWhenIdle
+[       OK ] NomotoIdentifier.NotExcitedWhenIdle (0 ms)
+[----------] 1 test from NomotoIdentifier (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"NomotoIdentifier.NotExcitedWhenIdle" end time: Sep 09 09:11 CST
+"NomotoIdentifier.NotExcitedWhenIdle" time elapsed: 00:00:00
+----------------------------------------------------------
+
+30/109 Testing: NomotoIdentifier.RejectsOutOfRangeInput
+30/109 Test: NomotoIdentifier.RejectsOutOfRangeInput
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=NomotoIdentifier.RejectsOutOfRangeInput" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"NomotoIdentifier.RejectsOutOfRangeInput" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = NomotoIdentifier.RejectsOutOfRangeInput
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from NomotoIdentifier
+[ RUN      ] NomotoIdentifier.RejectsOutOfRangeInput
+[       OK ] NomotoIdentifier.RejectsOutOfRangeInput (0 ms)
+[----------] 1 test from NomotoIdentifier (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"NomotoIdentifier.RejectsOutOfRangeInput" end time: Sep 09 09:11 CST
+"NomotoIdentifier.RejectsOutOfRangeInput" time elapsed: 00:00:00
+----------------------------------------------------------
+
+31/109 Testing: NomotoIdentifier.RecoversAfterNaNInput
+31/109 Test: NomotoIdentifier.RecoversAfterNaNInput
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=NomotoIdentifier.RecoversAfterNaNInput" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"NomotoIdentifier.RecoversAfterNaNInput" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = NomotoIdentifier.RecoversAfterNaNInput
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from NomotoIdentifier
+[ RUN      ] NomotoIdentifier.RecoversAfterNaNInput
+[       OK ] NomotoIdentifier.RecoversAfterNaNInput (0 ms)
+[----------] 1 test from NomotoIdentifier (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"NomotoIdentifier.RecoversAfterNaNInput" end time: Sep 09 09:11 CST
+"NomotoIdentifier.RecoversAfterNaNInput" time elapsed: 00:00:00
+----------------------------------------------------------
+
+32/109 Testing: NomotoIdentifier.InvalidWhenOutOfRange
+32/109 Test: NomotoIdentifier.InvalidWhenOutOfRange
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=NomotoIdentifier.InvalidWhenOutOfRange" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"NomotoIdentifier.InvalidWhenOutOfRange" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = NomotoIdentifier.InvalidWhenOutOfRange
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from NomotoIdentifier
+[ RUN      ] NomotoIdentifier.InvalidWhenOutOfRange
+[       OK ] NomotoIdentifier.InvalidWhenOutOfRange (0 ms)
+[----------] 1 test from NomotoIdentifier (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"NomotoIdentifier.InvalidWhenOutOfRange" end time: Sep 09 09:11 CST
+"NomotoIdentifier.InvalidWhenOutOfRange" time elapsed: 00:00:00
+----------------------------------------------------------
+
+33/109 Testing: PolePlacement.ReturnsFalseOnDegenerate
+33/109 Test: PolePlacement.ReturnsFalseOnDegenerate
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=PolePlacement.ReturnsFalseOnDegenerate" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PolePlacement.ReturnsFalseOnDegenerate" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PolePlacement.ReturnsFalseOnDegenerate
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PolePlacement
+[ RUN      ] PolePlacement.ReturnsFalseOnDegenerate
+[       OK ] PolePlacement.ReturnsFalseOnDegenerate (0 ms)
+[----------] 1 test from PolePlacement (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PolePlacement.ReturnsFalseOnDegenerate" end time: Sep 09 09:11 CST
+"PolePlacement.ReturnsFalseOnDegenerate" time elapsed: 00:00:00
+----------------------------------------------------------
+
+34/109 Testing: PolePlacement.ClampsNegativeKd
+34/109 Test: PolePlacement.ClampsNegativeKd
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=PolePlacement.ClampsNegativeKd" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PolePlacement.ClampsNegativeKd" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PolePlacement.ClampsNegativeKd
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PolePlacement
+[ RUN      ] PolePlacement.ClampsNegativeKd
+[       OK ] PolePlacement.ClampsNegativeKd (0 ms)
+[----------] 1 test from PolePlacement (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PolePlacement.ClampsNegativeKd" end time: Sep 09 09:11 CST
+"PolePlacement.ClampsNegativeKd" time elapsed: 00:00:00
+----------------------------------------------------------
+
+35/109 Testing: PolePlacement.ProducesTargetZetaWn
+35/109 Test: PolePlacement.ProducesTargetZetaWn
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_nomoto_identifier" "--gtest_filter=PolePlacement.ProducesTargetZetaWn" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"PolePlacement.ProducesTargetZetaWn" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = PolePlacement.ProducesTargetZetaWn
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from PolePlacement
+[ RUN      ] PolePlacement.ProducesTargetZetaWn
+[       OK ] PolePlacement.ProducesTargetZetaWn (0 ms)
+[----------] 1 test from PolePlacement (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"PolePlacement.ProducesTargetZetaWn" end time: Sep 09 09:11 CST
+"PolePlacement.ProducesTargetZetaWn" time elapsed: 00:00:00
+----------------------------------------------------------
+
+36/109 Testing: AutoTuner.PolePlacementProducesTargetZetaWn
+36/109 Test: AutoTuner.PolePlacementProducesTargetZetaWn
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.PolePlacementProducesTargetZetaWn" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.PolePlacementProducesTargetZetaWn" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.PolePlacementProducesTargetZetaWn
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.PolePlacementProducesTargetZetaWn
+[       OK ] AutoTuner.PolePlacementProducesTargetZetaWn (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.PolePlacementProducesTargetZetaWn" end time: Sep 09 09:11 CST
+"AutoTuner.PolePlacementProducesTargetZetaWn" time elapsed: 00:00:00
+----------------------------------------------------------
+
+37/109 Testing: AutoTuner.PolePlacementRejectsDegenerate
+37/109 Test: AutoTuner.PolePlacementRejectsDegenerate
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.PolePlacementRejectsDegenerate" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.PolePlacementRejectsDegenerate" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.PolePlacementRejectsDegenerate
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.PolePlacementRejectsDegenerate
+[       OK ] AutoTuner.PolePlacementRejectsDegenerate (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.PolePlacementRejectsDegenerate" end time: Sep 09 09:11 CST
+"AutoTuner.PolePlacementRejectsDegenerate" time elapsed: 00:00:00
+----------------------------------------------------------
+
+38/109 Testing: AutoTuner.PolePlacementClampsNegativeKd
+38/109 Test: AutoTuner.PolePlacementClampsNegativeKd
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.PolePlacementClampsNegativeKd" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.PolePlacementClampsNegativeKd" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.PolePlacementClampsNegativeKd
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.PolePlacementClampsNegativeKd
+[       OK ] AutoTuner.PolePlacementClampsNegativeKd (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.PolePlacementClampsNegativeKd" end time: Sep 09 09:11 CST
+"AutoTuner.PolePlacementClampsNegativeKd" time elapsed: 00:00:00
+----------------------------------------------------------
+
+39/109 Testing: AutoTuner.StabilityCheckAcceptsHealthy
+39/109 Test: AutoTuner.StabilityCheckAcceptsHealthy
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.StabilityCheckAcceptsHealthy" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.StabilityCheckAcceptsHealthy" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.StabilityCheckAcceptsHealthy
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.StabilityCheckAcceptsHealthy
+[       OK ] AutoTuner.StabilityCheckAcceptsHealthy (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.StabilityCheckAcceptsHealthy" end time: Sep 09 09:11 CST
+"AutoTuner.StabilityCheckAcceptsHealthy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+40/109 Testing: AutoTuner.StabilityCheckRejectsLowZeta
+40/109 Test: AutoTuner.StabilityCheckRejectsLowZeta
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.StabilityCheckRejectsLowZeta" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.StabilityCheckRejectsLowZeta" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.StabilityCheckRejectsLowZeta
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.StabilityCheckRejectsLowZeta
+[       OK ] AutoTuner.StabilityCheckRejectsLowZeta (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.StabilityCheckRejectsLowZeta" end time: Sep 09 09:11 CST
+"AutoTuner.StabilityCheckRejectsLowZeta" time elapsed: 00:00:00
+----------------------------------------------------------
+
+41/109 Testing: AutoTuner.StabilityCheckRejectsHighWn
+41/109 Test: AutoTuner.StabilityCheckRejectsHighWn
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.StabilityCheckRejectsHighWn" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.StabilityCheckRejectsHighWn" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.StabilityCheckRejectsHighWn
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.StabilityCheckRejectsHighWn
+[       OK ] AutoTuner.StabilityCheckRejectsHighWn (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.StabilityCheckRejectsHighWn" end time: Sep 09 09:11 CST
+"AutoTuner.StabilityCheckRejectsHighWn" time elapsed: 00:00:00
+----------------------------------------------------------
+
+42/109 Testing: AutoTuner.OscillationDetectorMeasuresAmplitude
+42/109 Test: AutoTuner.OscillationDetectorMeasuresAmplitude
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.OscillationDetectorMeasuresAmplitude" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.OscillationDetectorMeasuresAmplitude" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.OscillationDetectorMeasuresAmplitude
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.OscillationDetectorMeasuresAmplitude
+[       OK ] AutoTuner.OscillationDetectorMeasuresAmplitude (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.OscillationDetectorMeasuresAmplitude" end time: Sep 09 09:11 CST
+"AutoTuner.OscillationDetectorMeasuresAmplitude" time elapsed: 00:00:00
+----------------------------------------------------------
+
+43/109 Testing: AutoTuner.StabilityCheckRejectsOscillation
+43/109 Test: AutoTuner.StabilityCheckRejectsOscillation
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.StabilityCheckRejectsOscillation" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.StabilityCheckRejectsOscillation" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.StabilityCheckRejectsOscillation
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.StabilityCheckRejectsOscillation
+[       OK ] AutoTuner.StabilityCheckRejectsOscillation (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.StabilityCheckRejectsOscillation" end time: Sep 09 09:11 CST
+"AutoTuner.StabilityCheckRejectsOscillation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+44/109 Testing: AutoTuner.RingBufferNoHeap
+44/109 Test: AutoTuner.RingBufferNoHeap
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.RingBufferNoHeap" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.RingBufferNoHeap" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.RingBufferNoHeap
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.RingBufferNoHeap
+[       OK ] AutoTuner.RingBufferNoHeap (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.RingBufferNoHeap" end time: Sep 09 09:11 CST
+"AutoTuner.RingBufferNoHeap" time elapsed: 00:00:00
+----------------------------------------------------------
+
+45/109 Testing: AutoTuner.OscillationDetectorResetClearsPeaks
+45/109 Test: AutoTuner.OscillationDetectorResetClearsPeaks
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.OscillationDetectorResetClearsPeaks" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.OscillationDetectorResetClearsPeaks" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.OscillationDetectorResetClearsPeaks
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.OscillationDetectorResetClearsPeaks
+[       OK ] AutoTuner.OscillationDetectorResetClearsPeaks (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.OscillationDetectorResetClearsPeaks" end time: Sep 09 09:11 CST
+"AutoTuner.OscillationDetectorResetClearsPeaks" time elapsed: 00:00:00
+----------------------------------------------------------
+
+46/109 Testing: AutoTuner.EscDitherModulatesGains
+46/109 Test: AutoTuner.EscDitherModulatesGains
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.EscDitherModulatesGains" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.EscDitherModulatesGains" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.EscDitherModulatesGains
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.EscDitherModulatesGains
+[       OK ] AutoTuner.EscDitherModulatesGains (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.EscDitherModulatesGains" end time: Sep 09 09:11 CST
+"AutoTuner.EscDitherModulatesGains" time elapsed: 00:00:00
+----------------------------------------------------------
+
+47/109 Testing: AutoTuner.WindowSettleUpdateIsClamped
+47/109 Test: AutoTuner.WindowSettleUpdateIsClamped
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.WindowSettleUpdateIsClamped" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.WindowSettleUpdateIsClamped" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.WindowSettleUpdateIsClamped
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.WindowSettleUpdateIsClamped
+[       OK ] AutoTuner.WindowSettleUpdateIsClamped (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.WindowSettleUpdateIsClamped" end time: Sep 09 09:11 CST
+"AutoTuner.WindowSettleUpdateIsClamped" time elapsed: 00:00:00
+----------------------------------------------------------
+
+48/109 Testing: AutoTuner.EscTunesKpTowardOptimum
+48/109 Test: AutoTuner.EscTunesKpTowardOptimum
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.EscTunesKpTowardOptimum" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.EscTunesKpTowardOptimum" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.EscTunesKpTowardOptimum
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.EscTunesKpTowardOptimum
+[       OK ] AutoTuner.EscTunesKpTowardOptimum (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.EscTunesKpTowardOptimum" end time: Sep 09 09:11 CST
+"AutoTuner.EscTunesKpTowardOptimum" time elapsed: 00:00:00
+----------------------------------------------------------
+
+49/109 Testing: AutoTuner.EscUpdateUnsticksFromZeroKd
+49/109 Test: AutoTuner.EscUpdateUnsticksFromZeroKd
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.EscUpdateUnsticksFromZeroKd" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.EscUpdateUnsticksFromZeroKd" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.EscUpdateUnsticksFromZeroKd
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.EscUpdateUnsticksFromZeroKd
+[       OK ] AutoTuner.EscUpdateUnsticksFromZeroKd (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.EscUpdateUnsticksFromZeroKd" end time: Sep 09 09:11 CST
+"AutoTuner.EscUpdateUnsticksFromZeroKd" time elapsed: 00:00:00
+----------------------------------------------------------
+
+50/109 Testing: AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid
+50/109 Test: AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid
+[       OK ] AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid" end time: Sep 09 09:11 CST
+"AutoTuner.SettleRevertsToBaselineWhenEstimateInvalid" time elapsed: 00:00:00
+----------------------------------------------------------
+
+51/109 Testing: AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy
+51/109 Test: AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy
+[       OK ] AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy" end time: Sep 09 09:11 CST
+"AutoTuner.SettleAcceptsUpdateWhenEstimateHealthy" time elapsed: 00:00:00
+----------------------------------------------------------
+
+52/109 Testing: AutoTuner.RebaselineClearsIntegratorState
+52/109 Test: AutoTuner.RebaselineClearsIntegratorState
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_auto_tuner" "--gtest_filter=AutoTuner.RebaselineClearsIntegratorState" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutoTuner.RebaselineClearsIntegratorState" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutoTuner.RebaselineClearsIntegratorState
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutoTuner
+[ RUN      ] AutoTuner.RebaselineClearsIntegratorState
+[       OK ] AutoTuner.RebaselineClearsIntegratorState (0 ms)
+[----------] 1 test from AutoTuner (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutoTuner.RebaselineClearsIntegratorState" end time: Sep 09 09:11 CST
+"AutoTuner.RebaselineClearsIntegratorState" time elapsed: 00:00:00
+----------------------------------------------------------
+
+53/109 Testing: ManeuverSequencer.EmptyIsDone
+53/109 Test: ManeuverSequencer.EmptyIsDone
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.EmptyIsDone" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.EmptyIsDone" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.EmptyIsDone
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.EmptyIsDone
+[       OK ] ManeuverSequencer.EmptyIsDone (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.EmptyIsDone" end time: Sep 09 09:11 CST
+"ManeuverSequencer.EmptyIsDone" time elapsed: 00:00:00
+----------------------------------------------------------
+
+54/109 Testing: ManeuverSequencer.WilliamsonStructure
+54/109 Test: ManeuverSequencer.WilliamsonStructure
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.WilliamsonStructure" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.WilliamsonStructure" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.WilliamsonStructure
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.WilliamsonStructure
+[       OK ] ManeuverSequencer.WilliamsonStructure (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.WilliamsonStructure" end time: Sep 09 09:11 CST
+"ManeuverSequencer.WilliamsonStructure" time elapsed: 00:00:00
+----------------------------------------------------------
+
+55/109 Testing: ManeuverSequencer.UTurnUsesRudderTurn
+55/109 Test: ManeuverSequencer.UTurnUsesRudderTurn
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.UTurnUsesRudderTurn" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.UTurnUsesRudderTurn" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.UTurnUsesRudderTurn
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.UTurnUsesRudderTurn
+[       OK ] ManeuverSequencer.UTurnUsesRudderTurn (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.UTurnUsesRudderTurn" end time: Sep 09 09:11 CST
+"ManeuverSequencer.UTurnUsesRudderTurn" time elapsed: 00:00:00
+----------------------------------------------------------
+
+56/109 Testing: ManeuverSequencer.ZigzagStructure
+56/109 Test: ManeuverSequencer.ZigzagStructure
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.ZigzagStructure" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.ZigzagStructure" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.ZigzagStructure
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.ZigzagStructure
+[       OK ] ManeuverSequencer.ZigzagStructure (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.ZigzagStructure" end time: Sep 09 09:11 CST
+"ManeuverSequencer.ZigzagStructure" time elapsed: 00:00:00
+----------------------------------------------------------
+
+57/109 Testing: ManeuverSequencer.ZigzagReturnToStart
+57/109 Test: ManeuverSequencer.ZigzagReturnToStart
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.ZigzagReturnToStart" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.ZigzagReturnToStart" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.ZigzagReturnToStart
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.ZigzagReturnToStart
+[       OK ] ManeuverSequencer.ZigzagReturnToStart (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.ZigzagReturnToStart" end time: Sep 09 09:11 CST
+"ManeuverSequencer.ZigzagReturnToStart" time elapsed: 00:00:00
+----------------------------------------------------------
+
+58/109 Testing: ManeuverSequencer.ZigzagReturnTargetsPsi0
+58/109 Test: ManeuverSequencer.ZigzagReturnTargetsPsi0
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.ZigzagReturnTargetsPsi0" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.ZigzagReturnTargetsPsi0" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.ZigzagReturnTargetsPsi0
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.ZigzagReturnTargetsPsi0
+[       OK ] ManeuverSequencer.ZigzagReturnTargetsPsi0 (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.ZigzagReturnTargetsPsi0" end time: Sep 09 09:11 CST
+"ManeuverSequencer.ZigzagReturnTargetsPsi0" time elapsed: 00:00:00
+----------------------------------------------------------
+
+59/109 Testing: ManeuverSequencer.CloverleafTurnsUseRudder
+59/109 Test: ManeuverSequencer.CloverleafTurnsUseRudder
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.CloverleafTurnsUseRudder" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.CloverleafTurnsUseRudder" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.CloverleafTurnsUseRudder
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.CloverleafTurnsUseRudder
+[       OK ] ManeuverSequencer.CloverleafTurnsUseRudder (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.CloverleafTurnsUseRudder" end time: Sep 09 09:11 CST
+"ManeuverSequencer.CloverleafTurnsUseRudder" time elapsed: 00:00:00
+----------------------------------------------------------
+
+60/109 Testing: ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent
+60/109 Test: ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent
+[       OK ] ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent" end time: Sep 09 09:11 CST
+"ManeuverSequencer.CloverleafLegsAreGeometricallyConsistent" time elapsed: 00:00:00
+----------------------------------------------------------
+
+61/109 Testing: ManeuverSequencer.CloverleafGeometryClosesWithIdealShip
+61/109 Test: ManeuverSequencer.CloverleafGeometryClosesWithIdealShip
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.CloverleafGeometryClosesWithIdealShip" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.CloverleafGeometryClosesWithIdealShip" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.CloverleafGeometryClosesWithIdealShip
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.CloverleafGeometryClosesWithIdealShip
+[       OK ] ManeuverSequencer.CloverleafGeometryClosesWithIdealShip (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.CloverleafGeometryClosesWithIdealShip" end time: Sep 09 09:11 CST
+"ManeuverSequencer.CloverleafGeometryClosesWithIdealShip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+62/109 Testing: ManeuverSequencer.SearchTurnsUseRudder
+62/109 Test: ManeuverSequencer.SearchTurnsUseRudder
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.SearchTurnsUseRudder" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.SearchTurnsUseRudder" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.SearchTurnsUseRudder
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.SearchTurnsUseRudder
+[       OK ] ManeuverSequencer.SearchTurnsUseRudder (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.SearchTurnsUseRudder" end time: Sep 09 09:11 CST
+"ManeuverSequencer.SearchTurnsUseRudder" time elapsed: 00:00:00
+----------------------------------------------------------
+
+63/109 Testing: ManeuverSequencer.CirclesStructure
+63/109 Test: ManeuverSequencer.CirclesStructure
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.CirclesStructure" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.CirclesStructure" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.CirclesStructure
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.CirclesStructure
+[       OK ] ManeuverSequencer.CirclesStructure (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.CirclesStructure" end time: Sep 09 09:11 CST
+"ManeuverSequencer.CirclesStructure" time elapsed: 00:00:00
+----------------------------------------------------------
+
+64/109 Testing: ManeuverSequencer.TimeTriggerAdvances
+64/109 Test: ManeuverSequencer.TimeTriggerAdvances
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.TimeTriggerAdvances" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.TimeTriggerAdvances" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.TimeTriggerAdvances
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.TimeTriggerAdvances
+[       OK ] ManeuverSequencer.TimeTriggerAdvances (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.TimeTriggerAdvances" end time: Sep 09 09:11 CST
+"ManeuverSequencer.TimeTriggerAdvances" time elapsed: 00:00:00
+----------------------------------------------------------
+
+65/109 Testing: ManeuverSequencer.HeadingReachedTriggerAdvances
+65/109 Test: ManeuverSequencer.HeadingReachedTriggerAdvances
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.HeadingReachedTriggerAdvances" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.HeadingReachedTriggerAdvances" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.HeadingReachedTriggerAdvances
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.HeadingReachedTriggerAdvances
+[       OK ] ManeuverSequencer.HeadingReachedTriggerAdvances (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.HeadingReachedTriggerAdvances" end time: Sep 09 09:11 CST
+"ManeuverSequencer.HeadingReachedTriggerAdvances" time elapsed: 00:00:00
+----------------------------------------------------------
+
+66/109 Testing: ManeuverSequencer.HeadingReachedIsDirectionAware
+66/109 Test: ManeuverSequencer.HeadingReachedIsDirectionAware
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_maneuver_sequencer" "--gtest_filter=ManeuverSequencer.HeadingReachedIsDirectionAware" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ManeuverSequencer.HeadingReachedIsDirectionAware" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ManeuverSequencer.HeadingReachedIsDirectionAware
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ManeuverSequencer
+[ RUN      ] ManeuverSequencer.HeadingReachedIsDirectionAware
+[       OK ] ManeuverSequencer.HeadingReachedIsDirectionAware (0 ms)
+[----------] 1 test from ManeuverSequencer (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ManeuverSequencer.HeadingReachedIsDirectionAware" end time: Sep 09 09:11 CST
+"ManeuverSequencer.HeadingReachedIsDirectionAware" time elapsed: 00:00:00
+----------------------------------------------------------
+
+67/109 Testing: ParamStore.SerializeRoundtrip
+67/109 Test: ParamStore.SerializeRoundtrip
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.SerializeRoundtrip" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.SerializeRoundtrip" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.SerializeRoundtrip
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.SerializeRoundtrip
+[       OK ] ParamStore.SerializeRoundtrip (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.SerializeRoundtrip" end time: Sep 09 09:11 CST
+"ParamStore.SerializeRoundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+68/109 Testing: ParamStore.CrcDetectsCorruption
+68/109 Test: ParamStore.CrcDetectsCorruption
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.CrcDetectsCorruption" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.CrcDetectsCorruption" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.CrcDetectsCorruption
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.CrcDetectsCorruption
+[       OK ] ParamStore.CrcDetectsCorruption (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.CrcDetectsCorruption" end time: Sep 09 09:11 CST
+"ParamStore.CrcDetectsCorruption" time elapsed: 00:00:00
+----------------------------------------------------------
+
+69/109 Testing: ParamStore.CrcSelfExclusion
+69/109 Test: ParamStore.CrcSelfExclusion
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.CrcSelfExclusion" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.CrcSelfExclusion" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.CrcSelfExclusion
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.CrcSelfExclusion
+[       OK ] ParamStore.CrcSelfExclusion (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.CrcSelfExclusion" end time: Sep 09 09:11 CST
+"ParamStore.CrcSelfExclusion" time elapsed: 00:00:00
+----------------------------------------------------------
+
+70/109 Testing: ParamStore.ValidateRangeRejectsBad
+70/109 Test: ParamStore.ValidateRangeRejectsBad
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.ValidateRangeRejectsBad" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.ValidateRangeRejectsBad" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.ValidateRangeRejectsBad
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.ValidateRangeRejectsBad
+[       OK ] ParamStore.ValidateRangeRejectsBad (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.ValidateRangeRejectsBad" end time: Sep 09 09:11 CST
+"ParamStore.ValidateRangeRejectsBad" time elapsed: 00:00:00
+----------------------------------------------------------
+
+71/109 Testing: ParamStore.SaveLoadRoundtrip
+71/109 Test: ParamStore.SaveLoadRoundtrip
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.SaveLoadRoundtrip" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.SaveLoadRoundtrip" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.SaveLoadRoundtrip
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.SaveLoadRoundtrip
+[       OK ] ParamStore.SaveLoadRoundtrip (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.SaveLoadRoundtrip" end time: Sep 09 09:11 CST
+"ParamStore.SaveLoadRoundtrip" time elapsed: 00:00:00
+----------------------------------------------------------
+
+72/109 Testing: ParamStore.LoadDetectsCorruption
+72/109 Test: ParamStore.LoadDetectsCorruption
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.LoadDetectsCorruption" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.LoadDetectsCorruption" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.LoadDetectsCorruption
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.LoadDetectsCorruption
+[       OK ] ParamStore.LoadDetectsCorruption (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.LoadDetectsCorruption" end time: Sep 09 09:11 CST
+"ParamStore.LoadDetectsCorruption" time elapsed: 00:00:00
+----------------------------------------------------------
+
+73/109 Testing: ParamStore.LittleEndianPortable
+73/109 Test: ParamStore.LittleEndianPortable
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_param_store" "--gtest_filter=ParamStore.LittleEndianPortable" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"ParamStore.LittleEndianPortable" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = ParamStore.LittleEndianPortable
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from ParamStore
+[ RUN      ] ParamStore.LittleEndianPortable
+[       OK ] ParamStore.LittleEndianPortable (0 ms)
+[----------] 1 test from ParamStore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"ParamStore.LittleEndianPortable" end time: Sep 09 09:11 CST
+"ParamStore.LittleEndianPortable" time elapsed: 00:00:00
+----------------------------------------------------------
+
+74/109 Testing: AutopilotCore.DefaultModeIsManual
+74/109 Test: AutopilotCore.DefaultModeIsManual
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.DefaultModeIsManual" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.DefaultModeIsManual" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.DefaultModeIsManual
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.DefaultModeIsManual
+[       OK ] AutopilotCore.DefaultModeIsManual (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.DefaultModeIsManual" end time: Sep 09 09:11 CST
+"AutopilotCore.DefaultModeIsManual" time elapsed: 00:00:00
+----------------------------------------------------------
+
+75/109 Testing: AutopilotCore.ManualPassesRudderThrough
+75/109 Test: AutopilotCore.ManualPassesRudderThrough
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.ManualPassesRudderThrough" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.ManualPassesRudderThrough" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.ManualPassesRudderThrough
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.ManualPassesRudderThrough
+[       OK ] AutopilotCore.ManualPassesRudderThrough (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.ManualPassesRudderThrough" end time: Sep 09 09:11 CST
+"AutopilotCore.ManualPassesRudderThrough" time elapsed: 00:00:00
+----------------------------------------------------------
+
+76/109 Testing: AutopilotCore.AutoHeadingProducesNonzeroRudder
+76/109 Test: AutopilotCore.AutoHeadingProducesNonzeroRudder
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.AutoHeadingProducesNonzeroRudder" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.AutoHeadingProducesNonzeroRudder" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.AutoHeadingProducesNonzeroRudder
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.AutoHeadingProducesNonzeroRudder
+[       OK ] AutopilotCore.AutoHeadingProducesNonzeroRudder (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.AutoHeadingProducesNonzeroRudder" end time: Sep 09 09:11 CST
+"AutopilotCore.AutoHeadingProducesNonzeroRudder" time elapsed: 00:00:00
+----------------------------------------------------------
+
+77/109 Testing: AutopilotCore.SetModeResetsState
+77/109 Test: AutopilotCore.SetModeResetsState
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.SetModeResetsState" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.SetModeResetsState" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.SetModeResetsState
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.SetModeResetsState
+[       OK ] AutopilotCore.SetModeResetsState (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.SetModeResetsState" end time: Sep 09 09:11 CST
+"AutopilotCore.SetModeResetsState" time elapsed: 00:00:00
+----------------------------------------------------------
+
+78/109 Testing: AutopilotCore.HoldFreezesLastRudder
+78/109 Test: AutopilotCore.HoldFreezesLastRudder
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.HoldFreezesLastRudder" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.HoldFreezesLastRudder" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.HoldFreezesLastRudder
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.HoldFreezesLastRudder
+[       OK ] AutopilotCore.HoldFreezesLastRudder (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.HoldFreezesLastRudder" end time: Sep 09 09:11 CST
+"AutopilotCore.HoldFreezesLastRudder" time elapsed: 00:00:00
+----------------------------------------------------------
+
+79/109 Testing: AutopilotCore.HoldThenManualClears
+79/109 Test: AutopilotCore.HoldThenManualClears
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.HoldThenManualClears" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.HoldThenManualClears" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.HoldThenManualClears
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.HoldThenManualClears
+[       OK ] AutopilotCore.HoldThenManualClears (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.HoldThenManualClears" end time: Sep 09 09:11 CST
+"AutopilotCore.HoldThenManualClears" time elapsed: 00:00:00
+----------------------------------------------------------
+
+80/109 Testing: AutopilotCore.HighSpeedDisablesTuner
+80/109 Test: AutopilotCore.HighSpeedDisablesTuner
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.HighSpeedDisablesTuner" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.HighSpeedDisablesTuner" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.HighSpeedDisablesTuner
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.HighSpeedDisablesTuner
+[       OK ] AutopilotCore.HighSpeedDisablesTuner (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.HighSpeedDisablesTuner" end time: Sep 09 09:11 CST
+"AutopilotCore.HighSpeedDisablesTuner" time elapsed: 00:00:00
+----------------------------------------------------------
+
+81/109 Testing: AutopilotCore.LowSpeedEnablesTuner
+81/109 Test: AutopilotCore.LowSpeedEnablesTuner
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.LowSpeedEnablesTuner" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.LowSpeedEnablesTuner" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.LowSpeedEnablesTuner
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.LowSpeedEnablesTuner
+[       OK ] AutopilotCore.LowSpeedEnablesTuner (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.LowSpeedEnablesTuner" end time: Sep 09 09:11 CST
+"AutopilotCore.LowSpeedEnablesTuner" time elapsed: 00:00:00
+----------------------------------------------------------
+
+82/109 Testing: AutopilotCore.ManeuverCompletesToAutoHeading
+82/109 Test: AutopilotCore.ManeuverCompletesToAutoHeading
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.ManeuverCompletesToAutoHeading" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.ManeuverCompletesToAutoHeading" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.ManeuverCompletesToAutoHeading
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.ManeuverCompletesToAutoHeading
+[       OK ] AutopilotCore.ManeuverCompletesToAutoHeading (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.ManeuverCompletesToAutoHeading" end time: Sep 09 09:11 CST
+"AutopilotCore.ManeuverCompletesToAutoHeading" time elapsed: 00:00:00
+----------------------------------------------------------
+
+83/109 Testing: AutopilotCore.EnterAutoHeadingSeedsRudderBaseline
+83/109 Test: AutopilotCore.EnterAutoHeadingSeedsRudderBaseline
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.EnterAutoHeadingSeedsRudderBaseline" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.EnterAutoHeadingSeedsRudderBaseline" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.EnterAutoHeadingSeedsRudderBaseline
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.EnterAutoHeadingSeedsRudderBaseline
+[       OK ] AutopilotCore.EnterAutoHeadingSeedsRudderBaseline (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.EnterAutoHeadingSeedsRudderBaseline" end time: Sep 09 09:11 CST
+"AutopilotCore.EnterAutoHeadingSeedsRudderBaseline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+84/109 Testing: AutopilotCore.EscDitherReachesPdGainsAfterBaseline
+84/109 Test: AutopilotCore.EscDitherReachesPdGainsAfterBaseline
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.EscDitherReachesPdGainsAfterBaseline" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.EscDitherReachesPdGainsAfterBaseline" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.EscDitherReachesPdGainsAfterBaseline
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.EscDitherReachesPdGainsAfterBaseline
+[       OK ] AutopilotCore.EscDitherReachesPdGainsAfterBaseline (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.EscDitherReachesPdGainsAfterBaseline" end time: Sep 09 09:11 CST
+"AutopilotCore.EscDitherReachesPdGainsAfterBaseline" time elapsed: 00:00:00
+----------------------------------------------------------
+
+85/109 Testing: AutopilotCore.NoBaselinePassesScheduleGainsThrough
+85/109 Test: AutopilotCore.NoBaselinePassesScheduleGainsThrough
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.NoBaselinePassesScheduleGainsThrough" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.NoBaselinePassesScheduleGainsThrough" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.NoBaselinePassesScheduleGainsThrough
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.NoBaselinePassesScheduleGainsThrough
+[       OK ] AutopilotCore.NoBaselinePassesScheduleGainsThrough (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.NoBaselinePassesScheduleGainsThrough" end time: Sep 09 09:11 CST
+"AutopilotCore.NoBaselinePassesScheduleGainsThrough" time elapsed: 00:00:00
+----------------------------------------------------------
+
+86/109 Testing: AutopilotCore.IdentUpdatesDoNotOverwriteEscGains
+86/109 Test: AutopilotCore.IdentUpdatesDoNotOverwriteEscGains
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.IdentUpdatesDoNotOverwriteEscGains" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.IdentUpdatesDoNotOverwriteEscGains" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.IdentUpdatesDoNotOverwriteEscGains
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.IdentUpdatesDoNotOverwriteEscGains
+[       OK ] AutopilotCore.IdentUpdatesDoNotOverwriteEscGains (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.IdentUpdatesDoNotOverwriteEscGains" end time: Sep 09 09:11 CST
+"AutopilotCore.IdentUpdatesDoNotOverwriteEscGains" time elapsed: 00:00:00
+----------------------------------------------------------
+
+87/109 Testing: AutopilotCore.EscFallbackRestoresBaselineOnOscillation
+87/109 Test: AutopilotCore.EscFallbackRestoresBaselineOnOscillation
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.EscFallbackRestoresBaselineOnOscillation" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.EscFallbackRestoresBaselineOnOscillation" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.EscFallbackRestoresBaselineOnOscillation
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.EscFallbackRestoresBaselineOnOscillation
+[       OK ] AutopilotCore.EscFallbackRestoresBaselineOnOscillation (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.EscFallbackRestoresBaselineOnOscillation" end time: Sep 09 09:11 CST
+"AutopilotCore.EscFallbackRestoresBaselineOnOscillation" time elapsed: 00:00:00
+----------------------------------------------------------
+
+88/109 Testing: AutopilotCore.OscDetectorStarvedDuringReferenceMotion
+88/109 Test: AutopilotCore.OscDetectorStarvedDuringReferenceMotion
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.OscDetectorStarvedDuringReferenceMotion" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.OscDetectorStarvedDuringReferenceMotion" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.OscDetectorStarvedDuringReferenceMotion
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.OscDetectorStarvedDuringReferenceMotion
+[       OK ] AutopilotCore.OscDetectorStarvedDuringReferenceMotion (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.OscDetectorStarvedDuringReferenceMotion" end time: Sep 09 09:11 CST
+"AutopilotCore.OscDetectorStarvedDuringReferenceMotion" time elapsed: 00:00:00
+----------------------------------------------------------
+
+89/109 Testing: AutopilotCore.ManeuverHeadingLegAppliesScheduledGains
+89/109 Test: AutopilotCore.ManeuverHeadingLegAppliesScheduledGains
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.ManeuverHeadingLegAppliesScheduledGains" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.ManeuverHeadingLegAppliesScheduledGains" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.ManeuverHeadingLegAppliesScheduledGains
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.ManeuverHeadingLegAppliesScheduledGains
+[       OK ] AutopilotCore.ManeuverHeadingLegAppliesScheduledGains (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.ManeuverHeadingLegAppliesScheduledGains" end time: Sep 09 09:11 CST
+"AutopilotCore.ManeuverHeadingLegAppliesScheduledGains" time elapsed: 00:00:00
+----------------------------------------------------------
+
+90/109 Testing: AutopilotCore.IdentTrialIdentifiesAndAppliesGains
+90/109 Test: AutopilotCore.IdentTrialIdentifiesAndAppliesGains
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_autopilot_core" "--gtest_filter=AutopilotCore.IdentTrialIdentifiesAndAppliesGains" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"AutopilotCore.IdentTrialIdentifiesAndAppliesGains" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = AutopilotCore.IdentTrialIdentifiesAndAppliesGains
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AutopilotCore
+[ RUN      ] AutopilotCore.IdentTrialIdentifiesAndAppliesGains
+[       OK ] AutopilotCore.IdentTrialIdentifiesAndAppliesGains (0 ms)
+[----------] 1 test from AutopilotCore (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"AutopilotCore.IdentTrialIdentifiesAndAppliesGains" end time: Sep 09 09:11 CST
+"AutopilotCore.IdentTrialIdentifiesAndAppliesGains" time elapsed: 00:00:00
+----------------------------------------------------------
+
+91/109 Testing: TunerDebugApi.PolePlacementPassThrough
+91/109 Test: TunerDebugApi.PolePlacementPassThrough
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.PolePlacementPassThrough" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.PolePlacementPassThrough" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.PolePlacementPassThrough
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.PolePlacementPassThrough
+[       OK ] TunerDebugApi.PolePlacementPassThrough (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.PolePlacementPassThrough" end time: Sep 09 09:11 CST
+"TunerDebugApi.PolePlacementPassThrough" time elapsed: 00:00:00
+----------------------------------------------------------
+
+92/109 Testing: TunerDebugApi.StabilityCheckPassThrough
+92/109 Test: TunerDebugApi.StabilityCheckPassThrough
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.StabilityCheckPassThrough" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.StabilityCheckPassThrough" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.StabilityCheckPassThrough
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.StabilityCheckPassThrough
+[       OK ] TunerDebugApi.StabilityCheckPassThrough (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.StabilityCheckPassThrough" end time: Sep 09 09:11 CST
+"TunerDebugApi.StabilityCheckPassThrough" time elapsed: 00:00:00
+----------------------------------------------------------
+
+93/109 Testing: TunerDebugApi.EstablishBaselineThenSnapshotConsistent
+93/109 Test: TunerDebugApi.EstablishBaselineThenSnapshotConsistent
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.EstablishBaselineThenSnapshotConsistent" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.EstablishBaselineThenSnapshotConsistent" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.EstablishBaselineThenSnapshotConsistent
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.EstablishBaselineThenSnapshotConsistent
+[       OK ] TunerDebugApi.EstablishBaselineThenSnapshotConsistent (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.EstablishBaselineThenSnapshotConsistent" end time: Sep 09 09:11 CST
+"TunerDebugApi.EstablishBaselineThenSnapshotConsistent" time elapsed: 00:00:00
+----------------------------------------------------------
+
+94/109 Testing: TunerDebugApi.EvaluateEstimateDriftGateSemantics
+94/109 Test: TunerDebugApi.EvaluateEstimateDriftGateSemantics
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.EvaluateEstimateDriftGateSemantics" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.EvaluateEstimateDriftGateSemantics" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.EvaluateEstimateDriftGateSemantics
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.EvaluateEstimateDriftGateSemantics
+[       OK ] TunerDebugApi.EvaluateEstimateDriftGateSemantics (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.EvaluateEstimateDriftGateSemantics" end time: Sep 09 09:11 CST
+"TunerDebugApi.EvaluateEstimateDriftGateSemantics" time elapsed: 00:00:00
+----------------------------------------------------------
+
+95/109 Testing: TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase
+95/109 Test: TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase
+[       OK ] TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase" end time: Sep 09 09:11 CST
+"TunerDebugApi.DitherOnceRequiresEnabledAndAdvancesPhase" time elapsed: 00:00:00
+----------------------------------------------------------
+
+96/109 Testing: TunerDebugApi.AccumulateAndEscStepIndividuallyCallable
+96/109 Test: TunerDebugApi.AccumulateAndEscStepIndividuallyCallable
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.AccumulateAndEscStepIndividuallyCallable" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.AccumulateAndEscStepIndividuallyCallable" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.AccumulateAndEscStepIndividuallyCallable
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.AccumulateAndEscStepIndividuallyCallable
+[       OK ] TunerDebugApi.AccumulateAndEscStepIndividuallyCallable (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.AccumulateAndEscStepIndividuallyCallable" end time: Sep 09 09:11 CST
+"TunerDebugApi.AccumulateAndEscStepIndividuallyCallable" time elapsed: 00:00:00
+----------------------------------------------------------
+
+97/109 Testing: TunerDebugApi.ClampUpdateLimitsAndAbsFloor
+97/109 Test: TunerDebugApi.ClampUpdateLimitsAndAbsFloor
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.ClampUpdateLimitsAndAbsFloor" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.ClampUpdateLimitsAndAbsFloor" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.ClampUpdateLimitsAndAbsFloor
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.ClampUpdateLimitsAndAbsFloor
+[       OK ] TunerDebugApi.ClampUpdateLimitsAndAbsFloor (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.ClampUpdateLimitsAndAbsFloor" end time: Sep 09 09:11 CST
+"TunerDebugApi.ClampUpdateLimitsAndAbsFloor" time elapsed: 00:00:00
+----------------------------------------------------------
+
+98/109 Testing: TunerDebugApi.OscFeedAndReset
+98/109 Test: TunerDebugApi.OscFeedAndReset
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.OscFeedAndReset" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.OscFeedAndReset" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.OscFeedAndReset
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.OscFeedAndReset
+[       OK ] TunerDebugApi.OscFeedAndReset (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.OscFeedAndReset" end time: Sep 09 09:11 CST
+"TunerDebugApi.OscFeedAndReset" time elapsed: 00:00:00
+----------------------------------------------------------
+
+99/109 Testing: TunerDebugApi.RevertRebaseSuspend
+99/109 Test: TunerDebugApi.RevertRebaseSuspend
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.RevertRebaseSuspend" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.RevertRebaseSuspend" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.RevertRebaseSuspend
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.RevertRebaseSuspend
+[       OK ] TunerDebugApi.RevertRebaseSuspend (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.RevertRebaseSuspend" end time: Sep 09 09:11 CST
+"TunerDebugApi.RevertRebaseSuspend" time elapsed: 00:00:00
+----------------------------------------------------------
+
+100/109 Testing: TunerDebugApi.ForceGainsBypassesGate_DebugOnly
+100/109 Test: TunerDebugApi.ForceGainsBypassesGate_DebugOnly
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.ForceGainsBypassesGate_DebugOnly" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.ForceGainsBypassesGate_DebugOnly" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.ForceGainsBypassesGate_DebugOnly
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.ForceGainsBypassesGate_DebugOnly
+[       OK ] TunerDebugApi.ForceGainsBypassesGate_DebugOnly (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.ForceGainsBypassesGate_DebugOnly" end time: Sep 09 09:11 CST
+"TunerDebugApi.ForceGainsBypassesGate_DebugOnly" time elapsed: 00:00:00
+----------------------------------------------------------
+
+101/109 Testing: TunerDebugApi.SettleWindowOnceAcceptsOrReverts
+101/109 Test: TunerDebugApi.SettleWindowOnceAcceptsOrReverts
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.SettleWindowOnceAcceptsOrReverts" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.SettleWindowOnceAcceptsOrReverts" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.SettleWindowOnceAcceptsOrReverts
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.SettleWindowOnceAcceptsOrReverts
+[       OK ] TunerDebugApi.SettleWindowOnceAcceptsOrReverts (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.SettleWindowOnceAcceptsOrReverts" end time: Sep 09 09:11 CST
+"TunerDebugApi.SettleWindowOnceAcceptsOrReverts" time elapsed: 00:00:00
+----------------------------------------------------------
+
+102/109 Testing: TunerDebugApi.SetParamsRoundTripAndResetsState
+102/109 Test: TunerDebugApi.SetParamsRoundTripAndResetsState
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.SetParamsRoundTripAndResetsState" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.SetParamsRoundTripAndResetsState" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.SetParamsRoundTripAndResetsState
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.SetParamsRoundTripAndResetsState
+[       OK ] TunerDebugApi.SetParamsRoundTripAndResetsState (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.SetParamsRoundTripAndResetsState" end time: Sep 09 09:11 CST
+"TunerDebugApi.SetParamsRoundTripAndResetsState" time elapsed: 00:00:00
+----------------------------------------------------------
+
+103/109 Testing: TunerDebugApi.TickThroughApiMatchesDirectTick
+103/109 Test: TunerDebugApi.TickThroughApiMatchesDirectTick
+Command: "/home/jim/Desktop/auto_rudder/control/build/tests/test_tuner_debug_api" "--gtest_filter=TunerDebugApi.TickThroughApiMatchesDirectTick" "--gtest_also_run_disabled_tests"
+Directory: /home/jim/Desktop/auto_rudder/control/build/tests
+"TunerDebugApi.TickThroughApiMatchesDirectTick" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Running main() from /home/jim/Desktop/auto_rudder/control/build/_deps/googletest-src/googletest/src/gtest_main.cc
+Note: Google Test filter = TunerDebugApi.TickThroughApiMatchesDirectTick
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from TunerDebugApi
+[ RUN      ] TunerDebugApi.TickThroughApiMatchesDirectTick
+[       OK ] TunerDebugApi.TickThroughApiMatchesDirectTick (0 ms)
+[----------] 1 test from TunerDebugApi (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"TunerDebugApi.TickThroughApiMatchesDirectTick" end time: Sep 09 09:11 CST
+"TunerDebugApi.TickThroughApiMatchesDirectTick" time elapsed: 00:00:00
+----------------------------------------------------------
+
+104/109 Testing: sim_all
+104/109 Test: sim_all
+Command: "/home/jim/Desktop/auto_rudder/control/build/sim/ar_sim" "--all"
+Directory: /home/jim/Desktop/auto_rudder/control/build/sim
+"sim_all" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+scenario              K      T overshoot   settle   ess1σ     bias     freq PASS
+step_typical       0.20   8.00    1.30%   17.44s   0.000   0.053    0.00 PASS
+step_fast          0.50   3.00    1.24%   14.80s   0.000   0.183    0.00 PASS
+step_slow          0.10  20.00    9.16%   35.72s   0.003   0.118    0.00 FAIL
+SOME FAIL
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"sim_all" end time: Sep 09 09:11 CST
+"sim_all" time elapsed: 00:00:00
+----------------------------------------------------------
+
+105/109 Testing: sim_validate
+105/109 Test: sim_validate
+Command: "/home/jim/Desktop/auto_rudder/control/build/sim/ar_sim" "--validate"
+Directory: /home/jim/Desktop/auto_rudder/control/build/sim
+"sim_validate" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+case                   overshoot   settle   ess1σ     bias     freq maxStepμs PASS
+typical_nodist            1.30%   17.44s   0.000   0.053    0.00       0.3 PASS
+typical_dist              4.39%   14.08s   0.422   0.291   12.00       1.3 FAIL
+fast_nodist               1.24%   14.80s   0.000   0.183    0.00       0.2 PASS
+slow_nodist               9.16%   35.72s   0.061   0.083    0.00       0.9 FAIL
+SOME FAIL
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Failed.
+"sim_validate" end time: Sep 09 09:11 CST
+"sim_validate" time elapsed: 00:00:00
+----------------------------------------------------------
+
+106/109 Testing: sim_ident
+106/109 Test: sim_ident
+Command: "/home/jim/Desktop/auto_rudder/control/build/sim/ar_sim" "--ident"
+Directory: /home/jim/Desktop/auto_rudder/control/build/sim
+"sim_ident" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+RLS 辨识结果: K=0.2293 (真值 0.20), T=9.0723 (真值 8.00), valid=1 excited=1
+PASS
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sim_ident" end time: Sep 09 09:11 CST
+"sim_ident" time elapsed: 00:00:00
+----------------------------------------------------------
+
+107/109 Testing: sim_esc
+107/109 Test: sim_esc
+Command: "/home/jim/Desktop/auto_rudder/control/build/sim/ar_sim" "--esc"
+Directory: /home/jim/Desktop/auto_rudder/control/build/sim
+"sim_esc" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+ESC 长期: Kp 2.5000→1.5320 Kd 12.0000→8.6773 | 辨识 K=0.2121 (真值 0.20) T=8.3536 (真值 8.00) valid=1 | baseline=1(t=13s) moved=1 stable=1 | leg=32s
+PASS
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sim_esc" end time: Sep 09 09:11 CST
+"sim_esc" time elapsed: 00:00:00
+----------------------------------------------------------
+
+108/109 Testing: sim_trial
+108/109 Test: sim_trial
+Command: "/home/jim/Desktop/auto_rudder/control/build/sim/ar_sim" "--trial"
+Directory: /home/jim/Desktop/auto_rudder/control/build/sim
+"sim_trial" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+Z形辨识试验: K=0.200→K̂=0.2067 (+3.4%)  T=8.0→T̂=8.13 (+1.6%)  valid=1  用时 175s
+增益: 试验前 Kp=1.00 Kd=0.50 → 试验后 Kp=1.5723 Kd=8.5277  applied=1
+PASS
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sim_trial" end time: Sep 09 09:11 CST
+"sim_trial" time elapsed: 00:00:00
+----------------------------------------------------------
+
+109/109 Testing: sim_maneuver_zigzag
+109/109 Test: sim_maneuver_zigzag
+Command: "/home/jim/Desktop/auto_rudder/control/build/sim/ar_sim" "--maneuver" "zigzag"
+Directory: /home/jim/Desktop/auto_rudder/control/build/sim
+"sim_maneuver_zigzag" start time: Sep 09 09:11 CST
+Output:
+----------------------------------------------------------
+机动 zigzag       K=0.20 T=8.00 v=10.0kn sea=0 dist=0: completed=1 seqDone=1 maxH=21.5° maxR=23.5° PASS
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"sim_maneuver_zigzag" end time: Sep 09 09:11 CST
+"sim_maneuver_zigzag" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Sep 09 09:11 CST

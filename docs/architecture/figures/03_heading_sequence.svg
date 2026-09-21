@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="777.6pt" height="482.4pt" viewBox="0 0 777.6 482.4" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:date>2026-09-15T11:53:33.983137</dc:date>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.10.7+dfsg1, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 482.4 
+L 777.6 482.4 
+L 777.6 0 
+L 0 0 
+z
+" style="fill: #f5f8fb"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 162.401416 175.501221 
+Q 162.401416 192.794524 162.401416 208.52258 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 165.001416 203.32258 
+L 162.401416 208.52258 
+L 159.801416 203.32258 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_3">
+    <path d="M 162.401416 270.522802 
+Q 162.401416 287.816106 162.401416 303.544161 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 165.001416 298.344161 
+L 162.401416 303.544161 
+L 159.801416 298.344161 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_4">
+    <path d="M 261.433425 335.324093 
+Q 278.83729 335.324093 294.675907 335.324093 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 289.475907 332.724093 
+L 294.675907 335.324093 
+L 289.475907 337.924093 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_5">
+    <path d="M 395.268531 305.103802 
+Q 395.268531 287.810499 395.268531 272.082443 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 392.668531 277.282443 
+L 395.268531 272.082443 
+L 397.868531 277.282443 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_6">
+    <path d="M 395.268531 210.082221 
+Q 395.268531 192.788918 395.268531 177.060862 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 392.668531 182.260862 
+L 395.268531 177.060862 
+L 397.868531 182.260862 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_7">
+    <path d="M 494.30054 145.28093 
+Q 511.704405 145.28093 527.543022 145.28093 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 522.343022 142.68093 
+L 527.543022 145.28093 
+L 522.343022 147.88093 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_8">
+    <path d="M 628.135646 175.501432 
+Q 628.135646 240.305462 628.135646 303.544244 
+" clip-path="url(#p7d53e6ece2)" style="fill: none; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+    <path d="M 630.735646 298.344244 
+L 628.135646 303.544244 
+L 625.535646 298.344244 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #647d90; stroke-dasharray: 5.18,2.24; stroke-dashoffset: 0; stroke: #647d90; stroke-width: 1.4; stroke-linecap: round"/>
+   </g>
+   <g id="patch_9">
+    <path d="M 69.577996 174.939181 
+L 255.224835 174.939181 
+Q 261.046513 174.939181 261.046513 169.756186 
+L 261.046513 120.805674 
+Q 261.046513 115.622679 255.224835 115.622679 
+L 69.577996 115.622679 
+Q 63.756319 115.622679 63.756319 120.805674 
+L 63.756319 169.756186 
+Q 63.756319 174.939181 69.577996 174.939181 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e5f5ee; stroke: #258566; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_10">
+    <path d="M 69.577996 269.960763 
+L 255.224835 269.960763 
+Q 261.046513 269.960763 261.046513 264.777767 
+L 261.046513 215.827256 
+Q 261.046513 210.64426 255.224835 210.64426 
+L 69.577996 210.64426 
+Q 63.756319 210.64426 63.756319 215.827256 
+L 63.756319 264.777767 
+Q 63.756319 269.960763 69.577996 269.960763 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e6f2fb; stroke: #2776ad; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_11">
+    <path d="M 69.577996 364.982344 
+L 255.224835 364.982344 
+Q 261.046513 364.982344 261.046513 359.799349 
+L 261.046513 310.848837 
+Q 261.046513 305.665842 255.224835 305.665842 
+L 69.577996 305.665842 
+Q 63.756319 305.665842 63.756319 310.848837 
+L 63.756319 359.799349 
+Q 63.756319 364.982344 69.577996 364.982344 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e6f2fb; stroke: #2776ad; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_12">
+    <path d="M 302.445112 364.982344 
+L 488.09195 364.982344 
+Q 493.913628 364.982344 493.913628 359.799349 
+L 493.913628 310.848837 
+Q 493.913628 305.665842 488.09195 305.665842 
+L 302.445112 305.665842 
+Q 296.623434 305.665842 296.623434 310.848837 
+L 296.623434 359.799349 
+Q 296.623434 364.982344 302.445112 364.982344 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e6f2fb; stroke: #2776ad; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_13">
+    <path d="M 302.445112 269.960763 
+L 488.09195 269.960763 
+Q 493.913628 269.960763 493.913628 264.777767 
+L 493.913628 215.827256 
+Q 493.913628 210.64426 488.09195 210.64426 
+L 302.445112 210.64426 
+Q 296.623434 210.64426 296.623434 215.827256 
+L 296.623434 264.777767 
+Q 296.623434 269.960763 302.445112 269.960763 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e6f2fb; stroke: #2776ad; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_14">
+    <path d="M 302.445112 174.939181 
+L 488.09195 174.939181 
+Q 493.913628 174.939181 493.913628 169.756186 
+L 493.913628 120.805674 
+Q 493.913628 115.622679 488.09195 115.622679 
+L 302.445112 115.622679 
+Q 296.623434 115.622679 296.623434 120.805674 
+L 296.623434 169.756186 
+Q 296.623434 174.939181 302.445112 174.939181 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e6f2fb; stroke: #2776ad; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_15">
+    <path d="M 535.312227 174.939181 
+L 720.959065 174.939181 
+Q 726.780743 174.939181 726.780743 169.756186 
+L 726.780743 120.805674 
+Q 726.780743 115.622679 720.959065 115.622679 
+L 535.312227 115.622679 
+Q 529.490549 115.622679 529.490549 120.805674 
+L 529.490549 169.756186 
+Q 529.490549 174.939181 535.312227 174.939181 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #e5f5ee; stroke: #258566; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="patch_16">
+    <path d="M 535.312227 364.982344 
+L 720.959065 364.982344 
+Q 726.780743 364.982344 726.780743 359.799349 
+L 726.780743 310.848837 
+Q 726.780743 305.665842 720.959065 305.665842 
+L 535.312227 305.665842 
+Q 529.490549 305.665842 529.490549 310.848837 
+L 529.490549 359.799349 
+Q 529.490549 364.982344 535.312227 364.982344 
+z
+" clip-path="url(#p7d53e6ece2)" style="fill: #f3edf9; stroke: #8860a5; stroke-width: 1.3; stroke-linejoin: miter"/>
+   </g>
+   <g id="text_1">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="162.401416" y="138.082065" transform="rotate(-0 162.401416 138.082065)">① headingControlStep</text>
+   </g>
+   <g id="text_2">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="162.401416" y="159.343448" transform="rotate(-0 162.401416 159.343448)">pendingBaseline_ 时 initBaseline</text>
+   </g>
+   <g id="text_3">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="162.401416" y="233.201958" transform="rotate(-0 162.401416 233.201958)">② GainSchedule::query</text>
+   </g>
+   <g id="text_4">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="162.401416" y="254.495529" transform="rotate(-0 162.401416 254.495529)">speedKn + seaState → 名义 Kp/Kd</text>
+   </g>
+   <g id="text_5">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="162.401416" y="328.270665" transform="rotate(-0 162.401416 328.270665)">③ NomotoIdentifier::update</text>
+   </g>
+   <g id="text_6">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="162.401416" y="349.307767" transform="rotate(-0 162.401416 349.307767)">r、实际舵角、dt → 辨识状态</text>
+   </g>
+   <g id="text_7">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="395.268531" y="328.270665" transform="rotate(-0 395.268531 328.270665)">④ idSnapshot</text>
+   </g>
+   <g id="text_8">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="395.268531" y="349.307767" transform="rotate(-0 395.268531 349.307767)">excited / valid / K / T</text>
+   </g>
+   <g id="text_9">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="395.268531" y="232.967958" transform="rotate(-0 395.268531 232.967958)">⑤ AutoTuner::tick</text>
+   </g>
+   <g id="text_10">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="395.268531" y="254.286185" transform="rotate(-0 395.268531 254.286185)">名义增益 + 传感器 + 辨识快照</text>
+   </g>
+   <g id="text_11">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="395.268531" y="137.946377" transform="rotate(-0 395.268531 137.946377)">⑥ 配置 PD</text>
+   </g>
+   <g id="text_12">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="395.268531" y="159.36044" transform="rotate(-0 395.268531 159.36044)">setDt(dt) → setGains(Kp, Kd)</text>
+   </g>
+   <g id="text_13">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="628.135646" y="138.227502" transform="rotate(-0 628.135646 138.227502)">⑦ PdController::update</text>
+   </g>
+   <g id="text_14">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #40596b" x="628.135646" y="159.264604" transform="rotate(-0 628.135646 159.264604)">航向参考与测量 → 舵角指令</text>
+   </g>
+   <g id="text_15">
+    <text style="font-weight: 700; font-size: 10.4px; font-family: 'Noto Sans CJK JP'; text-anchor: middle; fill: #17334d" x="628.135646" y="327.98954" transform="rotate(-0 628.135646 327.98954)">下一周期再反馈</text>
+   </g>
+   <g id="text_16">
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; fill: #40596b" transform="translate(591.63031 343.290969)">执行器/模型更新后</text>
+    <text style="font-size: 8.7px; font-family: 'Noto Sans CJK JP'; fill: #40596b" transform="translate(588.985646 355.324564)">返回实际舵角与航向</text>
+   </g>
+  </g>
+  <g id="text_17">
+   <text style="font-weight: 700; font-size: 19px; font-family: 'Noto Sans CJK JP'; text-anchor: start; fill: #14334d" x="34.992" y="34.062606" transform="rotate(-0 34.992 34.062606)">03 / 一个航向控制周期的真实顺序</text>
+  </g>
+  <g id="text_18">
+   <text style="font-size: 10px; font-family: 'Noto Sans CJK JP'; text-anchor: start; fill: #536c7d" x="34.992" y="49.463375" transform="rotate(-0 34.992 49.463375)">按 ①→⑦ 阅读；状态保存在同一个 AutopilotCore 对象内，下一周期继续使用。</text>
+  </g>
+  <g id="text_19">
+   <text style="font-size: 9px; font-family: 'Noto Sans CJK JP'; text-anchor: start; fill: #617889" x="34.992" y="468.8928" transform="rotate(-0 34.992 468.8928)">MANUAL/HOLD 不执行此链；未完成的 AUTO_MANEUVER 不调用 tuner.tick()。</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p7d53e6ece2">
+   <rect x="23.328" y="67.536" width="730.944" height="371.448"/>
+  </clipPath>
+ </defs>
+</svg>
