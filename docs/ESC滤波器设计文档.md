@@ -262,7 +262,7 @@ $\alpha_L=0.857$ 意味着新样本权重 85.7%，等效滞后仅 $(1-\alpha_L)/
 | `EscTunesKpTowardOptimum` | `control/tests/test_auto_tuner.cpp:177-216` | 端到端收敛证据，采用 §7 配套参数组（$\operatorname{Re}H=0.908$、每窗整周期） |
 | `EscDitherModulatesGains` | `test_auto_tuner.cpp:118-137` | 载波真实到达输出（解调链路的激励端前提） |
 | `WindowSettleUpdateIsClamped` | `test_auto_tuner.cpp:141-172` | 窗末结算含 LPF/积分/限幅的确定性行为 |
-| `RebaselineClearsIntegratorState` | `test_auto_tuner.cpp:289-312` | 重锚清零滤波器/解调状态（§6.2 规则 2） |
+| `RebaselineClearsIntegratorState` | `test_auto_tuner.cpp:289-313` | 重锚清零滤波器/解调状态（§6.2 规则 2） |
 | tune 仿真（`tune.csv`） | `control/sim` | 默认参数组下"低速徘徊而不劣化"的实际表现 |
 
 ---

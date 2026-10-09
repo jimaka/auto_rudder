@@ -156,10 +156,10 @@ ECU 收到参数后回复确认：
 
 ## 5. 与 C++ 代码的参数映射
 
-| UI 参数 | C++ 字段 | 默认值 |
+| UI 参数 | C++ 字段 | C++ 默认值 |
 |---------|----------|--------|
-| Kp | `PdController::Params::Kp` | 1.5 |
-| Kd | `PdController::Params::Kd` | 0.6 |
+| Kp | `PdController::Params::Kp` | 1.0 |
+| Kd | `PdController::Params::Kd` | 0.5 |
 | 舵角限幅 | `PdController::Params::dMax` | 35 |
 | 舵速限幅 | `PdController::Params::ddMax` | 10 |
 | 死区 | `PdController::Params::deadzone` | 0.3 |
@@ -169,7 +169,7 @@ ECU 收到参数后回复确认：
 | 遗忘因子λ | `NomotoIdentifier::Params::lambda` | 0.98 |
 | δ激励 | `NomotoIdentifier::Params::deltaMin` | 3 |
 | r激励 | `NomotoIdentifier::Params::rMin` | 0.5 |
-| P0 | `NomotoIdentifier::Params::p0` | 1e6 |
+| P0 | `NomotoIdentifier::Params::p0` | 1.0 |
 | ζ目标 | `AutoTuner::Params::zeta` | 0.85 |
 | ωn | `AutoTuner::Params::wn` | 0.20 |
 | ESC 扰动幅 | `AutoTuner::Params::escAmp` | 0.05 |
@@ -183,6 +183,8 @@ ECU 收到参数后回复确认：
 | 振荡° | `AutoTuner::Params::oscMax` | 5 |
 | 高速去激活 | `AutoTuner::Params::highSpeedDeactivateKn` | 15 |
 | 窗口 | `AutoTuner::Params::windowSec` | 60 |
+
+> 注：表中为 C++ 结构体默认值；UI 自身的初始值 Kp=1.5、Kd=0.6、P0=1e6 与之不同（见 `debug_ui.html` 中 `State.pd` / `State.id`）。
 
 ---
 
@@ -305,7 +307,7 @@ index,heading,headingRef,rudder,rudderCmd,error,rate
 
 ```
 control/ui/
-├── debug_ui.html       # 调试界面（单文件，933 行）
+├── debug_ui.html       # 调试界面（单文件，1096 行）
 └── README.md           # 本说明文档
 ```
 

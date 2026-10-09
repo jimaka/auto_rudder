@@ -2,7 +2,7 @@
 
 > 本文档面向代码阅读与维护，逐函数说明 ESC（极值搜索控制）自动调参模块的作用、输入输出与调用关系，并给出每拍主流程与窗末结算流程的完整实现框架。
 >
-> **事实来源约定**：一切行为描述均与源码严格对齐——`control/include/auto_tuner.hpp`（ESC 全部实现，共 510 行），引用格式 `auto_tuner.hpp:行号`。上层集成点见 `control/include/autopilot_core.hpp`。数学推导（为什么这样做）见 `docs/ESC方案数学推导与算法实现详解.md`，本文只回答"代码怎么跑"。
+> **事实来源约定**：一切行为描述均与源码严格对齐——`control/include/auto_tuner.hpp`（ESC 全部实现，共 513 行），引用格式 `auto_tuner.hpp:行号`。上层集成点见 `control/include/autopilot_core.hpp`。数学推导（为什么这样做）见 `docs/ESC方案数学推导与算法实现详解.md`，本文只回答"代码怎么跑"。
 
 **目录**
 
@@ -20,7 +20,7 @@
 
 ## 1. 模块总览
 
-ESC 自动调参由单个类 `AutoTuner`（`auto_tuner.hpp:80-508`）承载，无堆分配、无外部依赖（仅依赖 `NomotoIdentifier` 的快照投影与 `angle_utils`），满足 ECU 部署约束。
+ESC 自动调参由单个类 `AutoTuner`（`auto_tuner.hpp:80-511`）承载，无堆分配、无外部依赖（仅依赖 `NomotoIdentifier` 的快照投影与 `angle_utils`），满足 ECU 部署约束。
 
 模块在三层调参架构中承担**层 2（极点配置基线）+ 层 3（ESC 精调）**两个角色：
 
@@ -46,7 +46,7 @@ ESC 自动调参由单个类 `AutoTuner`（`auto_tuner.hpp:80-508`）承载，�
 
 ### 2.1 与上层（AutopilotCore）的关系
 
-`AutopilotCore` 回归"模式状态机 + 机动编排 + 每拍转发"，每拍闭环只剩五步（`autopilot_core.hpp:151-177`）：
+`AutopilotCore` 回归"模式状态机 + 机动编排 + 每拍转发"，每拍闭环只剩五步（`autopilot_core.hpp:151-173`）：
 
 ```
 调度查询(schedKp/schedKd) → 喂辨识器 → tuner_.tick(TunerInput) → 转发增益给 PD → PD 闭环
@@ -89,7 +89,7 @@ flowchart LR
 
 ### 2.3 双参数正交解调
 
-$K_p$ 用 $\sin(\omega t)$ 载波、$K_d$ 用 $\cos(\omega t)$ 载波（`escDither`，`auto_tuner.hpp:384-385`），两载波正交，解调时分别与 $\sin/\cos$ 相关即可同时分离两个梯度分量（`accumulate`，`auto_tuner.hpp:373-374`），无需分时轮询。
+$K_p$ 用 $\sin(\omega t)$ 载波、$K_d$ 用 $\cos(\omega t)$ 载波（`escDither`，`auto_tuner.hpp:387-388`），两载波正交，解调时分别与 $\sin/\cos$ 相关即可同时分离两个梯度分量（`accumulate`，`auto_tuner.hpp:376-377`），无需分时轮询。
 
 ---
 
@@ -149,50 +149,50 @@ R1 深化后，模块对外只暴露三个动作接口（`auto_tuner.hpp:144`）
 
 以下函数均为私有（R1 起），只能经 `tick()` / `establishBaseline()` / `suspend()` 驱动。
 
-### 4.1 `applyEstimate_(K, T, oscAmp, driftGate, forceRebase) → bool`（`auto_tuner.hpp:308-329`）
+### 4.1 `applyEstimate_(K, T, oscAmp, driftGate, forceRebase) → bool`（`auto_tuner.hpp:311-332`）
 
 **作用**：评估并应用一组辨识估计——`tick` 周期路径与 `establishBaseline` 一次性路径的**共享实现**，两条路径的全部语义差异都折叠在 `driftGate` / `forceRebase` 两个标志里。
 
 执行顺序：
 
-1. **漂移检查**（`:309-313`，仅 `driftGate=true` 且已有基线）：若
+1. **漂移检查**（`:312-316`，仅 `driftGate=true` 且已有基线）：若
 $$|\hat K-K_{base}| \le 0.25\cdot\max(|K_{base}|,\,0.05)\quad\text{且}\quad|\hat T-T_{base}| \le 0.25\cdot\max(|T_{base}|,\,1.0)$$
-则直接返回 false——漂移在 25% 阈值内时新旧极点配置差异在 ESC 自身修正能力范围内，交给 ESC 连续调参，不动基线（P12 漂移重基线策略；分母下限 `kReBaselineKFloor/TFloor` 防止早期小估计把相对偏差放大到失真，`:499-502`）；
-2. **极点配置**（`:315`）：`polePlacement()` 解出候选 $K_p,K_d$，失败即拒；
-3. **稳定门**（`:316`）：`stabilityCheck()` 四条件，不过即拒；
-4. **接受**（`:317-321`）：`setBaseline()` 更新基线增益，`baselineEstablished_=true`，`curKp_/curKd_` 切到新配置，`baseK_/baseT_` 记录本次基线对应的估计（作为后续漂移判据的基准）；
-5. **重锚**（`:322-327`，`forceRebase || 已有旧基线`）：`rebaseEsc()` 清零 ESC 积分器与测量状态，窗口节拍重对齐。旧梯度是围绕旧增益旧模型测得的，不得施加到新基线。
+则直接返回 false——漂移在 25% 阈值内时新旧极点配置差异在 ESC 自身修正能力范围内，交给 ESC 连续调参，不动基线（P12 漂移重基线策略；分母下限 `kReBaselineKFloor/TFloor` 防止早期小估计把相对偏差放大到失真，`:504-505`）；
+2. **极点配置**（`:318`）：`polePlacement()` 解出候选 $K_p,K_d$，失败即拒；
+3. **稳定门**（`:319`）：`stabilityCheck()` 四条件，不过即拒；
+4. **接受**（`:321-324`）：`setBaseline()` 更新基线增益，`baselineEstablished_=true`，`curKp_/curKd_` 切到新配置，`baseK_/baseT_` 记录本次基线对应的估计（作为后续漂移判据的基准）；
+5. **重锚**（`:325-330`，`forceRebase || 已有旧基线`）：`rebaseEsc()` 清零 ESC 积分器与测量状态，窗口节拍重对齐。旧梯度是围绕旧增益旧模型测得的，不得施加到新基线。
 
-### 4.2 `settleWindow_(const IdSnapshot&)`（`auto_tuner.hpp:333-345`）
+### 4.2 `settleWindow_(const IdSnapshot&)`（`auto_tuner.hpp:336-348`）
 
 **作用**：ESC 窗口结算，每 $T_w$ 执行一次（原 `AutopilotCore::escTrigger`，R1 内收）。
 
 流程：
 
-1. 守卫：`!enabled_ || !baselineEstablished_` 直接返回（`:334`）；
-2. 取当前增益副本，调 `escStep(Kp, Kd)` 算出新候选增益（`:335-336`）；
-3. **窗末稳定门**（`:337-340`）：用最新有效辨识估计 $\hat K,\hat T$（无效则以 0 传入使检查自然失败）+ 实测振荡幅值，对**新候选增益**做 `stabilityCheck`；
-4. 过门：`curKp_/curKd_` 持久化为新增益（`:341`）；不过门：`revert()` 回退到基线（`:344`）。
+1. 守卫：`!enabled_ || !baselineEstablished_` 直接返回（`:337`）；
+2. 取当前增益副本，调 `escStep(Kp, Kd)` 算出新候选增益（`:338-339`）；
+3. **窗末稳定门**（`:340-343`）：用最新有效辨识估计 $\hat K,\hat T$（无效则以 0 传入使检查自然失败）+ 实测振荡幅值，对**新候选增益**做 `stabilityCheck`；
+4. 过门：`curKp_/curKd_` 持久化为新增益（`:344`）；不过门：`revert()` 回退到基线（`:347`）。
 
 这是 ESC 微调永远走不出安全域的制度保证：**ESC 积分器可以任意走，但只有过稳定门的那一步才被持久化**。
 
-### 4.3 `accumulate(e, delta, oscEligible)`（`auto_tuner.hpp:354-376`）
+### 4.3 `accumulate(e, delta, oscEligible)`（`auto_tuner.hpp:357-379`）
 
 **作用**：每拍性能样本累积 + 因果解调，ESC 梯度估计的数据源头。三条支路：
 
-**支路 1：ITAE 样本入窗**（`:355-360`）——向三个环形缓冲分别推入 $|e|$、$|\delta|$、$|\Delta\delta|$，供窗末 `computeJ()` 使用；`prevDelta_` 维护舵角差分。
+**支路 1：ITAE 样本入窗**（`:358-363`）——向三个环形缓冲分别推入 $|e|$、$|\delta|$、$|\Delta\delta|$，供窗末 `computeJ()` 使用；`prevDelta_` 维护舵角差分。
 
-**支路 2：振荡检测喂入**（`:362`）——仅当 `oscEligible=true`（参考稳定满 30 s）才把带符号误差喂给 `OscillationDetector`。
+**支路 2：振荡检测喂入**（`:365`）——仅当 `oscEligible=true`（参考稳定满 30 s）才把带符号误差喂给 `OscillationDetector`。
 
-**支路 3：ESC 因果解调**（`:364-375`，仅 `enabled_`）——P11 整改的核心：
+**支路 3：ESC 因果解调**（`:367-378`，仅 `enabled_`）——P11 整改的核心：
 
-- 本拍成本增量 $c_k = \big(t|e| + w_U|\delta| + w_{D u}|\Delta\delta|\big)\,dt$，与 `computeJ` 被积函数严格一致（`:366-367`）；
-- 一阶高通（后向欧拉，系数 $\alpha_H=\tau_H/(\tau_H+dt)$ 按**控制周期**计算）去除直流/慢漂分量：`hpfY_ = α_H·(hpfY_ + c - hpfCPrev_)`（`:369-371`）；
-- 与本拍载波同相相关累积：`demodKpSum_ += hpfY_·sin(φ)`、`demodKdSum_ += hpfY_·cos(φ)`（`:373-374`）。
+- 本拍成本增量 $c_k = \big(t|e| + w_U|\delta| + w_{D u}|\Delta\delta|\big)\,dt$，与 `computeJ` 被积函数严格一致（`:369-370`）；
+- 一阶高通（后向欧拉，系数 $\alpha_H=\tau_H/(\tau_H+dt)$ 按**控制周期**计算）去除直流/慢漂分量：`hpfY_ = α_H·(hpfY_ + c - hpfCPrev_)`（`:372-374`）；
+- 与本拍载波同相相关累积：`demodKpSum_ += hpfY_·sin(φ)`、`demodKdSum_ += hpfY_·cos(φ)`（`:376-377`）。
 
 P11 的历史教训写在注释里：旧实现把按 `dt` 设计的 HPF/LPF 用在每 60 s 才来一个的样本上，梯度被衰减 2~3 个数量级，调参结果与初值逐位相同——所以解调必须每拍做，系数必须按真实采样周期算。
 
-### 4.4 `escDither(Kp&, Kd&)`（`auto_tuner.hpp:382-388`）
+### 4.4 `escDither(Kp&, Kd&)`（`auto_tuner.hpp:385-391`）
 
 **作用**：每拍扰动注入，经典摄动 ESC 的激励端。
 
@@ -206,19 +206,19 @@ Kd *= 1 + a·cos(φ)     // 正交载波
 
 - **相对摄动**：载波以比例形式（±5%）叠加，增益量级变化时扰动自动缩放；
 - **不持久化**：修改的是 `tick()` 里的输出副本，`curKp_/curKd_` 本体不带载波——载波只是"探针"，不是增益的一部分；
-- **相位连续性**：相位超过 $2\pi$ 回绕（`:387`），且 `rebaseEsc()` 故意不清 `escPhase_`，避免重锚拍载波突跳（`:434-437` 注释）。
+- **相位连续性**：相位超过 $2\pi$ 回绕（`:390`），且 `rebaseEsc()` 故意不清 `escPhase_`，避免重锚拍载波突跳（`:437-440` 注释）。
 
-### 4.5 `escStep(Kp&, Kd&)`（`auto_tuner.hpp:395-426`）
+### 4.5 `escStep(Kp&, Kd&)`（`auto_tuner.hpp:398-429`）
 
 **作用**：窗末梯度结算与积分更新，ESC 的"决策"环节。五步：
 
-1. **记录本窗代价**（`:398`）：`lastJ_ = computeJ()`（观测用）；
-2. **梯度归一化**（`:400-405`）：解调累积量换算为梯度估计
+1. **记录本窗代价**（`:401`）：`lastJ_ = computeJ()`（观测用）；
+2. **梯度归一化**（`:402-407`）：解调累积量换算为梯度估计
 $$\hat g = \frac{2}{a\cdot N}\sum_k y_k\cdot\text{载波}_k$$
 系数 2 来自正弦相关器的幅值还原，$a$ 是摄动幅值，$N$ 是窗口拍数。这是"代价对增益相对摄动的偏导"的实测估计；
-3. **LPF 平滑**（`:407-409`）：梯度估计经一阶低通，系数 $\alpha_L = T_w/(\tau_L+T_w)$ 按**窗口周期**计算（输入每 60 s 才到达一次，这是与 HPF 不同的时基，P11 整改点之一）；
-4. **梯度下降 + 幅值约束**（`:411-416`）：$K_{new} = K - \eta\hat g$，经 `clampUpdate()` 限制单次更新幅度，再 clamp 到非负；
-5. **清窗**（`:418-425`）：三个环形缓冲、HPF 状态、解调累积全部清零——下一窗从零开始（**非重叠窗**设计）。
+3. **LPF 平滑**（`:409-412`）：梯度估计经一阶低通，系数 $\alpha_L = T_w/(\tau_L+T_w)$ 按**窗口周期**计算（输入每 60 s 才到达一次，这是与 HPF 不同的时基，P11 整改点之一）；
+4. **梯度下降 + 幅值约束**（`:414-419`）：$K_{new} = K - \eta\hat g$，经 `clampUpdate()` 限制单次更新幅度，再 clamp 到非负；
+5. **清窗**（`:421-428`）：三个环形缓冲、HPF 状态、解调累积全部清零——下一窗从零开始（**非重叠窗**设计）。
 
 ### 4.6 `computeJ() → double`（`auto_tuner.hpp:214-223`）
 
@@ -247,17 +247,17 @@ $$K_p=\frac{\omega_n^2 T}{K},\qquad K_d=\frac{2\zeta\omega_n T - 1}{K}$$
 
 两个调用点：`applyEstimate_`（建基线前）与 `settleWindow_`（ESC 步持久化前）。
 
-### 4.9 `revert(Kp&, Kd&)`（`auto_tuner.hpp:429-432`）
+### 4.9 `revert(Kp&, Kd&)`（`auto_tuner.hpp:432-435`）
 
 **作用**：回退——把增益恢复为基线值 `baselineKp_/baselineKd_`。仅在 `settleWindow_` 稳定门不通过时调用。基线始终是"最近一次通过全部检查的增益"，因此回退目标天然安全。
 
-### 4.10 `rebaseEsc()`（`auto_tuner.hpp:438-450`）
+### 4.10 `rebaseEsc()`（`auto_tuner.hpp:441-453`）
 
 **作用**：ESC 状态重锚——清零梯度积分器、HPF 状态、解调累积、窗口样本、`prevDelta_`。**保留**基线增益、`curKp_/curKd_`、基线估计与载波相位。
 
 两个调用点：显式重基线（`applyEstimate_`）与模式挂起（`suspend`）。理由：旧梯度与旧窗口成本围绕旧增益旧模型测得，继续积分会把陈旧信息施加到新基线；相位不清是为了载波连续。
 
-### 4.11 `clampUpdate(newVal, oldVal) → double`（`auto_tuner.hpp:452-461`）
+### 4.11 `clampUpdate(newVal, oldVal) → double`（`auto_tuner.hpp:455-464`）
 
 **作用**：单次更新幅值限制，$|\Delta| \le \max(|old|\cdot 10\%,\ 10^{-3})$。
 
@@ -310,7 +310,7 @@ P11 整改点在注释里：`old==0` 时纯比例上限为 0 会**永久锁死�
 | `oscDetector_` | — | 振荡检测器 | `accumulate`（门控） | `reset` |
 | `lastJ_` | 0 | 上窗代价（观测） | `escStep` | `reset` |
 
-### 策略常量（constexpr，行为不变、不新增可调面，`auto_tuner.hpp:499-507`）
+### 策略常量（constexpr，行为不变、不新增可调面，`auto_tuner.hpp:498-508`）
 
 | 常量 | 值 | 含义 |
 |---|---|---|
@@ -354,7 +354,7 @@ sequenceDiagram
 | 评估窗口 | 60 s（3000 拍） | 梯度归一化、LPF、积分更新、稳定门、接受/回退 |
 | 重基线 | 事件驱动 | K/T 漂移超 25% 或辨识试验收官 → 极点配置 + 重锚 |
 
-载波周期 ≈125.7 s 是窗口的约 2 倍——每窗覆盖约两个完整载波周期，相关器能有效抑制非载波频率的代价分量（详见数学推导文档 §4）。
+载波周期 ≈125.7 s 约为窗口的 2 倍——每窗仅覆盖约半个载波周期（0.477 个），整周期均值事实不严格成立；载波相位跨窗连续使残余误差逐窗轮转、近似零均值涨落（偏置转化为方差，详见数学推导文档 §4）。
 
 ---
 
@@ -407,28 +407,28 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["输入 e, δ, oscEligible (:354)"] --> B["舵角差分 dδ = δ - prevDelta_<br/>窗内时刻 t (:355-356)"]
-    B --> C["支路1：ITAE 样本入窗<br/>push |e|, |δ|, |dδ| (:357-359)"]
-    C --> D{"支路2：oscEligible?<br/>(:362)"}
+    A["输入 e, δ, oscEligible (:357)"] --> B["舵角差分 dδ = δ - prevDelta_<br/>窗内时刻 t (:358-359)"]
+    B --> C["支路1：ITAE 样本入窗<br/>push |e|, |δ|, |dδ| (:360-362)"]
+    C --> D{"支路2：oscEligible?<br/>(:365)"}
     D -- 是 --> E["oscDetector_.update(e)<br/>参考稳定 30s 后才喂入"]
     D -- 否 --> F
-    E --> F{"支路3：enabled_?<br/>(:364)"}
+    E --> F{"支路3：enabled_?<br/>(:367)"}
     F -- 否 --> G["返回（调度直通期<br/>不做解调）"]
-    F -- 是 --> H["本拍成本增量<br/>c = (t|e| + wU|δ| + wDu|dδ|)·dt (:366)"]
-    H --> I["一阶 HPF 去直流<br/>α 按控制周期 dt 计算 (:369-371)"]
-    I --> J["同相相关累积<br/>Σ+= y·sin(φ)  /  Σ+= y·cos(φ) (:373-374)"]
-    J --> K["demodCount_++ (:375)"]
+    F -- 是 --> H["本拍成本增量<br/>c = (t|e| + wU|δ| + wDu|dδ|)·dt (:369)"]
+    H --> I["一阶 HPF 去直流<br/>α 按控制周期 dt 计算 (:372-374)"]
+    I --> J["同相相关累积<br/>Σ+= y·sin(φ)  /  Σ+= y·cos(φ) (:376-377)"]
+    J --> K["demodCount_++ (:378)"]
 ```
 
 ### 9.3 `escDither()` —— 激励端：每拍把 ±5% 正交载波叠加到输出增益（不持久化）
 
 ```mermaid
 flowchart TD
-    A["输入输出引用 Kp, Kd (:382)"] --> B{"enabled_?<br/>(:383)"}
+    A["输入输出引用 Kp, Kd (:385)"] --> B{"enabled_?<br/>(:386)"}
     B -- 否 --> C["直接返回"]
-    B -- 是 --> D["Kp *= 1 + a·sin(φ)<br/>Kd *= 1 + a·cos(φ) (:384-385)<br/>相对摄动，a=5%"]
-    D --> E["相位推进 φ += ω·dt (:386)"]
-    E --> F{"φ > 2π?<br/>(:387)"}
+    B -- 是 --> D["Kp *= 1 + a·sin(φ)<br/>Kd *= 1 + a·cos(φ) (:387-388)<br/>相对摄动，a=5%"]
+    D --> E["相位推进 φ += ω·dt (:389)"]
+    E --> F{"φ > 2π?<br/>(:390)"}
     F -- 是 --> G["φ -= 2π<br/>保持相位连续"]
     F -- 否 --> H
     G --> H["返回（副本带载波，<br/>curKp_/curKd_ 本体不变）"]
@@ -438,44 +438,44 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["窗口满触发 (:333)"] --> B{"enabled_ 且<br/>baselineEstablished_?<br/>(:334)"}
+    A["窗口满触发 (:336)"] --> B{"enabled_ 且<br/>baselineEstablished_?<br/>(:337)"}
     B -- 否 --> C["直接返回"]
-    B -- 是 --> D["取 curKp/curKd 副本 (:335)"]
-    D --> E["escStep(Kp,Kd)<br/>梯度结算+积分更新 (:336)"]
-    E --> F["取最新辨识估计 Khat/That<br/>(无效则以 0 传入) (:337-338)"]
-    F --> G{"stabilityCheck<br/>(Khat,That,Kp,Kd,osc实测)<br/>四条件全过? (:339-340)"}
-    G -- 是 --> H["接受：curKp_/curKd_ ← 新增益<br/>ESC 更新持久化 (:341)"]
-    G -- 否 --> I["revert()<br/>回退到基线 (:344)"]
+    B -- 是 --> D["取 curKp/curKd 副本 (:338)"]
+    D --> E["escStep(Kp,Kd)<br/>梯度结算+积分更新 (:339)"]
+    E --> F["取最新辨识估计 Khat/That<br/>(无效则以 0 传入) (:340-341)"]
+    F --> G{"stabilityCheck<br/>(Khat,That,Kp,Kd,osc实测)<br/>四条件全过? (:342-343)"}
+    G -- 是 --> H["接受：curKp_/curKd_ ← 新增益<br/>ESC 更新持久化 (:344)"]
+    G -- 否 --> I["revert()<br/>回退到基线 (:347)"]
 ```
 
 ### 9.5 `escStep()` —— 窗末决策：解调累积 → 归一化梯度 → LPF → 限幅积分 → 清窗
 
 ```mermaid
 flowchart TD
-    A["输入输出引用 Kp, Kd (:395)"] --> B{"enabled_?<br/>(:396)"}
+    A["输入输出引用 Kp, Kd (:398)"] --> B{"enabled_?<br/>(:399)"}
     B -- 否 --> C["直接返回"]
-    B -- 是 --> D["lastJ_ = computeJ()<br/>记录本窗代价 (:398)"]
-    D --> E["梯度归一化 (:401-405)<br/>ĝ = 2·Σ(y·载波)/(a·N)"]
-    E --> F["LPF 平滑梯度 (:407-409)<br/>α 按窗口周期 60s 计算"]
-    F --> G["梯度下降 (:411-412)<br/>K_new = K - η·ĝ"]
-    G --> H["clampUpdate 限幅 ±10%<br/>再 clamp 非负 (:413-416)"]
-    H --> I["清窗：环形缓冲/HPF/解调累积<br/>全部归零，非重叠窗 (:418-425)"]
+    B -- 是 --> D["lastJ_ = computeJ()<br/>记录本窗代价 (:401)"]
+    D --> E["梯度归一化 (:402-407)<br/>ĝ = 2·Σ(y·载波)/(a·N)"]
+    E --> F["LPF 平滑梯度 (:409-412)<br/>α 按窗口周期 60s 计算"]
+    F --> G["梯度下降 (:414-415)<br/>K_new = K - η·ĝ"]
+    G --> H["clampUpdate 限幅 ±10%<br/>再 clamp 非负 (:416-419)"]
+    H --> I["清窗：环形缓冲/HPF/解调累积<br/>全部归零，非重叠窗 (:421-428)"]
 ```
 
 ### 9.6 `applyEstimate_()` —— 辨识评估共享路径：漂移检查 → 极点配置 → 稳定门 → 建基线/重锚
 
 ```mermaid
 flowchart TD
-    A["输入 K,T,oscAmp,<br/>driftGate,forceRebase (:308)"] --> B{"driftGate 且已有基线<br/>且 K,T 漂移 ≤25%?<br/>(:309-311)"}
-    B -- 是 --> C["返回 false<br/>漂移在阈值内，ESC 自治 (:312)"]
-    B -- 否 --> D{"polePlacement<br/>解出 Kp2,Kd2?<br/>(:315)"}
+    A["输入 K,T,oscAmp,<br/>driftGate,forceRebase (:311)"] --> B{"driftGate 且已有基线<br/>且 K,T 漂移 ≤25%?<br/>(:312-314)"}
+    B -- 是 --> C["返回 false<br/>漂移在阈值内，ESC 自治 (:315)"]
+    B -- 否 --> D{"polePlacement<br/>解出 Kp2,Kd2?<br/>(:318)"}
     D -- 否 --> E["返回 false（P6）"]
-    D -- 是 --> F{"stabilityCheck<br/>四条件全过?<br/>(:316)"}
+    D -- 是 --> F{"stabilityCheck<br/>四条件全过?<br/>(:319)"}
     F -- 否 --> G["返回 false（P4/§3.10.7）"]
-    F -- 是 --> H["setBaseline +<br/>baselineEstablished_=true<br/>curKp/curKd ← 新配置 (:318-320)"]
-    H --> I["baseK_/baseT_ ← K,T<br/>记录漂移判据基准 (:321)"]
-    I --> J{"forceRebase 或<br/>已有旧基线?<br/>(:322)"}
-    J -- 是 --> K["rebaseEsc() +<br/>winCounter_=0<br/>积分器清零重锚 (:325-326)"]
+    F -- 是 --> H["setBaseline +<br/>baselineEstablished_=true<br/>curKp/curKd ← 新配置 (:321-323)"]
+    H --> I["baseK_/baseT_ ← K,T<br/>记录漂移判据基准 (:324)"]
+    I --> J{"forceRebase 或<br/>已有旧基线?<br/>(:325)"}
+    J -- 是 --> K["rebaseEsc() +<br/>winCounter_=0<br/>积分器清零重锚 (:328-329)"]
     J -- 否 --> L
     K --> L["返回 true"]
 ```
@@ -573,13 +573,13 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    subgraph R["revert() —— 回退：恢复最近过检的基线增益 (:429-432)"]
+    subgraph R["revert() —— 回退：恢复最近过检的基线增益 (:432-435)"]
         R1["Kp ← baselineKp_<br/>Kd ← baselineKd_"]
     end
-    subgraph RB["rebaseEsc() —— 重锚：清 ESC 全部测量/积分状态 (:438-450)"]
+    subgraph RB["rebaseEsc() —— 重锚：清 ESC 全部测量/积分状态 (:441-453)"]
         RB1["grad/hpf/demod/窗口样本/prevDelta_ 清零<br/>保留：基线增益、curKp/Kd、baseK/T、载波相位"]
     end
-    subgraph CU["clampUpdate() —— 限幅：单窗更新 ≤ max(10%|old|, 1e-3) (:452-461)"]
+    subgraph CU["clampUpdate() —— 限幅：单窗更新 ≤ max(10%|old|, 1e-3) (:455-464)"]
         CU1["maxDelta = max(|old|·0.10, 1e-3)<br/>d 截断到 ±maxDelta<br/>返回 old + d"]
     end
 ```

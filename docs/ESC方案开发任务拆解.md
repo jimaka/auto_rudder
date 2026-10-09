@@ -114,8 +114,8 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 
 - **目标**：由 $\hat K,\hat T$ 解析反解 $K_p=\omega_n^2T/K$、$K_d=(2\zeta\omega_nT-1)/K$，作为 ESC 的基线锚点。
 - **涉及文件**：`auto_tuner.hpp:228-237`。
-- **实施要点**：前置检查（$K,T$ 有限、$|K|,|T|\ge10^{-6}$）；$K_d$ 负值 clamp 到 0（`auto_tuner.hpp:235`）；**该函数是全仓库公式唯一定义处**，仿真安装调度表也调它。
-- **验收标准**：典型船 $K{=}0.2,T{=}8$ 代入结果与手算一致；退化输入（NaN、0、负值）返回 false。
+- **实施要点**：前置检查（$K,T$ 有限、$|K|,|T|\ge10^{-6}$）；$K_d$ 负值 clamp 到 0（`auto_tuner.hpp:235`）；**该函数是全仓库公式唯一定义处**（注意：当前仿真安装调度表是在 `simulator.hpp` 内联展开同一公式，并未调用本函数——`auto_tuner.hpp` 注释已标注"亦应调此处"）。
+- **验收标准**：典型船 $K{=}0.2,T{=}8$ 代入结果与手算一致；退化输入（NaN、0、$|K|/|T|<10^{-6}$）返回 false。
 - **依赖**：T1（目标 $\zeta,\omega_n$）。
 
 ### T5 稳定门 `stabilityCheck()`
@@ -141,9 +141,9 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 
 ![ESC 信号链](../assets/esc_chain.png)
 
-- **T7.1 载波注入 `escDither()`**（`auto_tuner.hpp:382-388`）：每拍 $K_p\times(1+a\sin\varphi)$、$K_d\times(1+a\cos\varphi)$，相位按 $\omega\,dt$ 推进、$2\pi$ 回绕。**每拍执行，不持久化**（只改输出副本）。
-- **T7.2 因果解调（`accumulate()` 支路 3）**（`auto_tuner.hpp:364-375`）：每拍成本增量 $c_k$ → 一阶 HPF（系数按**控制周期** $dt$ 算）→ 与同相载波相乘累积。
-- **T7.3 窗末结算 `escStep()`**（`auto_tuner.hpp:395-426`）：梯度归一化 $\hat g=2\sum(y\cdot\text{载波})/(aN)$ → LPF（系数按**窗口周期** $T_w$ 算）→ 梯度下降 → 清窗（非重叠窗）。
+- **T7.1 载波注入 `escDither()`**（`auto_tuner.hpp:385-391`）：每拍 $K_p\times(1+a\sin\varphi)$、$K_d\times(1+a\cos\varphi)$，相位按 $\omega\,dt$ 推进、$2\pi$ 回绕。**每拍执行，不持久化**（只改输出副本）。
+- **T7.2 因果解调（`accumulate()` 支路 3）**（`auto_tuner.hpp:367-378`）：每拍成本增量 $c_k$ → 一阶 HPF（系数按**控制周期** $dt$ 算）→ 与同相载波相乘累积。
+- **T7.3 窗末结算 `escStep()`**（`auto_tuner.hpp:398-429`）：梯度归一化 $\hat g=2\sum(y\cdot\text{载波})/(aN)$ → LPF（系数按**窗口周期** $T_w$ 算）→ 梯度下降 → 清窗（非重叠窗）。
 
 ![解调原理](../assets/esc_math_demod.png)
 
@@ -159,7 +159,7 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 ### T8 安全小件：clampUpdate / revert / rebaseEsc
 
 - **目标**：三根安全绳，函数小但语义精确。
-- **涉及文件**：`auto_tuner.hpp:452-461`（限幅）、`:429-432`（回退）、`:438-450`（重锚）。
+- **涉及文件**：`auto_tuner.hpp:455-464`（限幅）、`:432-435`（回退）、`:441-453`（重锚）。
 - **实施要点**：
   - `clampUpdate`：上限取 $\max(|old|\cdot10\%,\ 10^{-3})$——`old==0` 时纯比例上限会**永久锁死更新**（P11：极点配置把 $K_d$ 钳 0 后 ESC 再也调不动它）；
   - `rebaseEsc`：清梯度/HPF/解调/窗口样本，**但不清载波相位**（避免重锚拍载波突跳）、不清基线；
@@ -174,7 +174,7 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 
 ### T9 基线管理 `applyEstimate_()`
 
-- **目标**：辨识评估共享路径——漂移检查 → 极点配置 → 稳定门 → 建基线/重锚（`auto_tuner.hpp:308-329`）。
+- **目标**：辨识评估共享路径——漂移检查 → 极点配置 → 稳定门 → 建基线/重锚（`auto_tuner.hpp:311-332`）。
 - **实施要点**：P12 漂移策略——$|\Delta K|,|\Delta T|$ 在 25% 阈值内（分母带下限 `kReBaselineKFloor=0.05`/`kReBaselineTFloor=1.0`）交给 ESC 自治，不动基线；重基线时必须 `rebaseEsc()` + 窗口节拍清零（陈旧梯度不得施加到新基线）。
 - **验收标准**：漂移 24% 不动基线、26% 触发重基线且梯度积分器归零。
 - **依赖**：T4、T5、T8。
@@ -185,7 +185,7 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 - **实施要点**：
   - **增益所有权**（P12）：基线建立后 `curKp_/curKd_` 归 ESC 拥有，不再跟随调度表每拍刷新——否则 ESC 每拍的调整被调度表覆盖；
   - **振荡门控**（P12）：参考变化后 30 s 内不喂振荡检测（机动期间的误差摆动是指令响应）；
-  - **窗末裁决**（`settleWindow_`，`:333-345`）：ESC 步进后必须过稳定门才持久化，不过门 `revert()` 回退。
+  - **窗末裁决**（`settleWindow_`，`:336-348`）：ESC 步进后必须过稳定门才持久化，不过门 `revert()` 回退。
 
 ![tick 每拍流程](../assets/tick_flow.png)
 
@@ -194,7 +194,7 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 
 ### T11 AutopilotCore 集成与模式生命周期
 
-- **目标**：`AutopilotCore` 回归"状态机 + 转发"，每拍闭环五步（`autopilot_core.hpp:151-177`）；模式切换与辨识试验两个钩子接对。
+- **目标**：`AutopilotCore` 回归"状态机 + 转发"，每拍闭环五步（`autopilot_core.hpp:151-173`）；模式切换与辨识试验两个钩子接对。
 - **涉及文件**：`autopilot_core.hpp:47`（MANUAL/HOLD → `suspend()`）、`:166-167`（每拍 `tick()`）、`:185`（试验收官 `establishBaseline()`）。
 - **实施要点**：`suspend()` 清测量状态但**保留基线**（手动操舵期间的旧测量不得混入下一窗口）；`establishBaseline` 以 osc=0 传入、由 ζ/ωn 代数条件把关（机动刚结束振荡测量无效）。
 - **验收标准**：模式 AUTO→MANUAL→AUTO 往返后窗口无脏数据；Z 形试验收官成功建基线，失败保持原增益。
@@ -231,7 +231,7 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 ### T14 参数整定
 
 - **目标**：六个 ESC 参数（$a,\omega,\eta,\tau_H,\tau_L,T_w$）在仿真中寻一组稳健默认值，并给出整定指导。
-- **实施要点**：满足时间尺度分离（载波周期 ≈126 s 远慢于闭环、每窗覆盖约 2 个载波周期）；梯度噪声与收敛速度用 $\eta,\tau_L$ 权衡；诚实记录已知张力（默认参数组的结构性张力见推导文档第 7 章）。
+- **实施要点**：满足时间尺度分离（载波周期 ≈126 s 远慢于闭环；注意默认参数组每窗仅覆盖约 0.48 个载波周期、不足半个，整定新参数组时应按推导文档 §7.1 的顺序配套——先定 $T_w$，再取 $\omega=2\pi n/T_w$ 使窗口覆盖整数个载波周期）；梯度噪声与收敛速度用 $\eta,\tau_L$ 权衡；诚实记录已知张力（默认参数组的结构性张力见推导文档第 7 章）。
 
 ![时间尺度分离](../assets/esc_math_timescale.png)
 
@@ -265,9 +265,9 @@ ESC 闭环的工作原理（即我们要建造的东西）：
 | T4 | 极点配置 | `polePlacement` | `auto_tuner.hpp:228-237` | T1 | 0.5 d |
 | T5 | 稳定门 | `stabilityCheck` | `auto_tuner.hpp:241-254` | T4 | 1 d |
 | T6 | 振荡检测 | `OscillationDetector` | `auto_tuner.hpp:257-292` | — | 1 d |
-| T7 | ESC 核心三环 | dither/demod/step | `auto_tuner.hpp:354-426` | T1, T3 | 3 d |
-| T8 | 安全小件 | clamp/revert/rebase | `auto_tuner.hpp:429-461` | T1 | 0.5 d |
-| T9 | 基线管理 | `applyEstimate_` | `auto_tuner.hpp:308-329` | T4, T5, T8 | 1 d |
+| T7 | ESC 核心三环 | dither/demod/step | `auto_tuner.hpp:357-429` | T1, T3 | 3 d |
+| T8 | 安全小件 | clamp/revert/rebase | `auto_tuner.hpp:432-464` | T1 | 0.5 d |
+| T9 | 基线管理 | `applyEstimate_` | `auto_tuner.hpp:311-332` | T4, T5, T8 | 1 d |
 | T10 | tick 编排 | `tick` + `settleWindow_` | `auto_tuner.hpp:150-183` | T6~T9 | 2 d |
 | T11 | Core 集成 | 模式钩子 + 转发 | `autopilot_core.hpp` | T10 | 1 d |
 | T12 | 单元测试 | 回归用例集 | `tests/test_auto_tuner.cpp` | T4~T11 | 2 d |

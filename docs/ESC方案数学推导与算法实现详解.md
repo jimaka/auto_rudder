@@ -30,7 +30,7 @@ pre.mermaid-block svg { max-height: 940px; }
 
 船舶操纵性随船速、载荷、吃水、海况显著变化，固定增益无法全工况最优。本工程的控制律是 **PD（故意无积分项）**，其增益 $K_p,K_d$ 可以由"RLS 在线辨识 Nomoto 参数 + 极点配置"解析给出（第 2 章）。但解析解建立在三个近似之上：
 
-1. **模型近似**：真实船舶艏摇不是严格的一阶 Nomoto，$K,T$ 本身还随工况缓变，辨识估计带有百分之十几量级的误差（本工程仿真中约 $+18\%$，见第 6 章）；
+1. **模型近似**：真实船舶艏摇不是严格的一阶 Nomoto，$K,T$ 本身还随工况缓变，辨识估计带有百分之十几量级的误差（本工程仿真中约 $+12\%$，见第 6 章）；
 2. **非线性环节**：实际 PD 实现含死区、微分滤波、舵角/舵速限幅、输出量化（§2.2），解析推导采用的是理想线性化模型；
 3. **目标近似**：极点配置把"好"定义为一对目标模态 $(\zeta,\omega_n)$，而工程真正关心的是一个可在线计算的代价 $J$（航向误差 + 操舵代价，第 3 章）——模态目标只是 $J$ 的代理。
 
@@ -181,14 +181,14 @@ $$
 J=\int_0^{T_w}\Bigl(t\,|e(t)|+w_U\,|\delta(t)|+w_{Du}\,|\dot\delta(t)|\Bigr)\,dt
 $$
 
-离散实现（`computeJ`，`auto_tuner.hpp:214-223`；每拍增量 `accumulate`，:366-367）：
+离散实现（`computeJ`，`auto_tuner.hpp:214-223`；每拍增量 `accumulate`，:369-370）：
 
 $$
 J \approx \sum_{k=0}^{N-1}\Bigl(t_k|e_k|+w_U|\delta_k|+w_{Du}|\Delta\delta_k|\Bigr)\,dt,
 \qquad t_k=k\,dt,\quad N=T_w/dt=3000
 $$
 
-窗口**非重叠**，结算后清零（`escStep` 内 :418-425）；样本存 `RingBuffer<double,3000>`（:479-482），主循环零堆分配。ITAE 时钟 $t_k$ 每窗从 0 重启（`accumulate` :356 用 `windowErr_.size()*dt`），保证各窗 $J$ 口径一致。注意 `computeJ` 只用于可观测输出 `lastJ_`（:398），ESC 梯度并不直接由它差分得到（见第 4 章）。
+窗口**非重叠**，结算后清零（`escStep` 内 :421-428）；样本存 `RingBuffer<double,3000>`（:483-485），主循环零堆分配。ITAE 时钟 $t_k$ 每窗从 0 重启（`accumulate` :359 用 `windowErr_.size()*dt`），保证各窗 $J$ 口径一致。注意 `computeJ` 在模块内只用于可观测输出 `lastJ_`（:401，另经调试接口/仿真外读），ESC 梯度并不直接由它差分得到（见第 4 章）。
 
 三项的量纲与权重：$e,\delta$ 取度，$t\,|e|$ 主导全项（$T_w$ 尺度下数值最大），$w_U=0.01$、$w_{Du}=0.005$ 是小权重修正项。
 
@@ -231,7 +231,7 @@ $$
 
 ### 4.2 注入相对摄动后 $J(t)$ 的谐波展开（系数写全）
 
-代码注入的是**相对（乘性）摄动**（`escDither`，`auto_tuner.hpp:382-388`）：
+代码注入的是**相对（乘性）摄动**（`escDither`，`auto_tuner.hpp:385-391`）：
 
 $$
 \theta(t)=\bar\theta\,\bigl(1+a\sin\omega t\bigr)
@@ -309,7 +309,7 @@ y(t)=A\sin(\omega t+\varphi_H)+B\cos(2\omega t+\varphi_2),
 \qquad A=J''\bar\theta a\Delta\bar\theta\,|H(j\omega)|
 $$
 
-乘以与本拍注入**同相**的载波 $\sin\omega t$（代码 `accumulate` :373：`demodKpSum_ += hpfY_ * std::sin(escPhase_)`，同一 `escPhase_` 驱动 `escDither` 的注入，保证因果同相）。逐项展开：
+乘以与本拍注入**同相**的载波 $\sin\omega t$（代码 `accumulate` :376：`demodKpSum_ += hpfY_ * std::sin(escPhase_)`，同一 `escPhase_` 驱动 `escDither` 的注入，保证因果同相）。逐项展开：
 
 **基波项**（积化和差 $\sin x\sin y=\frac12[\cos(x-y)-\cos(x+y)]$）：
 
@@ -331,7 +331,7 @@ $$
 2. **$2\omega$ 与 $\omega$、$3\omega$ 交流项**——整数周期窗口内均值为零；
 3. HPF 瞬态与残余慢漂——随 $\tau_H$ 指数衰减。
 
-注意 $\cos\varphi_H$ 因子：**载波相位必须对准**，任何相位失配（如 HPF 相移、额外滤波延迟）都按 $\cos(\text{失配})$ 衰减梯度。代码用同一 `escPhase_` 同时驱动注入与解调且解调在每拍即时进行（"因果解调"，:372-375），把这个失配压缩到只剩 HPF 相移 $\varphi_H$（另有一个"解调相位领先一拍"的存疑项，见 §7.4）。
+注意 $\cos\varphi_H$ 因子：**载波相位必须对准**，任何相位失配（如 HPF 相移、额外滤波延迟）都按 $\cos(\text{失配})$ 衰减梯度。代码用同一 `escPhase_` 同时驱动注入与解调且解调在每拍即时进行（"因果解调"，:376-378），把这个失配压缩到只剩 HPF 相移 $\varphi_H$（另有一个"解调相位领先一拍"的存疑项，见 §7.4）。
 
 下图用合成信号（$J(\theta)=(\theta-\theta^*)^2$、$\bar\theta-\theta^*=0.8$、默认参数 $a=0.05$、$\omega=0.05\ \mathrm{rad/s}$）对这条链路做了数值验证：原始 $J(t)$ 的直流 + 基波 + 二倍频结构、HPF 后的幅值衰减（$\omega\tau_H=0.25$）、乘以同相载波后均值恒正（$\bar\theta$ 在最优点右侧、梯度为正），以及归一化滑动平均收敛到梯度估计值（幅值含 HPF 衰减因子，方向正确）。
 
@@ -339,7 +339,7 @@ $$
 
 ### 4.5 窗口平均与 $\hat g=\dfrac{2\sum(y_k\sin\varphi_k)}{aN}$ 的完整证明
 
-窗口内有 $N$ 拍样本，代码在窗末归一化（`escStep` :399-405，系数 :402）：
+窗口内有 $N$ 拍样本，代码在窗末归一化（`escStep` :402-408，系数 :405）：
 
 $$
 \hat g=\frac{2}{aN}\sum_{k=0}^{N-1}y_k\sin\varphi_k
@@ -387,7 +387,7 @@ $$
 - **$2$**：恰好抵消 $\sin^2$ 的窗口均值 $1/2$；
 - **$a$**：除掉注入摄动的幅值，把"每单位摄动引起的 $J$ 变化"还原出来。
 
-由于摄动是相对形式 $\theta=\bar\theta(1+u)$，$u=a\sin\omega t$ 无量纲，链式法则给出 $\dfrac{\partial J}{\partial u}=\bar\theta\,\dfrac{\partial J}{\partial\theta}$——所以 $\hat g$ 的准确含义是"**$J$ 对无量纲相对摄动的梯度**"（代码注释 :399 的"∂J/∂(增益相对摄动)"），数值上等于 $\bar\theta J'(\bar\theta)$，量纲与 $J$ 相同。这既是它的优点（多参数时天然按各自量级加权）也是 §4.11 量纲近似的来源。
+由于摄动是相对形式 $\theta=\bar\theta(1+u)$，$u=a\sin\omega t$ 无量纲，链式法则给出 $\dfrac{\partial J}{\partial u}=\bar\theta\,\dfrac{\partial J}{\partial\theta}$——所以 $\hat g$ 的准确含义是"**$J$ 对无量纲相对摄动的梯度**"（代码注释 :402 的"∂J/∂(增益相对摄动)"），数值上等于 $\bar\theta J'(\bar\theta)$，量纲与 $J$ 相同。这既是它的优点（多参数时天然按各自量级加权）也是 §4.11 量纲近似的来源。
 
 ---
 
@@ -403,7 +403,7 @@ H\,(\boldsymbol\theta-\boldsymbol\theta^*),\qquad
 H=\begin{pmatrix}H_{11}&H_{12}\\H_{12}&H_{22}\end{pmatrix}\succ 0
 $$
 
-注入正交载波（`escDither`，`auto_tuner.hpp:384-385`）：
+注入正交载波（`escDither`，`auto_tuner.hpp:387-388`）：
 
 $$
 K_p(t)=\bar K_p\bigl(1+a\sin\omega t\bigr),\qquad
@@ -432,7 +432,7 @@ $$
 
 #### 4.6.2 正交性：$\langle\sin\cdot\cos\rangle=0$ 的证明与解调分离
 
-$K_d$ 通道的解调用 $\cos\omega t$（`accumulate` :374）。$K_p$ 路解调时，$K_d$ 载波分量的贡献为：
+$K_d$ 通道的解调用 $\cos\omega t$（`accumulate` :377）。$K_p$ 路解调时，$K_d$ 载波分量的贡献为：
 
 $$
 \Big\langle a\bar\theta_2\frac{\partial J}{\partial\theta_2}\cos\omega t\cdot\sin\omega t\Big\rangle
@@ -447,7 +447,7 @@ $$
 \hat g_{K_d}=\frac{2}{aN}\sum_k y_k\cos\varphi_k=\bar K_d\,\frac{\partial J}{\partial K_d}\operatorname{Re}H(j\omega)
 $$
 
-（`escStep` :401-405，同一归一化系数作用于两路累积量 `demodKpSum_/demodKdSum_`。）
+（`escStep` :402-408，同一归一化系数作用于两路累积量 `demodKpSum_/demodKdSum_`。）
 
 下图在合成二维二次 Bowl $J(K_p,K_d)$ 上复现了双参数搜索（算法参数与 `auto_tuner.hpp` 一致：$a=0.05$、$\omega=0.05\ \mathrm{rad/s}$、$\eta=0.02$、$\pm10\%$ 限幅）：正交 sin/cos 摄动下，增益轨迹从偏离初值 $(0.42,0.08)$ 螺旋收敛到最优点 $(K_p^*,K_d^*)$ 附近。
 
@@ -488,7 +488,7 @@ $$
 默认参数下的量级结论（$\varphi_0=0$ 参考相位）：
 
 - 串扰项本身很小（$\sim0.6\%$），**真正严重的是二倍频泄漏**：其贡献约 $\dfrac{2}{a}\cdot\dfrac{J''\bar\theta^2a^2}{4}\cdot0.225\cdot|H(j2\omega)|\approx0.05\,a\,J''\bar\theta^2$（$|H(j2\omega)|=0.447$），与梯度信号 $J''\bar\theta\Delta\bar\theta\cdot\operatorname{Re}H\approx0.059\,J''\bar\theta\Delta\bar\theta$ 之比为 $\approx 0.86\,a\,\bar\theta/\Delta\bar\theta$——**当 $|\Delta\bar\theta|\lesssim 4\%\cdot\bar\theta$ 时，谐波泄漏超过真实梯度信号**，估计在最优点附近几个百分点的邻域内失去方向性，表现为围绕 $\theta^*$ 的极限环；
-- 代码的载波相位**跨窗连续**（`escPhase_` 在 `reset/rebaseEsc` 中刻意保留，:436-437、:464），非整数周期意味着每窗起点相位 $\varphi_0$ 逐窗轮转，上述残余不再是固定偏置而在窗间近似零均值涨落——**偏置转化为方差**（§4.11），由 LPF 与多窗平均部分吸收；
+- 代码的载波相位**跨窗连续**（`escPhase_` 在 `reset/rebaseEsc` 中刻意保留，:439-440、:467），非整数周期意味着每窗起点相位 $\varphi_0$ 逐窗轮转，上述残余不再是固定偏置而在窗间近似零均值涨落——**偏置转化为方差**（§4.11），由 LPF 与多窗平均部分吸收；
 - 结论与工程备注一致：**默认 $\omega=0.05\ \mathrm{rad/s}$（周期 $125.7\ \mathrm{s}$）与 $T_w=60\ \mathrm{s}$ 存在结构性张力**——窗内装不满半个载波周期，§4.5 的三个均值事实全部失效；收敛测试改用 $\omega=2\pi/60$（每窗恰好 1 个整周期，`test_auto_tuner.cpp:179-181`）后所有正交/归一化关系严格成立，代价是 HPF 偏置因子仍有 $0.908$（$\tau_H=30$）。参数整定的正确顺序是：先定 $T_w$，再取 $\omega=2\pi n/T_w$，最后配 $\tau_H$ 使 $(\omega\tau_H)^2/(1+(\omega\tau_H)^2)\gtrsim0.9$。该问题的完整讨论见 §7.1。
 
 ### 4.8 离散化实现：每拍 HPF 与窗末 LPF
@@ -518,11 +518,11 @@ y_k(\tau_H+dt)=\tau_H\bigl(y_{k-1}+c_k-c_{k-1}\bigr)
 \alpha_H=\frac{\tau_H}{\tau_H+dt}\;}
 $$
 
-与代码逐字对应（`accumulate`，`auto_tuner.hpp:369-371`）：`alphaH = escHPFtau/(escHPFtau+dt)`，`hpfY_ = alphaH*(hpfY_ + c - hpfCPrev_)`。数值：$\alpha_H=5/5.02=0.99602$。注意 $c_k$ 是**每拍**成本增量 $c_k=(t_k|e_k|+w_U|\delta_k|+w_{Du}|\Delta\delta_k|)\,dt$（:366-367），与 `computeJ` 的被积函数严格一致——HPF 的输入与被积序列同口径，差分 $c_k-c_{k-1}$ 与乘法 $\alpha_H$ 共同实现"去直流、留交流"。
+与代码逐字对应（`accumulate`，`auto_tuner.hpp:372-373`）：`alphaH = escHPFtau/(escHPFtau+dt)`，`hpfY_ = alphaH*(hpfY_ + c - hpfCPrev_)`。数值：$\alpha_H=5/5.02=0.99602$。注意 $c_k$ 是**每拍**成本增量 $c_k=(t_k|e_k|+w_U|\delta_k|+w_{Du}|\Delta\delta_k|)\,dt$（:369-370），与 `computeJ` 的被积函数严格一致——HPF 的输入与被积序列同口径，差分 $c_k-c_{k-1}$ 与乘法 $\alpha_H$ 共同实现"去直流、留交流"。
 
 #### 4.8.2 窗末 LPF：为什么系数必须用 $T_w$ 而非 $dt$（P11 整改教训）
 
-梯度低通的连续模型 $G(s)=\dfrac{1}{\tau_L s+1}$，即 $\tau_L\dot g+g=\hat g$。它的输入 $\hat g$ **每 $T_w$ 秒才到达一个新样本**（`escStep` 由 `settleWindow_` 每 `winBeats` 拍调用一次，:171-177 → :333-345 → :336）。因此离散化时真实的采样间隔是 $T_w$，后向欧拉给出：
+梯度低通的连续模型 $G(s)=\dfrac{1}{\tau_L s+1}$，即 $\tau_L\dot g+g=\hat g$。它的输入 $\hat g$ **每 $T_w$ 秒才到达一个新样本**（`escStep` 由 `settleWindow_` 每 `winBeats` 拍调用一次，:171-177 → :336-348 → :339）。因此离散化时真实的采样间隔是 $T_w$，后向欧拉给出：
 
 $$
 \tau_L\frac{g_w-g_{w-1}}{T_w}+g_w=\hat g_w
@@ -535,7 +535,7 @@ $$
 \alpha_L=\frac{T_w}{\tau_L+T_w}=\frac{60}{10+60}=0.857\;}
 $$
 
-与代码逐字对应（`escStep` :407-409）：`alphaL = windowSec/(escLPFtau+windowSec)`。
+与代码逐字对应（`escStep` :410-412）：`alphaL = windowSec/(escLPFtau+windowSec)`。
 
 **P11 教训的定量表述**：旧实现把按 $dt=0.02\ \mathrm{s}$ 设计的系数用在每 $T_w=60\ \mathrm{s}$ 才来一个的样本上。若错误地用 $dt$ 计算，$\alpha_L^{错}=\dfrac{0.02}{10.02}=0.002$，与正确值 $0.857$ 相差约 **430 倍**——新梯度几乎进不了估计器；HPF 侧同理（按 $dt$ 设计的差分滤波器用在窗级样本上，等效时间常数被放大 $T_w/dt=3000$ 倍）。两重错误叠加使梯度被衰减 2~3 个数量级，调参结果与初值逐位相同。**原则：ESC 各环节运行在不同时间尺度——扰动/解调在每拍（$dt$）、LPF/积分在窗末（$T_w$）——每个滤波器系数必须用该环节真实的采样周期计算。**（整改记录见 `auto_tuner.hpp:8-12` 头注释。）
 
@@ -545,7 +545,7 @@ $$
 
 #### 4.9.1 平均化更新方程与收敛条件
 
-窗末更新（`escStep` :411-412）：$\bar\theta_{w+1}=\bar\theta_w-\eta\,g_w$。把 LPF 近似为直通（$\alpha_L=0.857$，滞后仅 0.17 窗，定性结论不变），代入 §4.5 的梯度估计 $\hat g=\bar\theta J''(\bar\theta-\theta^*)\operatorname{Re}H$：
+窗末更新（`escStep` :414-415）：$\bar\theta_{w+1}=\bar\theta_w-\eta\,g_w$。把 LPF 近似为直通（$\alpha_L=0.857$，滞后仅 0.17 窗，定性结论不变），代入 §4.5 的梯度估计 $\hat g=\bar\theta J''(\bar\theta-\theta^*)\operatorname{Re}H$：
 
 $$
 \Delta\bar\theta_{w+1}
@@ -563,18 +563,18 @@ $$
 
 收缩因子 $\rho=1-\eta\bar\theta J''\operatorname{Re}H$，等效连续时间常数 $\tau_{adapt}\approx\dfrac{T_w}{\eta\bar\theta J''\operatorname{Re}H}$。**困难在于 $J''$ 事先未知**（这正是用 ESC 而不是解析解的原因），所以无法先验设定最优 $\eta$；$\eta=0.02$ 是保守小步长，配合两道工程兜底：
 
-1. **更新限幅** `clampUpdate`（:452-461）：$|\Delta\bar\theta|\le\max(|\bar\theta_{old}|\cdot10\%,\,10^{-3})$。量级估计：仿真中窗口 $J\sim O(10^4\!\sim\!10^5)$（tune 试验 $J: 93639.7\to93221.2$），梯度 $\hat g=\bar\theta J'(\bar\theta)$ 同量级，$\eta\hat g$ 远超 $\pm10\%$ 限幅——**远离最优点时更新实际骑在限幅上**（每窗最多动 10%，相当于归一化的固定速率爬坡），只有接近最优点、梯度足够小时才进入上述线性收缩区。限幅因此同时扮演了"自适应步长归一化"与"野梯度防火墙"（单窗噪声/机动畸变造成的错误估计最多造成 10% 偏移，且随即被稳定门审查）双重角色；
-2. **稳定门 + 回退**（§5.5 工程层，§2.4 数学口径）：每窗结算后过 `stabilityCheck`，不过则 `revert` 回基线（`settleWindow_` :339-344），发散路径被硬切断。
+1. **更新限幅** `clampUpdate`（:455-464）：$|\Delta\bar\theta|\le\max(|\bar\theta_{old}|\cdot10\%,\,10^{-3})$。量级估计：仿真中窗口 $J\sim O(10^4)$（tune 试验 $J: 20834.9\to21173.2$），梯度 $\hat g=\bar\theta J'(\bar\theta)$ 同量级，$\eta\hat g$ 远超 $\pm10\%$ 限幅——**远离最优点时更新实际骑在限幅上**（每窗最多动 10%，相当于归一化的固定速率爬坡），只有接近最优点、梯度足够小时才进入上述线性收缩区。限幅因此同时扮演了"自适应步长归一化"与"野梯度防火墙"（单窗噪声/机动畸变造成的错误估计最多造成 10% 偏移，且随即被稳定门审查）双重角色；
+2. **稳定门 + 回退**（§5.5 工程层，§2.4 数学口径）：每窗结算后过 `stabilityCheck`，不过则 `revert` 回基线（`settleWindow_` :342-347），发散路径被硬切断。
 
 $\eta=0.02$ 的另一个作用是维护时间尺度分离：适应速率 $\eta\bar\theta J''/T_w$ 必须远慢于载波（§4.10），小 $\eta$ 直接拉大这个比例。
 
 #### 4.9.2 $\pm10\%$ 比例限幅与 $10^{-3}$ 绝对下限
 
-`clampUpdate`（:452-461）取 `maxDelta = max(|old|·maxUpdateFrac, absMinUpdate)`：
+`clampUpdate`（:455-464）取 `maxDelta = max(|old|·maxUpdateFrac, absMinUpdate)`：
 
 - **比例限幅（10%）**：单窗增益变动不超过当前值的十分之一，与 ESC"微调"定位一致——粗调是极点配置的事；
-- **绝对下限（$10^{-3}$，P11 引入）**：防止 $|old|=0$ 时比例上限退化为 0 造成永久锁死。边界情形：极点配置在 $\hat T<2.94\ \mathrm{s}$ 时把 $K_d$ 钳到 0（§2.4），此后 $K_d$ 通道的相对摄动 $\bar K_d(1+a\cos\omega t)\equiv0$，**该通道不再有自有激励，梯度信息只可能来自 Hessian 交叉项与噪声相关**；此时 `absMinUpdate` 保证"一旦出现非零梯度符号，更新步长不被比例上限锁死"，$K_d$ 能以每窗至多 $10^{-3}$ 的速率爬离 0（回归测试 `EscUpdateUnsticksFromZeroKd`，`test_auto_tuner.cpp:218-244`，断言 $0<K_d\le3\times10^{-3}$ 恰是这一机制的锁定）。这是一个**工程补丁而非数学上完备的激励**——数学上 $K_d=0$ 处无法测得该方向梯度，见 §7.5；
-- 更新后还有非负钳位（:415-416），与稳定门 $K_p>0$（:246）一起保证增益符号物理合法。
+- **绝对下限（$10^{-3}$，P11 引入）**：防止 $|old|=0$ 时比例上限退化为 0 造成永久锁死。边界情形：极点配置在 $\hat T<2.94\ \mathrm{s}$ 时把 $K_d$ 钳到 0（§2.4），此后 $K_d$ 通道的相对摄动 $\bar K_d(1+a\cos\omega t)\equiv0$，**该通道不再有自有激励，梯度信息只可能来自 Hessian 交叉项与噪声相关**；此时 `absMinUpdate` 保证"一旦出现非零梯度符号，更新步长不被比例上限锁死"，$K_d$ 能以每窗至多 $10^{-3}$ 的速率爬离 0（回归测试 `EscUpdateUnsticksFromZeroKd`，`test_auto_tuner.cpp:219-245`，断言 $0<K_d\le3\times10^{-3}$ 恰是这一机制的锁定）。这是一个**工程补丁而非数学上完备的激励**——数学上 $K_d=0$ 处无法测得该方向梯度，见 §7.5；
+- 更新后还有非负钳位（:418-419），与稳定门 $K_p>0$（:246）一起保证增益符号物理合法。
 
 ### 4.10 稳定性概述：时间尺度三分离与平均化/奇异摄动理论
 
@@ -592,7 +592,7 @@ $$
 
 - **闭环 ≪ 载波**：每个载波周期内闭环近似到达准稳态，$J(\theta)$ 才能当作**静态映射**处理（§4.1 的泰勒模型是对静态映射展开的）；
 - **载波 ≪ 适应**：$\theta$ 在一个载波周期内几乎不动，"中心值 $\bar\theta$ + 摄动"的分解才有意义，窗口平均才是在固定工作点上测梯度；
-- 校核本项目参数：测试配置下载波周期 $60\ \mathrm{s}$，$\tau_{cl}/T_{载波}\approx0.3$——分离比仅 3 倍余度，属"勉强成立"；默认配置（载波 $125.7\ \mathrm{s}$）分离比 7 倍，但付出了 §4.7 的非整数窗口代价。**这两个默认值的张力（载波周期 vs 窗口长度不可兼得）是默认参数组最根本的设计瑕疵**。适应时间常数以 tune 试验为准：典型船约 18 窗（$18\times60\ \mathrm{s}=18\ \mathrm{min}$）进入平台，确实远慢于载波。
+- 校核本项目参数：测试配置下载波周期 $60\ \mathrm{s}$，$\tau_{cl}/T_{载波}\approx0.3$——分离比仅 3 倍余度，属"勉强成立"；默认配置（载波 $125.7\ \mathrm{s}$）分离比 7 倍，但付出了 §4.7 的非整数窗口代价。**这两个默认值的张力（载波周期 vs 窗口长度不可兼得）是默认参数组最根本的设计瑕疵**。适应时间常数以 tune 试验为准：增益中心以每窗 $\le\pm10\%$ 的限幅速率逐窗迁移（窗长 $128\ \mathrm{s}$），完成一次数倍限幅幅度的迁移需十余分钟，确实远慢于载波。
 
 下图把三个时间尺度画在同一坐标系里：闭环误差调节时间约 24 s（秒级）、载波周期约 126 s（百秒级，图中标出 60 s 评估窗与载波周期的相对大小——默认参数下单窗装不满半个周期，即 §4.7 的问题）、积分器以每 60 s 一次的节拍经数十分钟收敛（多窗口级）。
 
@@ -606,7 +606,7 @@ $$
 |---|---|
 | 代价 $J(\theta)$ 光滑，存在孤立局部极小且 $J''(\theta^*)>0$ | §3 代价函数对增益的静态映射（仿真/实测以 $J$ 平台确认极小存在） |
 | 闭环（被摄动的内环）对被调参数**指数稳定**且远快于适应环 | PD + Nomoto 闭环，$\zeta\ge0.6,\ \omega_n\le0.5$ 由稳定门保证（`stabilityCheck` :241-254）；时间尺度分离 §4.10.1 |
-| 摄动周期信号、幅值 $a$ 充分小 | $a=5\%$ 相对摄动（`escDither` :382-388） |
+| 摄动周期信号、幅值 $a$ 充分小 | $a=5\%$ 相对摄动（`escDither` :385-391） |
 | 适应增益 $\eta$ 充分小（奇异摄动参数） | $\eta=0.02$，另有 $\pm10\%$ 限幅压顶（`clampUpdate`） |
 | HPF/LPF 截止频率配置使解调信号保相位 | $\tau_H,\tau_L$；§4.3/§4.8 给出量化判据 |
 
@@ -625,7 +625,7 @@ $$
 | HPF 增益/相位（§4.3/§4.5） | 乘性因子 $\operatorname{Re}H(j\omega)=\dfrac{(\omega\tau_H)^2}{1+(\omega\tau_H)^2}$ | 默认 $0.059$（衰减 17 倍）；测试配置 $0.908$ |
 | 非整数窗口 $\sin^2$ 均值偏移（§4.7） | 乘性因子 $2m_{ss}$ | 默认 $1.047$（$\varphi_0=0$，逐窗轮转） |
 | 二倍频/基波泄漏（§4.7） | 加性项 $\propto \frac{a}{2}J''\bar\theta^2\cdot(\text{泄漏均值})$ | 默认参数下 $\vert \Delta\bar\theta\vert \lesssim4\%\,\bar\theta$ 时淹没信号 |
-| 窗口内参考机动/海况突变 | 加性畸变（$J$ 的非平稳成分穿不过 HPF 但被部分泄漏） | 振荡检测有 30 s 参考稳定门控（:165-166, :505），**$J$ 累积本身无门控**——机动窗的梯度被污染 |
+| 窗口内参考机动/海况突变 | 加性畸变（$J$ 的非平稳成分穿不过 HPF 但被部分泄漏） | 振荡检测有 30 s 参考稳定门控（:165-166, :508），**$J$ 累积本身无门控**——机动窗的梯度被污染 |
 | $J$ 慢漂（$K,T$ 变化、风压差） | HPF 阻不绝 $\nu\lesssim1/\tau_H$ 的漂移，残余以近直流形式泄漏进相关器 | $\tau_H=5\ \mathrm{s}$ 以下频段，靠窗间涨落抵消 |
 
 所有乘性偏置的共同点：**只改变步长不改变符号**（只要 $\operatorname{Re}H>0$），因此减慢收敛而不破坏方向；加性偏置才制造极限环。这一区分决定了整改优先级。
@@ -680,7 +680,7 @@ $$
 
 ## 5. 算法实现流程（代码级）
 
-本章把第 4 章的每个数学环节落到 `control/include/auto_tuner.hpp`（510 行，namespace `ar`）的具体实现。核心事实：`AutoTuner` 对外仅 3 个动作——`tick()`（每拍主入口）、`establishBaseline()`（一次性建基线）、`suspend()`（挂起）；所有 ESC 更新都必须经过稳定门才能生效。
+本章把第 4 章的每个数学环节落到 `control/include/auto_tuner.hpp`（513 行，namespace `ar`）的具体实现。核心事实：`AutoTuner` 对外仅 3 个动作——`tick()`（每拍主入口）、`establishBaseline()`（一次性建基线）、`suspend()`（挂起）；所有 ESC 更新都必须经过稳定门才能生效。
 
 ### 5.1 信号链总览
 
@@ -694,20 +694,20 @@ $$
 
 **输出 `GainCommand`**（:51-54）：`{Kp, Kd}`——**已含 ESC 载波**，直接交给 PD。
 
-**关键内部状态**（声明 :463-507，`reset()` :114-142 清零）：
+**关键内部状态**（声明 :466-508，`reset()` :114-142 清零）：
 
 | 状态 | 行号 | 含义 |
 |---|---|---|
-| `escPhase_` | :464 | 载波相位（rad），重锚时刻意保留以保相位连续 |
-| `baselineKp_/baselineKd_` | :466-467 | 基线增益（回退目标） |
-| `gradKp_/gradKd_` | :469-470 | LPF 平滑后的梯度估计（积分器输入） |
-| `hpfY_/hpfCPrev_` | :472-473 | HPF 状态 |
-| `demodKpSum_/demodKdSum_/demodCount_` | :474-476 | 解调相关累积量（sin/cos 通道）与拍数 |
-| `windowErr_/windowDelta_/windowDDelta_` | :479-482 | 窗口样本环形缓冲（`RingBuffer<double,3000>`，零堆分配） |
-| `curKp_/curKd_` | :487-488 | 当前去载波中心增益（基线建立后归 ESC 所有） |
-| `baseK_/baseT_` | :489-490 | 基线对应的 K/T 估计（漂移判据基准） |
-| `winCounter_` | :491 | 窗口节拍计数 |
-| `oscDetector_` | :483 | 振荡检测器（嵌套类，:257-292） |
+| `escPhase_` | :467 | 载波相位（rad），重锚时刻意保留以保相位连续 |
+| `baselineKp_/baselineKd_` | :469-470 | 基线增益（回退目标） |
+| `gradKp_/gradKd_` | :472-473 | LPF 平滑后的梯度估计（积分器输入） |
+| `hpfY_/hpfCPrev_` | :475-476 | HPF 状态 |
+| `demodKpSum_/demodKdSum_/demodCount_` | :477-479 | 解调相关累积量（sin/cos 通道）与拍数 |
+| `windowErr_/windowDelta_/windowDDelta_` | :483-485 | 窗口样本环形缓冲（`RingBuffer<double,3000>`，零堆分配） |
+| `curKp_/curKd_` | :490-491 | 当前去载波中心增益（基线建立后归 ESC 所有） |
+| `baseK_/baseT_` | :492-493 | 基线对应的 K/T 估计（漂移判据基准） |
+| `winCounter_` | :494 | 窗口节拍计数 |
+| `oscDetector_` | :486 | 振荡检测器（嵌套类，:257-292） |
 
 ### 5.3 每拍主流程（50 Hz）
 
@@ -736,7 +736,7 @@ flowchart TD
 6. **窗口结算判定**（:171-177）：`winBeats = round(windowSec/dt) = 3000`，计数满则 `settleWindow_(id)`；
 7. **扰动注入与返回**（:180-182）：取 `curKp_/curKd_`，基线已建立才 `escDither` 叠载波，返回 `{Kp,Kd}`。
 
-其中第 5 步的 `accumulate`（:354-376）是每拍 ESC 测量的核心，按代码顺序：算 `dδ`、以 `windowErr_.size()*dt` 推出本拍窗内时刻（ITAE 时间权重）、三样本入环形缓冲、（满足 30 s 门控才）喂振荡检测、`enabled_` 为真才计算成本增量 $c_k$ 并做 HPF 与双路因果解调累积。注意三个环形缓冲**不受 `enabled_` 影响**持续写入，`enabled_` 只门控解调段（:364）。`escDither`（:382-388）先以当前相位施加载波再推进相位 `escPhase_ += escFreq·dt`（>2π 回卷），载波只作用于当拍返回值、不写入 `curKp_/curKd_` 本体。
+其中第 5 步的 `accumulate`（:357-379）是每拍 ESC 测量的核心，按代码顺序：算 `dδ`、以 `windowErr_.size()*dt` 推出本拍窗内时刻（ITAE 时间权重）、三样本入环形缓冲、（满足 30 s 门控才）喂振荡检测、`enabled_` 为真才计算成本增量 $c_k$ 并做 HPF 与双路因果解调累积。注意三个环形缓冲**不受 `enabled_` 影响**持续写入，`enabled_` 只门控解调段（:367）。`escDither`（:385-391）先以当前相位施加载波再推进相位 `escPhase_ += escFreq·dt`（>2π 回卷），载波只作用于当拍返回值、不写入 `curKp_/curKd_` 本体。
 
 下图是 `tick()` 每拍内部流程的完整示意：
 
@@ -744,43 +744,43 @@ flowchart TD
 
 ### 5.4 窗末结算流程（每 60 s）
 
-触发：`tick` 内 `++winCounter_ >= winBeats(=3000)` → 计数清零 → `settleWindow_(id)`（:171-177）。结算分两层：**试更新**（`escStep`，:395-426，在局部副本上完成归一化 → LPF → 积分 → 限幅 → 清窗）与**接受/回退裁决**（`settleWindow_` 本体，:333-345）：
+触发：`tick` 内 `++winCounter_ >= winBeats(=3000)` → 计数清零 → `settleWindow_(id)`（:171-177）。结算分两层：**试更新**（`escStep`，:398-429，在局部副本上完成归一化 → LPF → 积分 → 限幅 → 清窗）与**接受/回退裁决**（`settleWindow_` 本体，:336-348）：
 
 ```mermaid
 flowchart TD
-    A["winCounter_ 满 3000 拍 → settleWindow_"] --> C{"enabled_ 且<br/>baselineEstablished_ ?（:334）"}
+    A["winCounter_ 满 3000 拍 → settleWindow_"] --> C{"enabled_ 且<br/>baselineEstablished_ ?（:337）"}
     C -->|"否"| Z["直接返回"]
     C -->|"是"| D["lastJ_ = computeJ →<br/>ĝ = 2S/(a·N) → LPF αL≈0.857"]
     D --> G["积分 new = old − η·grad →<br/>clampUpdate ±10%/1e-3 → 清窗"]
-    G --> J{"快照有效且 stabilityCheck<br/>四条件全过？（:337-340）"}
-    J -->|"是"| K["接受：持久化新增益（:341）"]
-    J -->|"否"| L["revert 回基线增益（:344）"]
+    G --> J{"快照有效且 stabilityCheck<br/>四条件全过？（:342-343）"}
+    J -->|"是"| K["接受：持久化新增益（:344）"]
+    J -->|"否"| L["revert 回基线增益（:347）"]
 ```
 
 两个值得注意的实现事实：
 
-- **快照无效 ⇒ 必回退**：`id.valid==false` 时 `Khat=0`，稳定门第一条件即失败，本窗试更新被丢弃（:337-344）。辨识长期无效时 ESC 实际停摆，增益钉在极点配置基线——这是保守安全设计；
-- **非重叠窗**：结算后下一窗从零开始累积；ITAE 时钟、HPF、解调累积全部清零，但**载波相位 `escPhase_` 跨窗连续**（:464，见 §4.7 的"偏置转化为方差"讨论）。
+- **快照无效 ⇒ 必回退**：`id.valid==false` 时 `Khat=0`，稳定门第一条件即失败，本窗试更新被丢弃（:340-347）。辨识长期无效时 ESC 实际停摆，增益钉在极点配置基线——这是保守安全设计；
+- **非重叠窗**：结算后下一窗从零开始累积；ITAE 时钟、HPF、解调累积全部清零，但**载波相位 `escPhase_` 跨窗连续**（:467，见 §4.7 的"偏置转化为方差"讨论）。
 
 ### 5.5 安全机制：四道防线
 
 ESC 更新**不直接生效**，全部增益变更须过稳定门。四道防线按"代数判定 → 回退 → 测量判定 → 全局门控"层层设防：
 
 1. **四条件稳定门**（`stabilityCheck`，:241-254）：用辨识快照 $\hat K/\hat T$ 反解闭环模态（§2.4 的逆公式），四个条件全部满足才接受——① $K,T$ 有限且非退化（$|K|,|T|\ge10^{-6}$）；② $K_p>0$；③ $\zeta\ge0.6$ 且 $\omega_n\le0.5\ \mathrm{rad/s}$；④ 实测振荡峰-峰幅值 $\le5^\circ$（`oscMax`）；
-2. **回退**（`settleWindow_` :333-345 → `revert` :429-432）：窗口结算不过门则恢复到基线增益——基线永远是"已验证安全"的锚点；辨识快照无效时保守拒绝；
-3. **振荡检测**（`OscillationDetector`，:257-292）：航向误差过零结算峰-峰幅值，取大者保守更新、否则 $0.9/0.1$ 平滑衰减；且**参考稳定满 30 s 后才喂入**（`kOscRefSettleSec`，:505）——机动期间的误差摆动是指令响应而非闭环振荡；
+2. **回退**（`settleWindow_` :336-348 → `revert` :432-435）：窗口结算不过门则恢复到基线增益——基线永远是"已验证安全"的锚点；辨识快照无效时保守拒绝；
+3. **振荡检测**（`OscillationDetector`，:257-292）：航向误差过零结算峰-峰幅值，取大者保守更新、否则 $0.9/0.1$ 平滑衰减；且**参考稳定满 30 s 后才喂入**（`kOscRefSettleSec`，:508）——机动期间的误差摆动是指令响应而非闭环振荡；
 4. **速度门控**：>15 kn 整体去激活（`highSpeedDeactivateKn`，:102, :152），仅层 1/层 2 运行。
 
 另有更新本身的限幅（`clampUpdate`，±10%/10⁻³，§4.9）可视为第 0 道防线：任何单窗更新最多移动 10%，野梯度不会造成大跳变。
 
 ### 5.6 生命周期：基线建立、漂移重基线与挂起
 
-基线的生命周期由共享实现 `applyEstimate_`（:308-329）驱动，两条调用路径：
+基线的生命周期由共享实现 `applyEstimate_`（:311-332）驱动，两条调用路径：
 
-- **tick 周期路径**（:159-160，`driftGate=true`）：快照有效时先查漂移——$|\Delta K|,|\Delta T|$ 相对基线在 25% 阈值内（分母带下限 0.05/1.0，:499-502）则直接返回，**ESC 自治、不动基线**（P12）；超阈值说明船况真变，才重新极点配置 + 过稳定门 + 写基线，且因已有旧基线而 `rebaseEsc()` 重锚（清 ESC 积分器/解调/窗口样本，:438-450）——旧梯度围绕旧增益旧模型测得，不得施加到新基线；
+- **tick 周期路径**（:159-160，`driftGate=true`）：快照有效时先查漂移——$|\Delta K|,|\Delta T|$ 相对基线在 25% 阈值内（分母带下限 0.05/1.0，:502-505）则直接返回，**ESC 自治、不动基线**（P12）；超阈值说明船况真变，才重新极点配置 + 过稳定门 + 写基线，且因已有旧基线而 `rebaseEsc()` 重锚（清 ESC 积分器/解调/窗口样本，:441-453）——旧梯度围绕旧增益旧模型测得，不得施加到新基线；
 - **一次性路径**（`establishBaseline`，:190-194，`driftGate=false, forceRebase=true`）：P14 辨识试验收官（`AutopilotCore::finalizeIdentTrial`，`autopilot_core.hpp:184-187`）或人工标定注入；跳过漂移检查、振荡量以 0 把关（机动刚结束振荡测量无效），恒重锚，返回值映射试验 OK/FAILED。
 
-`rebaseEsc` 清零：`gradKp_/gradKd_`、`hpfCPrev_/hpfY_`、解调累积、三个窗口环形缓冲、`prevDelta_`；**不清 `escPhase_`**——相位连续避免重锚拍载波突跳（注释 :436-437）。
+`rebaseEsc` 清零：`gradKp_/gradKd_`、`hpfCPrev_/hpfY_`、解调累积、三个窗口环形缓冲、`prevDelta_`；**不清 `escPhase_`**——相位连续避免重锚拍载波突跳（注释 :439-440）。
 
 `suspend()`（:199-203）在切出自动模式（MANUAL/HOLD）时由 `AutopilotCore::setMode` 调用（`autopilot_core.hpp:47`）：停用 + 清测量状态，**保留基线**，切回后无缝续上（P9：旧实现只翻标志位，手动操舵期间的旧测量会混进下一窗口）。
 
@@ -798,7 +798,7 @@ sequenceDiagram
     OP->>AP: 切 AUTO_HEADING
     AP->>TN: tick（基线未建立）
     TN-->>PD: 调度表名义增益直通
-    Note over ID: Z 形机动激励（±40°/15 s 翻转）
+    Note over ID: Z 形机动激励（±40°，翻转周期按 max(4T, 4/(ζωn)) 自适应）
     ID-->>AP: IdSnapshot {excited, valid, K̂, T̂}
     AP->>TN: establishBaseline(snap)（或周期路径漂移超阈）
     TN->>TN: 极点配置 → 稳定门 → 写基线 → rebaseEsc 重锚
@@ -822,7 +822,7 @@ sequenceDiagram
 - **零堆分配**：窗口样本用固定容量 `RingBuffer<double,3000>`（:57-78，P2 整改），主循环无任何堆分配，满足嵌入式硬实时约束；
 - **混合时基**：`escDither`/`accumulate` 内部用固定 `p_.dt=0.02 s` 作时基（HPF 系数、载波相位推进、ITAE 时间权重），而参考稳定计时用真实 `in.dt` 累加（:166）——调用方周期偏离 0.02 s 时两者口径不同，属既有设计（`p_.dt` 注释 :105 自称"内部系数时基"），使用时应保证 50 Hz 调用；
 - **P11 整改的两条主线**：①扰动必须真实注入（旧实现窗内增益恒定 → 解调恒零）；②滤波器系数必须用各环节真实采样周期（§4.8.2）；另有 `initBaseline` 防切入瞬跳、更新限幅绝对下限防 $K_d=0$ 锁死（§4.9.2）；
-- **`lastJ_` 只写不读**：记录后未被任何逻辑读取（疑似遗留调试字段，见 §7.5）。
+- **`lastJ_` 仅供观测**：控制逻辑不读取，仅经 `TunerDebugApi::snapshotOf` 只读快照外读（tune CSV 的 `lastJ` 列，见 §7.5）。
 
 ---
 
@@ -830,54 +830,54 @@ sequenceDiagram
 
 ### 6.1 试验设置
 
-数据来自闭环仿真器 `ar_sim --tune`（`control/sim/main.cpp:184-218` → `Simulator::runTuneConvergence`，`control/sim/simulator.hpp:332-455`），导出的逐秒 CSV 共 1200 行样本 + 18 行窗口结算记录：
+数据来自闭环仿真器 `ar_sim --tune`（`control/sim/main.cpp:184-220` → `Simulator::runTuneConvergence`，`control/sim/simulator.hpp:369-506`），导出的逐秒 CSV（26 列，含窗口代价与 ESC 内部状态快照）共 1200 行样本 + 7 行窗口结算记录。本节数字为 2026-10-09 现行代码实跑结果（§6.2~§6.5 配图为早期参数组运行的历史图，定性结构一致，定量数值以本文与现行 `ar_sim --tune` 输出为准）：
 
 | 配置项 | 取值 |
 |---|---|
 | 对象 | 典型船 Nomoto $K=0.2\ \mathrm{s^{-1}}$、$T=8\ \mathrm{s}$，舵机一阶惯性 + 限幅 |
 | 工况 | 10 kn，1200 s（20 min），50 Hz 显式欧拉 |
-| 参考激励 | Z 形 $\pm40^\circ$、每 15 s 翻转（既是辨识激励也是跟踪任务） |
+| 参考激励 | Z 形 $\pm40^\circ$、翻转周期缺省按船动态自适应 $\max(4T,\,4/(\zeta\omega_n))$（本试验 $T{=}8\ \mathrm{s}$ → $\mathrm{leg}=32\ \mathrm{s}$）；基线建立后降为 $\pm15^\circ$（两阶段激励，既是辨识激励也是跟踪任务） |
 | 调度表初值 | 以真值极点配置安装：$K_{p0}=2.5$、$K_{d0}=12.0$（仿真器目标模态 $\zeta=0.85,\omega_n=0.25$） |
-| 调参器参数 | **默认组**：$a=0.05$、$\omega=0.05\ \mathrm{rad/s}$、$\tau_H=5$、$\tau_L=10$、$T_w=60\ \mathrm{s}$、$\eta=0.02$；仅速度门控改为始终启用 |
-| 收敛判据（`simulator.hpp:436-452`） | ① 基线建立且辨识 `valid`；② ≥4 窗且末 3 窗 $J$ 相对散布 ≤10%；③ 末窗 $J$ ≤ 首窗 ×1.02 且 $\hat K/\hat T$ 偏差 ≤25%；④ 全程数值有界 |
+| 调参器参数 | **实验配套组**（仅本试验、不改算法缺省）：$T_w=4\!\times\!\mathrm{leg}=128\ \mathrm{s}$、$\omega=2\pi/T_w\approx0.049\ \mathrm{rad/s}$（每窗恰好 1 个载波整周期）、$\tau_H=\tau_L=T_w/2=64\ \mathrm{s}$、`oscMax` 放宽为 $20^\circ$；其余取默认（$a=0.05$、$\eta=0.02$ 等），速度门控改为始终启用 |
+| 收敛判据（`simulator.hpp:487-504`） | ① 基线建立且辨识 `valid`；② ≥4 窗且末 3 窗 $J$ 相对散布 ≤10%；③ 末窗 $J$ ≤ 首窗 ×1.02 且 $\hat K/\hat T$ 偏差 ≤25%；④ 全程数值有界 |
 
 ### 6.2 RLS 在线辨识收敛
 
-RLS 在 Z 形激励下约 1 min 收敛，$t=13\ \mathrm{s}$ 时快照首次满足 `excited && valid`，极点配置建立基线、ESC 启动（图中绿色点划线）：
+RLS 在 Z 形激励下持续收敛，$t=13\ \mathrm{s}$ 时快照首次满足 `excited && valid`，极点配置建立基线、ESC 启动（图中绿色点划线）：
 
 ![RLS 在线辨识收敛（Nomoto 一阶模型参数）](../assets/esc_sim_rls.png)
 
-末段估计围绕真值小幅波动：$\hat K\approx0.2364\sim0.2375$（$+18.2\%\sim+18.8\%$）、$\hat T\approx9.48\sim9.52\ \mathrm{s}$（$+18.5\%\sim+19.0\%$），均在收敛判据的 $\pm25\%$ 容差内。**这 +18% 量级的系统性偏差正是 ESC 存在的理由**（§1.1）：辨识受回归化与激励频谱限制不可能精确，极点配置把这个含误差的模型当真理，得到的基线注定偏离 $J$ 的最优点。
+末段估计围绕真值小幅波动：$\hat K\approx0.2231\sim0.2243$（$+11.5\%\sim+12.1\%$）、$\hat T\approx8.95\sim9.03\ \mathrm{s}$（$+11.9\%\sim+12.9\%$），均在收敛判据的 $\pm25\%$ 容差内。**这 +12% 量级的系统性偏差正是 ESC 存在的理由**（§1.1）：辨识受回归化与激励频谱限制不可能精确，极点配置把这个含误差的模型当真理，得到的基线注定偏离 $J$ 的最优点。
 
-值得记录的瞬态细节：$t=13\ \mathrm{s}$ 建基线时早期估计还很差（$\hat K\approx0.073$、$\hat T\approx1.1\ \mathrm{s}$），极点配置产出 $(K_p,K_d)\approx(0.60,\,0)$——$\hat T<2.94\ \mathrm{s}$ 触发 §2.4 的 $K_d$ 钳 0；此后随 RLS 收敛，$K,T$ 估计相对漂移多次越过 25% 阈值，P12 漂移重基线机制逐级把基线抬到 $(1.51,\ 7.22)$（$t=51\ \mathrm{s}$）一带，第 1 个评估窗结算时中心值已是 $(1.58,\ 8.77)$。整条"早期保守基线 → 漂移重基线 → ESC 接管微调"的链路按 §5.6 的设计运转。
+值得记录的瞬态细节：$t=13\ \mathrm{s}$ 建基线时早期估计还很差（$\hat K\approx0.073$、$\hat T\approx1.1\ \mathrm{s}$），极点配置产出 $(K_p,K_d)\approx(0.60,\,0)$——$\hat T<2.94\ \mathrm{s}$ 触发 §2.4 的 $K_d$ 钳 0；此后随 RLS 收敛，$K,T$ 估计相对漂移多次越过 25% 阈值，P12 漂移重基线机制逐级把基线抬升（$t=51\ \mathrm{s}$ 时 $(1.19,\ 3.34)$，$t=60\sim150\ \mathrm{s}$ 保持 $(1.40,\ 5.53)$），第 1 个评估窗（$t\approx304\ \mathrm{s}$）结算时中心值已是 $(1.49,\ 7.24)$。整条"早期保守基线 → 漂移重基线 → ESC 接管微调"的链路按 §5.6 的设计运转。
 
 ### 6.3 载波注入特写
 
-$t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中心值做 $\pm5\%$ 正弦调制（$\omega=0.05\ \mathrm{rad/s}$，周期 $\approx125.7\ \mathrm{s}$，200 s 内约 1.6 个周期），$K_d$ 用正交的余弦载波；窗末结算时刻中心值阶跃迁移。下方同时给出航向误差与舵角——载波对操舵的附加扰动淹没在 Z 形机动的舵角摆幅中。
+$t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中心值做 $\pm5\%$ 正弦调制（$\omega=2\pi/128\approx0.049\ \mathrm{rad/s}$，周期 $128\ \mathrm{s}$，200 s 内约 1.6 个周期），$K_d$ 用正交的余弦载波；窗末结算时刻中心值阶跃迁移。下方同时给出航向误差与舵角——载波对操舵的附加扰动淹没在 Z 形机动的舵角摆幅中。
 
 ![ESC 注入载波验证（t=400–600 s）](../assets/esc_sim_dither.png)
 
 ### 6.4 ESC 增益轨迹与窗口代价
 
-18 个评估窗（每窗 60 s）的中心增益轨迹与各窗 $J$：
+7 个评估窗（每窗 128 s = 4 个 Z 形段）的中心增益轨迹与各窗 $J$：
 
 ![ESC 增益中心轨迹与各评估窗口代价 J](../assets/esc_sim_gains.png)
 
-- 窗口代价：首窗 $J=93639.7$ → 末窗 $J=93221.2$，**变化 $-0.45\%$**；末 3 窗 $J$ 相同（散布 0%，满足 ≤10% 平台判据）；
-- 增益：$K_p$ 中心在 $1.45\sim1.74$、$K_d$ 中心在 $7.1\sim8.8$ 的邻域内逐窗迁移（每窗 ≤±10% 限幅），未触发稳定门回退，全程 `stable=1`；
+- 窗口代价：首窗 $J=20834.9$ → 末窗 $J=21173.2$，**变化 $+1.6\%$**（在 ×1.02 不劣化判据内）；末 3 窗 $J$ 相对散布 $7.8\%$（满足 ≤10% 平台判据）；
+- 增益：$K_p$ 中心在 $1.49\sim2.12$、$K_d$ 中心在 $7.19\sim8.94$ 的邻域内逐窗迁移（被接受的更新中 $K_p$ 一路骑在 $+10\%$ 限幅上，$K_d$ 在限幅内每窗数个百分点的迁移）；第 6 窗结算被稳定门拒绝并回退基线（$(2.12,\,7.48)\to(1.60,\,8.94)$），第 7 窗随即重新被接受——安全回退路径在真实闭环上被实际触发一次；全程 `stable=1`；
 - 终判 **converged=1**：四条判据（基线 + 辨识 valid、末 3 窗平台、$J$ 不劣化 + 辨识偏差 ≤25%、数值有界）全部满足。
 
-关于"$-0.45\%$ 意味着什么"的正确解读见 §7.2——它不是性能大幅提升的证据。
+关于"$+1.6\%$ 意味着什么"的正确解读见 §7.2——它不是性能大幅提升的证据。
 
 ### 6.5 全链路概览
 
 ![自动调参全链路概览](../assets/esc_sim_overview.png)
 
-四联图按时间轴对齐：航向误差（Z 形跟踪，$\pm60^\circ$ 峰值来自 ±40° 阶跃翻转瞬态）→ 舵角（指令与实际，贴 ±35° 限幅）→ 增益中心轨迹 → 窗口 $J$ 结算点。绿色点划线为基线建立时刻（$t=13\ \mathrm{s}$）；$J$ 在约 800 s（第 12 窗）后进入平台。
+四联图按时间轴对齐：航向误差（Z 形跟踪，$-60.8^\circ$ 峰值来自 ±40° 阶跃翻转瞬态）→ 舵角（指令与实际，贴 ±35° 限幅）→ 增益中心轨迹 → 窗口 $J$ 结算点。绿色点划线为基线建立时刻（$t=13\ \mathrm{s}$）；$J$ 全程在 $1.96\times10^4\sim2.12\times10^4$ 的带宽内波动，末 3 窗相对散布 7.8% 满足平台判据。
 
 ### 6.6 单元测试证据
 
-仿真之外，调参链路有 22 个专项 GoogleTest 用例锁定关键行为（2026-08-21 本机实测 `test_auto_tuner` 17/17、`test_autopilot_core` 17/17 通过，全库 90/90）：
+仿真之外，调参链路有 23 个专项 GoogleTest 用例锁定关键行为（2026-10-09 本机实测 `test_auto_tuner` 17/17、`test_autopilot_core` 17/17 通过，全库 9 个 GoogleTest 可执行 111/111）：
 
 - **端到端收敛**（`EscTunesKpTowardOptimum`，`test_auto_tuner.cpp:177-216`）：真实 PD + Nomoto 对象（$K=0.5/T=2$）、故意偏低基线 $K_p=0.15$，**配套参数** $\omega=2\pi/60$（每窗恰好 1 个载波周期）、$a=0.10$、$\tau_H=30\ \mathrm{s}$ 下，8 窗后 $K_p>0.18$（向改善方向移动）且 $J_{last}<J_{first}$——这是梯度下降严格成立的证据；
 - **安全行为**：`WindowSettleUpdateIsClamped`（每窗更新要么被 ±10%/10⁻³ 限幅、要么被稳定门精确回退）、`SettleRevertsToBaselineWhenEstimateInvalid`（快照无效必回退）、`EscFallbackRestoresBaselineOnOscillation`（注入 12° 峰-峰振荡 → 结算被拒 → 回退基线）；
@@ -895,33 +895,33 @@ $t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中�
 
 - **窗内仅 0.477 个载波周期**（$\Phi=\omega T_w=3\ \mathrm{rad}$）：§4.5 梯度估计赖以成立的三个整周期均值事实全部失效，双参数正交性（§4.6）严格性不再；数值上 $m_{ss}$ 偏 $+4.7\%$、二倍频泄漏通道 $-0.225$ 不消失——当 $|\Delta\bar\theta|\lesssim4\%\,\bar\theta$ 时谐波泄漏超过真实梯度信号，估计在最优点邻域内失去方向性；
 - **HPF 在载波频率处衰减至约 1/4**：$|H(j\omega)|=0.2425$，且相位超前 $76^\circ$，进入梯度估计的同相分量只剩 $\operatorname{Re}H(j\omega)=0.0588$——**梯度被等效衰减约 17 倍**；
-- **收敛证据的口径必须说清楚**：端到端"梯度下降严格成立"的证据来自配套参数（$\omega=2\pi/60$、$a=0.10$、$\tau_H=30$，$\operatorname{Re}H=0.908$、每窗整周期）的单元测试 `EscTunesKpTowardOptimum`；而第 6 章的 tune 仿真恰恰运行在**默认参数组**上——它观察到的是"$J$ 平台 + $J$ 不劣化 + 增益在基线邻域内稳定迁移、稳定门零回退"，即 ESC 在默认参数下表现为**低速徘徊而不劣化**，这与 §4.7 的分析（泄漏偏置逐窗轮转转化为方差、限幅与稳定门兜底）自洽，但它不构成严格梯度收敛的证据；
-- **整改方向**（参数整定正确顺序）：先定 $T_w$，再取 $\omega=2\pi n/T_w$（每窗整数个载波周期），最后配 $\tau_H$ 使 $(\omega\tau_H)^2/(1+(\omega\tau_H)^2)\gtrsim0.9$。对 $T_w=60\ \mathrm{s}$：$\omega=2\pi/60\approx0.105\ \mathrm{rad/s}$、$\tau_H=30\ \mathrm{s}$ 即单测采用的一组（$\operatorname{Re}H=0.908$）。在那之前，`Params` 中的默认值应视为**占位符，需成套重配**。
+- **收敛证据的口径必须说清楚**：端到端"梯度下降严格成立"的证据来自配套参数（$\omega=2\pi/60$、$a=0.10$、$\tau_H=30$，$\operatorname{Re}H=0.908$、每窗整周期）的单元测试 `EscTunesKpTowardOptimum`；第 6 章的 tune 仿真已改用同思路的实验配套参数（窗口对齐 Z 形周期、$\omega=2\pi/T_w$ 每窗整周期、$\tau_H=\tau_L=T_w/2$、`oscMax` 放宽为 $20^\circ$，见 §6.1），默认参数组不再被该实验使用——它观察到的是"$J$ 平台（末 3 窗散布 7.8%）+ $J$ 不劣化（$+1.6\%\le+2\%$）+ 增益在基线邻域内迁移，并真实触发过一次稳定门回退"，与 §4.7 的分析自洽；其实验判据口径是"平台 + 不劣化"，严格梯度收敛的证据仍由上述单元测试承担；
+- **整改方向**（参数整定正确顺序）：先定 $T_w$，再取 $\omega=2\pi n/T_w$（每窗整数个载波周期），最后配 $\tau_H$ 使 $(\omega\tau_H)^2/(1+(\omega\tau_H)^2)\gtrsim0.9$。对 $T_w=60\ \mathrm{s}$：$\omega=2\pi/60\approx0.105\ \mathrm{rad/s}$、$\tau_H=30\ \mathrm{s}$ 即单测采用的一组（$\operatorname{Re}H=0.908$）；仿真器的 tune/ESC 试验已按此思路在试验参数中成套配置（$T_w=4\!\times\!\mathrm{leg}$、$\omega=2\pi/T_w$、$\tau_H=\tau_L=T_w/2$）。`Params` 中的默认值仍为**占位符**，实船启用前需成套重配。
 
-### 7.2 "$J$ 改善 $-0.45\%$"的正确解读
+### 7.2 "$J$ 变化 $+1.6\%$"的正确解读
 
-第 6 章窗口代价从 93639.7 降到 93221.2，只有 $-0.45\%$。正确解读有三层：
+第 6 章窗口代价从 20834.9 微升到 21173.2（$+1.6\%$，在 ×1.02 不劣化判据内）。正确解读有三层：
 
-1. **它不是"ESC 带来大幅性能提升"的证据**。本试验的 $J$ 被 Z 形机动的 ±40° 阶跃瞬态主导，对该邻域内 ±10% 的增益变化天然不敏感（代价曲面在基线附近很平）；且极点配置基线（即便含 +18% 辨识误差）本来就不差；
+1. **它不是"ESC 带来大幅性能提升"的证据**。本试验的 $J$ 被 Z 形参考的阶跃翻转瞬态主导，对该邻域内 ±10% 的增益变化天然不敏感（代价曲面在基线附近很平）；且极点配置基线（即便含 +12% 辨识误差）本来就不差；
 2. **它的准确含义是"在 $J$ 不劣化的前提下，ESC 确实把增益调离了偏保守的解析初值，并在新工作点稳定下来"**——验证的是"无模型在线微调机制端到端可用且安全"，即机制正确性，而非收益幅度；
 3. **收益幅度的验证需要更苛刻的试验设计**：故意偏置的初值（单测 $K_p=0.15$ 起点即此类，8 窗后 $J$ 显著下降）、更接近保向工况的参考（小幅扰动而非持续 Z 形机动）、以及对照组（ESC 开/关）。这属于后续工作。
 
 ### 7.3 $w_{Du}$ 项文档公式与代码实现的量纲差异
 
-§3.1 的文档公式 $J=\int(\cdots+w_{Du}|\dot\delta|)\,dt$ 的严格离散应为 $w_{Du}\sum|\dot\delta_k|\,dt=w_{Du}\sum|\Delta\delta_k|$；而代码 `accumulate` :366-367 与 `computeJ` :220 均为 `wDu*|Δδ|*dt`——多乘了一个 $dt=0.02$，等效于把文档口径的 $w_{Du}$ 缩为 $w_{Du}\cdot dt=10^{-4}$（相差 50 倍）。由于 $w_{Du}$ 项在三项中本就是小权重修正，该差异不改变任何已报告结论的方向；但哪一端是设计意图需与作者核对（若以代码为准，文档公式应改写并声明实现权重为 $w_{Du}\,dt$；若以文档为准，代码多乘了一个 $dt$）。
+§3.1 的文档公式 $J=\int(\cdots+w_{Du}|\dot\delta|)\,dt$ 的严格离散应为 $w_{Du}\sum|\dot\delta_k|\,dt=w_{Du}\sum|\Delta\delta_k|$；而代码 `accumulate` :369-370 与 `computeJ` :220 均为 `wDu*|Δδ|*dt`——多乘了一个 $dt=0.02$，等效于把文档口径的 $w_{Du}$ 缩为 $w_{Du}\cdot dt=10^{-4}$（相差 50 倍）。由于 $w_{Du}$ 项在三项中本就是小权重修正，该差异不改变任何已报告结论的方向；但哪一端是设计意图需与作者核对（若以代码为准，文档公式应改写并声明实现权重为 $w_{Du}\,dt$；若以文档为准，代码多乘了一个 $dt$）。
 
 ### 7.4 解调相位领先一拍的存疑项
 
-`tick` 内 `accumulate`（用当前 `escPhase_` 解调，:373-374）先于 `escDither`（用同一相位施加载波后再推进，:384-386）。即第 $k$ 拍施加的载波相位为 $\varphi_k$，而第 $k+1$ 拍测量成本时以 $\varphi_{k+1}$ 解调——严格说存在 1 拍（0.02 s）错位，解调参考**领先**产生该拍成本的载波 $\omega\,dt$ 弧度。默认 $\omega=0.05\ \mathrm{rad/s}$ 时相位差仅 0.001 rad（相关衰减 $\cos(0.001)\approx1$），影响可忽略；高频测试载波（如 $2\pi\ \mathrm{rad/s}$，0.126 rad/拍）下相关增益衰减约 0.8%，测试仍通过。这是否为有意设计（对齐"施加后下一拍才见成本"的因果延迟）源码无注释说明，列为存疑项；若按无意处理，修复方式是把解调改用上一拍相位。
+`tick` 内 `accumulate`（用当前 `escPhase_` 解调，:376-377）先于 `escDither`（用同一相位施加载波后再推进，:387-389）。即第 $k$ 拍施加的载波相位为 $\varphi_k$，而第 $k+1$ 拍测量成本时以 $\varphi_{k+1}$ 解调——严格说存在 1 拍（0.02 s）错位，解调参考**领先**产生该拍成本的载波 $\omega\,dt$ 弧度。默认 $\omega=0.05\ \mathrm{rad/s}$ 时相位差仅 0.001 rad（相关衰减 $\cos(0.001)\approx1$），影响可忽略；高频测试载波（如 $2\pi\ \mathrm{rad/s}$，0.126 rad/拍）下相关增益衰减约 0.8%，测试仍通过。这是否为有意设计（对齐"施加后下一拍才见成本"的因果延迟）源码无注释说明，列为存疑项；若按无意处理，修复方式是把解调改用上一拍相位。
 
 ### 7.5 其他已知限制
 
 - **固定步长、无自适应步长**：$\eta=0.02$ 固定，中段收敛速率随工况 $J$ 量级漂移（§4.11.3 量纲分析），无法先验给出统一收敛时间；
 - **梯度 LPF 平滑很弱**：$\alpha_L=0.857$，新样本权重 85.7%，方差主要靠窗口平均压低；若人为调大 $\tau_L$，窗级滞后会收紧 §4.9 收敛条件 $0<\eta\bar\theta J''\operatorname{Re}H<2$ 的有效上界（滞后环易振荡），该边界未显式推导；
 - **$K_d=0$ 边界的激励缺失**：相对摄动在 $\bar K_d=0$ 处恒为零，该方向梯度数学上不可观测，`absMinUpdate` 解锁的方向正确性无理论保证（§4.9.2）；如需严格，可对该通道改用加性摄动 $K_d=\bar K_d+a\sin\omega t$；
-- **机动窗口的代价污染**：振荡检测喂入有 30 s 参考稳定门控（:505），但成本累积与 ESC 解调**无门控**——参考机动窗的 $J$ 含大误差瞬态，其梯度不代表稳态工作点，当前靠稳定门 + 回退兜底；如需严格，可在参考变化后冻结本窗解调累积；
+- **机动窗口的代价污染**：振荡检测喂入有 30 s 参考稳定门控（:508），但成本累积与 ESC 解调**无门控**——参考机动窗的 $J$ 含大误差瞬态，其梯度不代表稳态工作点，当前靠稳定门 + 回退兜底；如需严格，可在参考变化后冻结本窗解调累积；
 - **白噪声近似与缺波浪滤波**：§4.11.2 的方差公式假设 HPF 后噪声近似白；波浪引起的航向误差是窄带有色噪声，该假设低估方差。高海况（4–5 级）的最大短板是缺波浪滤波（陷波/Kalman），波频谐波可能落到载波附近淹没梯度——高海况保护三件套（dead-zone、泄漏项、激励频率避开遭遇谱峰 $0.05\sim0.2\ \mathrm{Hz}$）与降级链见《工程总体分析与ESC方案原理》§3.9；
-- **无显式收敛停机判据**：仿真以"末 3 窗 $J$ 平台"外判收敛，固件内部靠稳定门 + 回退兜底；`lastJ_` 只写不读（疑似遗留调试字段）；
+- **无显式收敛停机判据**：仿真以"末 3 窗 $J$ 平台"外判收敛，固件内部靠稳定门 + 回退兜底；`lastJ_` 控制逻辑不读、仅经调试快照外读作遥测；
 - **混合时基**：ESC 内部系数按固定 `p_.dt=0.02 s` 设计，调用方实际周期偏离 50 Hz 时 HPF/载波/ITAE 口径随之漂移（§5.7）。
 
 ---
@@ -930,7 +930,7 @@ $t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中�
 
 ### 8.1 参数总表
 
-`AutoTuner::Params` 全部默认值（`auto_tuner.hpp:82-106`）与内部常量（:499-507）：
+`AutoTuner::Params` 全部默认值（`auto_tuner.hpp:82-106`）与内部常量（:502-508）：
 
 | 参数 | 默认值 | 含义 | 行号 |
 |---|---|---|---|
@@ -951,12 +951,12 @@ $t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中�
 | `highSpeedDeactivateKn` | 15.0 | 高速去激活阈值 (kn) | :102 |
 | `windowSec` | 60.0 | 评估窗口长度 $T_w$ (s) | :104 |
 | `dt` | 0.02 | 控制周期 (s)：HPF/ITAE/载波相位/窗口拍数的内部时基 | :105 |
-| `kReBaselineTol` | 0.25 | K/T 相对漂移重基线阈值（内部常量） | :499 |
-| `kReBaselineKFloor` / `kReBaselineTFloor` | 0.05 / 1.0 | 漂移判据分母下限（内部常量） | :501-502 |
-| `kOscRefSettleSec` | 30.0 | 参考稳定满 30 s 才喂振荡检测（内部常量） | :505 |
-| `WIN_N` | 3000 | 窗口环形缓冲容量（$T_w/dt$） | :479 |
+| `kReBaselineTol` | 0.25 | K/T 相对漂移重基线阈值（内部常量） | :502 |
+| `kReBaselineKFloor` / `kReBaselineTFloor` | 0.05 / 1.0 | 漂移判据分母下限（内部常量） | :504-505 |
+| `kOscRefSettleSec` | 30.0 | 参考稳定满 30 s 才喂振荡检测（内部常量） | :508 |
+| `WIN_N` | 3000 | 窗口环形缓冲容量（$T_w/dt$） | :482 |
 
-仿真器侧目标模态（`control/sim/simulator.hpp:39-40`）：$\zeta=0.85$、$\omega_n=0.25\ \mathrm{rad/s}$（与固件默认 0.20 不同，第 6 章的 $K_{p0}=2.5,K_{d0}=12.0$ 按 0.25 计算）。
+仿真器侧目标模态（`control/sim/simulator.hpp:40-41`）：$\zeta=0.85$、$\omega_n=0.25\ \mathrm{rad/s}$（与固件默认 0.20 不同，第 6 章的 $K_{p0}=2.5,K_{d0}=12.0$ 按 0.25 计算）。
 
 ### 8.2 公式 ↔ 代码行号对照表
 
@@ -965,25 +965,25 @@ $t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中�
 | 极点配置 $K_p=\omega_n^2\hat T/\hat K,\ K_d=(2\zeta\omega_n\hat T-1)/\hat K$（§2.4） | `polePlacement`，`auto_tuner.hpp:233-234` |
 | $K_d$ 负值钳 0（$2\zeta\omega_n\hat T<1$） | `auto_tuner.hpp:235` |
 | 稳定门反解 $\tilde\omega_n=\sqrt{K_p\hat K/\hat T}$、$\tilde\zeta=(1+K_d\hat K)/(2\sqrt{\hat T K_p\hat K})$（§2.4） | `stabilityCheck`，`auto_tuner.hpp:247-248` |
-| $J$ 离散求和（§3.1） | `computeJ` :214-223；`accumulate` :366-367 |
-| 相对摄动 $\bar\theta(1+a\sin\varphi)/(1+a\cos\varphi)$（§4.2、§4.6） | `escDither` :384-385 |
-| HPF $y_k=\alpha_H(y_{k-1}+c_k-c_{k-1})$，$\alpha_H=\tau_H/(\tau_H+dt)$（§4.8.1） | `accumulate` :369-371 |
-| 每拍因果解调累积（§4.4） | `accumulate` :373-375 |
-| $\hat g=2S/(aN)$（§4.5） | `escStep` :399-405 |
-| LPF $g\leftarrow(1-\alpha_L)g+\alpha_L\hat g$，$\alpha_L=T_w/(\tau_L+T_w)$（§4.8.2） | `escStep` :407-409 |
-| 更新 $\bar\theta\leftarrow\bar\theta-\eta g$，非负钳位（§4.9） | `escStep` :411-416 |
-| $\pm10\%$ / $10^{-3}$ 限幅（§4.9.2） | `clampUpdate` :452-461 |
-| 窗口结算裁决（接受/回退）（§5.4） | `settleWindow_` :333-345，`revert` :429-432 |
-| 重锚（清 ESC 状态、保留载波相位）（§5.6） | `rebaseEsc` :438-450 |
-| 漂移重基线（25% 阈值）（§5.6） | `applyEstimate_` :308-329 |
-| 振荡检测（峰-峰幅值 + 30 s 门控）（§5.5） | `OscillationDetector` :257-292；门控 :165-166, :505 |
+| $J$ 离散求和（§3.1） | `computeJ` :214-223；`accumulate` :369-370 |
+| 相对摄动 $\bar\theta(1+a\sin\varphi)/(1+a\cos\varphi)$（§4.2、§4.6） | `escDither` :387-388 |
+| HPF $y_k=\alpha_H(y_{k-1}+c_k-c_{k-1})$，$\alpha_H=\tau_H/(\tau_H+dt)$（§4.8.1） | `accumulate` :372-373 |
+| 每拍因果解调累积（§4.4） | `accumulate` :376-378 |
+| $\hat g=2S/(aN)$（§4.5） | `escStep` :402-408 |
+| LPF $g\leftarrow(1-\alpha_L)g+\alpha_L\hat g$，$\alpha_L=T_w/(\tau_L+T_w)$（§4.8.2） | `escStep` :410-412 |
+| 更新 $\bar\theta\leftarrow\bar\theta-\eta g$，非负钳位（§4.9） | `escStep` :414-419 |
+| $\pm10\%$ / $10^{-3}$ 限幅（§4.9.2） | `clampUpdate` :455-464 |
+| 窗口结算裁决（接受/回退）（§5.4） | `settleWindow_` :336-348，`revert` :432-435 |
+| 重锚（清 ESC 状态、保留载波相位）（§5.6） | `rebaseEsc` :441-453 |
+| 漂移重基线（25% 阈值）（§5.6） | `applyEstimate_` :311-332 |
+| 振荡检测（峰-峰幅值 + 30 s 门控）（§5.5） | `OscillationDetector` :257-292；门控 :165-166, :508 |
 | 速度门控（§5.5） | :102, :152 |
 | PD 律 $\delta=K_pe+K_d\dot e$（§2.2） | `pd_controller.hpp:90` |
 | 角度归一化误差（§5.3） | `angle_utils.hpp:32-34` |
 
 ### 8.3 ESC/调参相关测试用例清单
 
-`control/tests/test_auto_tuner.cpp`（14 个 ESC/调参专项）与 `test_autopilot_core.cpp`（8 个链路相关）要点：
+`control/tests/test_auto_tuner.cpp`（15 个 ESC/调参专项）与 `test_autopilot_core.cpp`（8 个链路相关）要点：
 
 | 用例 | 位置 | 断言要点 |
 |---|---|---|
@@ -995,9 +995,9 @@ $t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中�
 | `EscDitherModulatesGains` | :118-137 | 载波峰-峰 ≈2·a·Kp 真实到达输出；基线未建立时直通 |
 | `WindowSettleUpdateIsClamped` | :141-172 | 逐窗"被限幅 ∨ 被精确回退" |
 | `EscTunesKpTowardOptimum` | :177-216 | 配套参数端到端收敛（§6.6） |
-| `EscUpdateUnsticksFromZeroKd` | :218-244 | $K_d=0$ 解锁且 ≤3×absMinUpdate |
+| `EscUpdateUnsticksFromZeroKd` | :219-245 | $K_d=0$ 解锁且 ≤3×absMinUpdate |
 | `SettleReverts/Accepts*`（2 例） | :248-285 | 快照无效必回退；快照健康接受有界更新 |
-| `RebaselineClearsIntegratorState` | :289-312 | 重锚作废旧解调累积 |
+| `RebaselineClearsIntegratorState` | :289-313 | 重锚作废旧解调累积 |
 | `HighSpeed/LowSpeedTuner*`（2 例） | `test_autopilot_core.cpp:71-87` | 速度门控 15 kn 上下行为 |
 | `EscDitherReachesPdGainsAfterBaseline` | :142-191 | 在线辨识 → 基线 → 载波真实到达 PD |
 | `NoBaselinePassesScheduleGainsThrough` | :193-206 | 无激励时调度增益逐位直通 |
@@ -1006,7 +1006,7 @@ $t=400\sim600\ \mathrm{s}$ 窗口的增益特写：$K_p$ 实际输出围绕中�
 | `OscDetectorStarvedDuringReferenceMotion` | :357-378 | 参考机动期间振荡检测不喂入、稳定 30 s 后恢复 |
 | `IdentTrialIdentifiesAndAppliesGains` | :401-428 | P14 自动 Z 形试验端到端：辨识 → 建基线 → 增益 ≈ 极点配置 |
 
-验证结果：`control/build/tests/test_auto_tuner` 17/17、`test_autopilot_core` 17/17 通过（2026-08-21 本机实测）；全库 8 个测试可执行共 90 用例全绿。
+验证结果：`control/build/tests/test_auto_tuner` 17/17、`test_autopilot_core` 17/17 通过（2026-10-09 本机实测）；全库 9 个 GoogleTest 可执行共 111 用例全绿（ctest 另注册的 `sim_all`/`sim_validate` 两个仿真指标场景当前未过——`step_slow` 调节时间 35.7 s 超 30 s 指标、`typical_dist` 操舵频次 12 次/分超 6 次/分指标，与调参链路无关）。
 
 ### 8.4 参考文档
 

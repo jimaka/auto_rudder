@@ -188,7 +188,8 @@ ESC 窗口寻优。CSV 每 1 s 记录 K̂/T̂、去载波持久增益（KpCenter
 python3 tools/plot_convergence.py out/tune.csv --trueK 0.2 --trueT 8 -o out/figures
 ```
 
-慢船激励适配：`--leg 60` 可把 Z 形参考翻转周期从默认 15 s 放大到 60 s（建议 ≥ 2T）。
+慢船激励适配：Z 形参考翻转周期缺省按船动态自适应，取 max(4T, 4/(ζωn))（保证每段航向基本
+到达参考值）；`--leg 60` 可显式覆盖为 60 s（`--tune` 与 `--esc` 共用该激励，--leg 对两者均生效）。
 
 ## 子图说明（多子图模式）
 
@@ -340,7 +341,7 @@ $ ./build/tools/ar_tuner_debug
 | 主流程 | `tick` | 与在线路径同一函数的一拍编排 |
 | 强制注入 | `forcegains` / `forcebase` / `forcephase` / `forcegrad` / `forceenabled` | 旁路稳定门，仅调试 |
 
-单元测试：`control/tests/test_tuner_debug_api.cpp`（13 个用例，含"force 确属旁路"
+单元测试：`control/tests/test_tuner_debug_api.cpp`（14 个用例，含"force 确属旁路"
 与"经 API 的 tick 与直接 tick 逐位一致"两条关键保证）。
 
 端到端验收：`tools/tuner_debug_accept.py` 驱动 CLI 对 9 个功能组 49 项断言
